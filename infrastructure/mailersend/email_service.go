@@ -1,0 +1,113 @@
+package mailsend
+
+import (
+	"context"
+
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/mailersend/mailersend-go"
+)
+
+type MailerSendService struct {
+	client      *mailersend.Mailersend
+	SenderEmail string
+	SenderName  string
+}
+
+func NewMailerSendService(apiKey, senderEmail, senderName string) *MailerSendService {
+	return &MailerSendService{client: mailersend.NewMailersend(apiKey), SenderEmail: senderEmail, SenderName: senderName}
+}
+
+func (m *MailerSendService) SendWelcomeEmail(ctx context.Context, claims *domain.EmailClaims) error {
+
+	from := mailersend.From{
+		Name:  m.SenderName,
+		Email: m.SenderEmail,
+	}
+
+	recipients := []mailersend.Recipient{
+		{
+			Name:  claims.Name,
+			Email: claims.To,
+		},
+	}
+
+	message := m.client.Email.NewMessage()
+	message.SetFrom(from)
+	message.SetRecipients(recipients)
+	message.SetSubject(claims.Subject)
+	message.SetHTML(claims.HTML)
+
+	_, err := m.client.Email.Send(context.Background(), message)
+	return err
+}
+
+func (m *MailerSendService) SendSuccessfullyDeletedEmail(ctx context.Context, claims *domain.EmailClaims) error {
+
+	from := mailersend.From{
+		Name:  m.SenderName,
+		Email: m.SenderEmail,
+	}
+
+	recipients := []mailersend.Recipient{
+		{
+			Name:  claims.Name,
+			Email: claims.To,
+		},
+	}
+
+	message := m.client.Email.NewMessage()
+	message.SetFrom(from)
+	message.SetRecipients(recipients)
+	message.SetSubject(claims.Subject)
+	message.SetHTML(claims.HTML)
+
+	_, err := m.client.Email.Send(context.Background(), message)
+	return err
+}
+
+func (m *MailerSendService) SendPasswordResetEmail(ctx context.Context, claims *domain.EmailClaims) error {
+
+	from := mailersend.From{
+		Name:  m.SenderName,
+		Email: m.SenderEmail,
+	}
+
+	recipients := []mailersend.Recipient{
+		{
+			Email: claims.To,
+		},
+	}
+
+	message := m.client.Email.NewMessage()
+	message.SetFrom(from)
+	message.SetRecipients(recipients)
+	message.SetSubject(claims.Subject)
+	message.SetHTML(claims.HTML)
+
+	_, err := m.client.Email.Send(ctx, message)
+	return err
+}
+
+func (m *MailerSendService) SendVerificationEmail(ctx context.Context, claims *domain.EmailClaims) error {
+
+	from := mailersend.From{
+		Name:  m.SenderName,
+		Email: m.SenderEmail,
+	}
+
+	recipients := []mailersend.Recipient{
+		{
+			Name:  claims.Name,
+			Email: claims.To,
+		},
+	}
+
+	message := m.client.Email.NewMessage()
+	message.SetFrom(from)
+	message.SetRecipients(recipients)
+	message.SetSubject(claims.Subject)
+	message.SetHTML(claims.HTML)
+
+	_, err := m.client.Email.Send(ctx, message)
+	return err
+}

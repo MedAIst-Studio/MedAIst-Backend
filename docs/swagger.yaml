@@ -1,0 +1,565 @@
+definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+      role:
+        type: string
+    type: object
+  auth.SignupRequest:
+    properties:
+      email:
+        type: string
+      fullName:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+    required:
+    - email
+    - fullName
+    - password
+    - phone
+    type: object
+  auth.SignupResponse:
+    properties:
+      role:
+        type: string
+    type: object
+  user.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  user.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+      language:
+        type: string
+    required:
+    - email
+    - language
+    type: object
+  user.GetCurrentUserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      fullName:
+        type: string
+      id:
+        type: string
+      isEmailVerified:
+        type: boolean
+      role:
+        type: string
+    type: object
+  user.GetUserResponse:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      is_email_verified:
+        type: boolean
+    type: object
+  user.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+  user.UpdateFullNameRequest:
+    properties:
+      address:
+        type: string
+      full_name:
+        type: string
+    required:
+    - address
+    - full_name
+    type: object
+  user.User:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+    type: object
+  user.VerifiyEmailRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+info:
+  contact: {}
+  description: |2-
+
+    ## How to use the API
+    1- Click which endpoint you want to use.
+    2- Click "Try it out" button.
+    3- Add your request body or your parameters which are showed and required by the endpoint.
+    4- Click "Execute" button.
+    5- You will see the response.
+
+    Some endpoints require authentication. In this case, you need to log in first.
+    I created two types of users for this project: admin and regular user.
+    Just send a POST request as below at [here](http://localhost:3000/swagger/index.html/).
+    After login, you will get a JWE token in cookies.
+    If you're using cookie-based auth, the cookie will be sent automatically.
+    Alternatively, you can use Bearer Token authentication via the "Authorize" button.
+
+    ### Login Request For Admin
+    ```json
+    {
+    "email": "admin@admin.com",
+    "password": "admin123"
+    }
+    ```
+
+    ### Login Request For User
+    ```json
+    {
+    "email": "user@user.com",
+    "password": "user1234"
+    }
+    ```
+
+    ## Error Handling
+    All error responses will follow this JSON format:
+
+    ```json
+    {
+    "message": string,
+    "code": int
+    }
+    ```
+    ### Example
+    ```json
+    {
+    "message": "invalid request",
+    "code": 400
+    }
+    ```
+
+    ## Reminder
+    I did not use `/api` prefix for the endpoint routes. Because I love to host my API on "api" subdomain.
+    Status code with `2xx` is a success code.
+    Status code with `4xx` is a client error code.
+    Status code with `5xx` is a server error code.
+  title: MedAIist-Backend API
+  version: "1.0"
+paths:
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Fetch users with pagination
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Page size
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/user.User'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get users for admin
+      tags:
+      - User
+  /admin/users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves user details by ID for admin purposes.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            $ref: '#/definitions/user.GetUserResponse'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get user details by ID for admin
+      tags:
+      - User
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user or admin
+      parameters:
+      - description: Client language
+        enum:
+        - tr
+        - en
+        - ar
+        in: header
+        name: X-Client-Language
+        required: true
+        type: string
+      - description: Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Removes the refresh token from the database.
+      parameters:
+      - description: Client language
+        in: header
+        name: X-Client-Language
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+      summary: Logout user
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Generate a new access token using a valid refresh token.
+        The API takes refresh token from req body the sends  a new access token.
+      parameters:
+      - description: Client language
+        enum:
+        - tr
+        - en
+        - ar
+        in: header
+        name: X-Client-Language
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: Refresh access token
+      tags:
+      - Auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Signup a new user
+      parameters:
+      - description: Client language
+        in: header
+        name: X-Client-Language
+        required: true
+        type: string
+      - description: Signup request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SignupResponse'
+        "400":
+          description: Bad Request
+        "409":
+          description: Conflict
+        "500":
+          description: Internal Server Error
+      summary: Signup
+      tags:
+      - Auth
+  /healthcheck:
+    get:
+      consumes:
+      - application/json
+      description: Check the health of the service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+      summary: Healthcheck
+      tags:
+      - Healthcheck
+  /users/account:
+    delete:
+      description: Delete a user's account
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete User Account
+      tags:
+      - User
+    patch:
+      consumes:
+      - application/json
+      description: Update a user's account information
+      parameters:
+      - description: Update User Account Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateFullNameRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update User Account
+      tags:
+      - User
+  /users/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: It sends  a password reset link to the user's email address.
+      parameters:
+      - description: Forgot Password Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: Forgot Password
+      tags:
+      - User
+  /users/password:
+    patch:
+      consumes:
+      - application/json
+      description: Change the password of a user
+      parameters:
+      - description: Change User Password Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Change User Password
+      tags:
+      - User
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get the current user. Requires Bearer token authentication.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.GetCurrentUserResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get Current User
+      tags:
+      - User
+  /users/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: It resets a user's password using a token.
+      parameters:
+      - description: Reset Password Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: Reset Password
+      tags:
+      - User
+  /users/verify-email:
+    post:
+      consumes:
+      - application/json
+      description: Verifies a user's email address using a token
+      parameters:
+      - description: Verify Email Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/user.VerifiyEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: Verify user email
+      tags:
+      - User
+securityDefinitions:
+  BearerAuth:
+    description: Enter your Bearer token in the format **Bearer &lt;token&gt;**
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
