@@ -9,7 +9,6 @@ import (
 )
 
 type RefreshTokenRequest struct {
-	Language     string `reqHeader:"X-Client-Language"`
 	RefreshToken string `json:"refresh_token"`
 }
 
@@ -32,7 +31,6 @@ func NewRefreshTokenHandler(repo Repository, ts TokenService) *RefreshTokenHandl
 // @Summary		Refresh access token
 // @Description	Generate a new access token using a valid refresh token.
 // @Description	The API takes refresh token from req body the sends  a new access token.
-// @Param			X-Client-Language	header	string	true	"Client language"	enums(tr,en,ar)
 // @Tags			Auth
 // @Accept			json
 // @Produce		json

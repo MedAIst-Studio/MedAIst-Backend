@@ -10,7 +10,6 @@ import (
 )
 
 type SignupRequest struct {
-	Language string `reqHeader:"X-Client-Language" validate:"required" swaggerignore:"true"`
 	FullName string `json:"fullName" validate:"required"`
 	Password string `json:"password" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
@@ -50,18 +49,18 @@ func NewSignupHandler(config *SignupConfig) *SignupHandler {
 	}
 }
 
-// @Summary		Signup
-// @Description	Signup a new user
-// @Tags			Auth
-// @Accept			json
-// @Produce		json
-// @Param			X-Client-Language	header		string			true	"Client language"
-// @Param			request				body		SignupRequest	true	"Signup request"
-// @Success		200					{object}	SignupResponse
-// @Failure		400
-// @Failure		409
-// @Failure		500
-// @Router			/auth/signup [post]
+//	@Summary		Signup
+//	@Description	Signup a new user
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+
+// @Param		request	body		SignupRequest	true	"Signup request"
+// @Success	200		{object}	SignupResponse
+// @Failure	400
+// @Failure	409
+// @Failure	500
+// @Router		/auth/signup [post]
 func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*SignupResponse, int, error) {
 	if err := h.validator.Validate(req); err != nil {
 		return nil, http.StatusBadRequest, domain.ErrInvalidRequest
@@ -99,16 +98,9 @@ func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*Signup
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	// go h.sendVerificationEmail(ctxWith5Seconds, &UserEmailInfo{
-	// 	username: user.FullName,
-	// 	email:    user.Email,
-	// 	language: req.Language,
-	// })
-
 	go h.sendWelcomeEmail(&UserEmailInfo{
 		username: user.FullName,
 		email:    user.Email,
-		language: req.Language,
 	})
 
 	return &SignupResponse{
@@ -121,7 +113,6 @@ func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*Signup
 type UserEmailInfo struct {
 	username string
 	email    string
-	language string
 }
 
 func (h *SignupHandler) sendWelcomeEmail(info *UserEmailInfo) {

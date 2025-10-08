@@ -8,8 +8,7 @@ import (
 )
 
 type ForgotPasswordRequest struct {
-	Language string `reqHeader:"X-Client-Language" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
+	Email string `json:"email" validate:"required,email"`
 }
 
 type ForgotPasswordResponse struct{}

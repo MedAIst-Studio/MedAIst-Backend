@@ -182,15 +182,6 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Logout user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Client language",
-                        "name": "X-Client-Language",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -214,20 +205,6 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Refresh access token",
-                "parameters": [
-                    {
-                        "enum": [
-                            "tr",
-                            "en",
-                            "ar"
-                        ],
-                        "type": "string",
-                        "description": "Client language",
-                        "name": "X-Client-Language",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "204": {
                         "description": "No Content"
@@ -243,25 +220,7 @@ const docTemplate = `{
         },
         "/auth/signup": {
             "post": {
-                "description": "Signup a new user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Signup",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Client language",
-                        "name": "X-Client-Language",
-                        "in": "header",
-                        "required": true
-                    },
                     {
                         "description": "Signup request",
                         "name": "request",
@@ -673,14 +632,10 @@ const docTemplate = `{
         "user.ForgotPasswordRequest": {
             "type": "object",
             "required": [
-                "email",
-                "language"
+                "email"
             ],
             "properties": {
                 "email": {
-                    "type": "string"
-                },
-                "language": {
                     "type": "string"
                 }
             }

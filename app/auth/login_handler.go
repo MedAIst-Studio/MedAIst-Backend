@@ -10,7 +10,6 @@ import (
 )
 
 type LoginRequest struct {
-	Language string `reqHeader:"X-Client-Language" validate:"required" swaggerignore:"true"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
@@ -50,7 +49,6 @@ func NewLoginHandler(config *LoginConfig) *LoginHandler {
 // @Tags			Auth
 // @Accept			json
 // @Produce		json
-// @Param			X-Client-Language	header		string			true	"Client language"	ENUMS(tr,en,ar)
 // @Param			request				body		LoginRequest	true	"Login Request"
 // @Success		200					{object}	LoginResponse
 // @Failure		400

@@ -53,11 +53,8 @@ definitions:
     properties:
       email:
         type: string
-      language:
-        type: string
     required:
     - email
-    - language
     type: object
   user.GetCurrentUserResponse:
     properties:
@@ -286,12 +283,6 @@ paths:
       consumes:
       - application/json
       description: Removes the refresh token from the database.
-      parameters:
-      - description: Client language
-        in: header
-        name: X-Client-Language
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -309,16 +300,6 @@ paths:
       description: |-
         Generate a new access token using a valid refresh token.
         The API takes refresh token from req body the sends  a new access token.
-      parameters:
-      - description: Client language
-        enum:
-        - tr
-        - en
-        - ar
-        in: header
-        name: X-Client-Language
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -333,23 +314,13 @@ paths:
       - Auth
   /auth/signup:
     post:
-      consumes:
-      - application/json
-      description: Signup a new user
       parameters:
-      - description: Client language
-        in: header
-        name: X-Client-Language
-        required: true
-        type: string
       - description: Signup request
         in: body
         name: request
         required: true
         schema:
           $ref: '#/definitions/auth.SignupRequest'
-      produces:
-      - application/json
       responses:
         "200":
           description: OK
@@ -361,9 +332,6 @@ paths:
           description: Conflict
         "500":
           description: Internal Server Error
-      summary: Signup
-      tags:
-      - Auth
   /healthcheck:
     get:
       consumes:

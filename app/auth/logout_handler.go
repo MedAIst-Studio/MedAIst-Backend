@@ -8,7 +8,6 @@ import (
 )
 
 type LogoutRequest struct {
-	Language     string `reqHeader:"X-Client-Language" validate:"required" swaggerignore:"true"`
 	RefreshToken string `json:"refresh_token"`
 }
 
@@ -30,7 +29,6 @@ func NewLogoutHandler(repo Repository) *LogoutHandler {
 //	@Summary		Logout user
 //	@Description	Removes the refresh token from the database.
 //
-//	@Param			X-Client-Language	header	string	true	"Client language"
 //
 //	@Tags			Auth
 //	@Accept			json
