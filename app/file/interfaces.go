@@ -22,3 +22,25 @@ type EmbeddingService interface {
 type FileService interface {
 	UploadFile(ctx context.Context, file *domain.File, data []byte) error
 }
+
+type Chunker interface {
+	ChunkPDF(ctx context.Context, fileBytes []byte, fileID string) ([]Chunk, error)
+}
+
+type Chunk struct {
+	Text     string
+	Metadata ChunkMetadata
+}
+
+type ChunkMetadata struct {
+	FileID      string
+	ChunkIndex  int
+	PageNumbers []int
+	CharCount   int
+}
+
+type ChunkOptions struct {
+	MaxChunkSize    int
+	OverlapSize     int
+	PreserveContext bool
+}

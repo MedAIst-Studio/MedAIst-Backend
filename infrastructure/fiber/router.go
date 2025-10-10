@@ -74,6 +74,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
@@ -108,8 +109,13 @@ func SetupRoutes(app *fiber.App) {
 		BucketName:      "files",
 		Location:        "us-east-1",
 	})
-
 	fmt.Println("Connected to MinIO at", "localhost:9000")
+
+	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
+		MaxChunkSize:    1000,
+		OverlapSize:     200,
+		PreserveContext: true,
+	})
 
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
@@ -151,7 +157,7 @@ func SetupRoutes(app *fiber.App) {
 	forgotPasswordHandler := user.NewForgotPasswordHandler(postgresRepo, mailersendService, jweTokenService, sl, validator)
 	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
 
-	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService)
+	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, chunker)
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)

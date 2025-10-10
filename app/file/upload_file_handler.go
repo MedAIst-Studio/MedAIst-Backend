@@ -3,6 +3,7 @@ package file
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"path/filepath"
@@ -19,18 +20,20 @@ type UploadFileResponse struct {
 }
 
 type UploadFileHandler struct {
-	repo Repository
-	fl   FileService
-	vb   VectorDB
-	ems  EmbeddingService
+	repo    Repository
+	fl      FileService
+	vb      VectorDB
+	ems     EmbeddingService
+	chunker Chunker
 }
 
-func NewUploadFileHandler(repo Repository, fl FileService) *UploadFileHandler {
+func NewUploadFileHandler(repo Repository, fl FileService, chunker Chunker) *UploadFileHandler {
 	return &UploadFileHandler{
 		repo: repo,
 		fl:   fl,
 		// vb:   vb,
 		// ems:  ems,
+		chunker: chunker,
 	}
 }
 
@@ -89,6 +92,15 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		}
 		return nil, 500, err
 	}
+
+	chunks, err := h.chunker.ChunkPDF(ctx, fileBytes, newFile.Id.String())
+	if err != nil {
+		return nil, 500, err
+	}
+
+	fmt.Printf("Generated %d chunks for file %s\n", len(chunks), newFile.Name)
+	fmt.Printf("Chunks Metadata: %+v\n", chunks[100].Metadata)
+	fmt.Printf("Chunks Text: %+v\n", chunks[100].Text)
 
 	// chunk files
 	// we will get something like this
