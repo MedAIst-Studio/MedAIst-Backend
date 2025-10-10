@@ -49,8 +49,8 @@ func NewLoginHandler(config *LoginConfig) *LoginHandler {
 // @Tags			Auth
 // @Accept			json
 // @Produce		json
-// @Param			request				body		LoginRequest	true	"Login Request"
-// @Success		200					{object}	LoginResponse
+// @Param			request	body		LoginRequest	true	"Login Request"
+// @Success		200		{object}	LoginResponse
 // @Failure		400
 // @Failure		401
 // @Failure		404

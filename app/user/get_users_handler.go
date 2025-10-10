@@ -17,7 +17,7 @@ type GetUsersResponse []User
 
 type User struct {
 	Id       uuid.UUID `json:"id"`
-	FullName string    `json:"full_name"`
+	Username string    `json:"username"`
 	Email    string    `json:"email"`
 }
 

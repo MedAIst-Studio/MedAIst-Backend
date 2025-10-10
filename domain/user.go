@@ -11,13 +11,13 @@ import (
 const (
 	UserRole          = "USER"
 	AdminRole         = "ADMIN"
-	MaxFullNameLength = 100
-	MinFullNameLength = 3
+	MaxUsernameLength = 100
+	MinUsernameLength = 3
 )
 
 type User struct {
 	Id              uuid.UUID `json:"id" validate:"required"`
-	FullName        string    `json:"fullName" validate:"required"`
+	Username        string    `json:"username" validate:"required"`
 	Role            string    `json:"role" validate:"required"`
 	Password        string    `json:"password" validate:"required"`
 	IsEmailVerified bool      `json:"isEmailVerified" validate:"required"`
@@ -25,9 +25,9 @@ type User struct {
 	Email           string    `json:"email" validate:"required"`
 }
 
-func NewUser(fullName, password, email string) (*User, error) {
+func NewUser(username, password, email string) (*User, error) {
 
-	if err := ValidateFullName(fullName); err != nil {
+	if err := ValidateUsername(username); err != nil {
 		return nil, err
 	}
 
@@ -41,11 +41,12 @@ func NewUser(fullName, password, email string) (*User, error) {
 	}
 
 	return &User{
-		Id:       uuid.New(),
-		FullName: fullName,
-		Role:     UserRole,
-		Password: hashedPassword,
-		Email:    email,
+		Id:        uuid.New(),
+		Username:  username,
+		Role:      UserRole,
+		Password:  hashedPassword,
+		Email:     email,
+		CreatedAt: time.Now(),
 	}, nil
 }
 
@@ -86,14 +87,14 @@ func HashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
-func ValidateFullName(fullName string) error {
+func ValidateUsername(username string) error {
 
-	if len(fullName) == 0 {
-		return ErrEmptyFullName
+	if len(username) == 0 {
+		return ErrEmptyUsername
 	}
 
-	if len(fullName) < MinFullNameLength {
-		return ErrTooShortFullName
+	if len(username) < MinUsernameLength {
+		return ErrTooShortUsername
 	}
 
 	return nil

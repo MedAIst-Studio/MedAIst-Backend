@@ -38,12 +38,15 @@ var (
 	ErrInvalidTokenSignature = errors.New("invalid token signature")
 	ErrNotExistRefreshToken  = errors.New("refresh token does not exist")
 
-	ErrEmptyFullName      = errors.New("full name cannot be empty")
+	ErrNotPDFFile       = errors.New("Dosya PDF formatında olmalıdır")
+	ErrFileSizeExceeded = errors.New("Dosya boyutu 10MB'ı geçemez")
+
+	ErrEmptyUsername      = errors.New("full name cannot be empty")
 	ErrPasswordTooShort   = errors.New("password must be at least 8 characters long")
 	ErrInvalidRequest     = errors.New("invalid request")
 	ErrUnauthorized       = errors.New("unauthorized access")
 	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrTooShortFullName   = errors.New("full name must be at least 3 characters long")
+	ErrTooShortUsername   = errors.New("full name must be at least 3 characters long")
 	ErrTodoNotFound       = errors.New("todo not found")
 
 	ErrEmptyTitle          = errors.New("title cannot be empty")

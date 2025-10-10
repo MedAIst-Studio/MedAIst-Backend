@@ -16,7 +16,7 @@ type Repository interface {
 	EmailExists(ctx context.Context, email string) (bool, error)
 	ResetPasswordByEmail(ctx context.Context, email, newPassword string) error
 	ChangePassword(ctx context.Context, user *domain.User) error
-	UpdateFullName(ctx context.Context, id uuid.UUID, fullName string) error
+	UpdateUsername(ctx context.Context, id uuid.UUID, username string) error
 	VerifyEmail(ctx context.Context, email string) error
 	GetUserNameAndEmailByIdForSendingVerificationEmail(ctx context.Context, id uuid.UUID) (string, string, error)
 	GetUserByIdForAdmin(ctx context.Context, id uuid.UUID) (*GetUserResponse, error)

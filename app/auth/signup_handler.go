@@ -10,10 +10,9 @@ import (
 )
 
 type SignupRequest struct {
-	FullName string `json:"fullName" validate:"required"`
+	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
-	Phone    string `json:"phone" validate:"required"`
 }
 
 type SignupResponse struct {
@@ -49,24 +48,23 @@ func NewSignupHandler(config *SignupConfig) *SignupHandler {
 	}
 }
 
-//	@Summary		Signup
-//	@Description	Signup a new user
-//	@Tags			Auth
-//	@Accept			json
-//	@Produce		json
-
-// @Param		request	body		SignupRequest	true	"Signup request"
-// @Success	200		{object}	SignupResponse
-// @Failure	400
-// @Failure	409
-// @Failure	500
-// @Router		/auth/signup [post]
+// @Summary		Signup
+// @Description	Signup a new user
+// @Tags			Auth
+// @Accept			json
+// @Produce		json
+// @Param			request	body		SignupRequest	true	"Signup request"
+// @Success		200		{object}	SignupResponse
+// @Failure		400
+// @Failure		409
+// @Failure		500
+// @Router			/auth/signup [post]
 func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*SignupResponse, int, error) {
 	if err := h.validator.Validate(req); err != nil {
 		return nil, http.StatusBadRequest, domain.ErrInvalidRequest
 	}
 
-	user, err := domain.NewUser(req.FullName, req.Password, req.Email)
+	user, err := domain.NewUser(req.Username, req.Password, req.Email)
 	if err != nil {
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, http.StatusBadRequest, err
@@ -99,7 +97,7 @@ func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*Signup
 	}
 
 	go h.sendWelcomeEmail(&UserEmailInfo{
-		username: user.FullName,
+		username: user.Username,
 		email:    user.Email,
 	})
 

@@ -8,20 +8,20 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 )
 
-type UpdateFullNameRequest struct {
-	FullName string `json:"full_name,omitempty" validate:"required"`
+type UpdateUsernameRequest struct {
+	Username string `json:"username,omitempty" validate:"required"`
 	Address  string `json:"address,omitempty" validate:"required"`
 }
 
-type UpdateFullNameResponse struct{}
+type UpdateUsernameResponse struct{}
 
-type UpdateFullNameService struct {
+type UpdateUsernameService struct {
 	repo     Repository
 	validate domain.Validator
 }
 
-func NewUpdateFullNameHandler(repo Repository, validate domain.Validator) *UpdateFullNameService {
-	return &UpdateFullNameService{repo: repo, validate: validate}
+func NewUpdateUsernameHandler(repo Repository, validate domain.Validator) *UpdateUsernameService {
+	return &UpdateUsernameService{repo: repo, validate: validate}
 }
 
 // Handle processes the request to update a user's account information.
@@ -31,19 +31,19 @@ func NewUpdateFullNameHandler(repo Repository, validate domain.Validator) *Updat
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
-//	@Param			request	body	UpdateFullNameRequest	true	"Update User Account Request"
+//	@Param			request	body	UpdateUsernameRequest	true	"Update User Account Request"
 //	@Security		BearerAuth
 //	@Success		204
 //	@Failure		400
 //	@Failure		401
 //	@Failure		500
 //	@Router			/users/account [patch]
-func (h *UpdateFullNameService) Handle(ctx context.Context, req *UpdateFullNameRequest) (*UpdateFullNameResponse, int, error) {
+func (h *UpdateUsernameService) Handle(ctx context.Context, req *UpdateUsernameRequest) (*UpdateUsernameResponse, int, error) {
 	if err := h.validate.Validate(req); err != nil {
 		return nil, http.StatusBadRequest, domain.ErrInvalidRequest
 	}
 	userId := domain.GetUserID(ctx)
-	if err := h.repo.UpdateFullName(ctx, userId, req.FullName); err != nil {
+	if err := h.repo.UpdateUsername(ctx, userId, req.Username); err != nil {
 		fmt.Println("Error updating account:", err)
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}

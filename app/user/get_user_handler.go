@@ -15,7 +15,7 @@ type GetUserRequest struct {
 
 type GetUserResponse struct {
 	ID              uuid.UUID `json:"id"`
-	FullName        string    `json:"full_name"`
+	Username        string    `json:"username"`
 	Email           string    `json:"email"`
 	IsEmailVerified bool      `json:"is_email_verified"`
 }

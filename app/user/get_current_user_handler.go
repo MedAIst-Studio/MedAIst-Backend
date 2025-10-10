@@ -12,7 +12,7 @@ type GetCurrentUserRequest struct{}
 
 type GetCurrentUserResponse struct {
 	Id              string    `json:"id"`
-	FullName        string    `json:"fullName"`
+	Username        string    `json:"username"`
 	Email           string    `json:"email"`
 	Role            string    `json:"role"`
 	IsEmailVerified bool      `json:"isEmailVerified"`
