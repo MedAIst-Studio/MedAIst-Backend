@@ -30,8 +30,8 @@ func (r *Repository) CreateSignupData(ctx context.Context, signupData *auth.Sign
 
 func (r *Repository) createUser(tx *sql.Tx, user *domain.User) error {
 	_, err := tx.ExecContext(context.Background(),
-		"INSERT INTO users (id, fullname, email, password, role) VALUES ($1, $2, $3, $4, $5)",
-		user.Id, user.FullName, user.Email, user.Password, user.Role)
+		"INSERT INTO users (id, username, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
+		user.Id, user.Username, user.Email, user.Password, user.Role, user.CreatedAt)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
 			return domain.ErrEmailAlreadyExists

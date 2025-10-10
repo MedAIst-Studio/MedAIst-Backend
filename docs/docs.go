@@ -126,18 +126,6 @@ const docTemplate = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "enum": [
-                            "tr",
-                            "en",
-                            "ar"
-                        ],
-                        "type": "string",
-                        "description": "Client language",
-                        "name": "X-Client-Language",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
                         "description": "Login Request",
                         "name": "request",
                         "in": "body",
@@ -220,6 +208,17 @@ const docTemplate = `{
         },
         "/auth/signup": {
             "post": {
+                "description": "Signup a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Signup",
                 "parameters": [
                     {
                         "description": "Signup request",
@@ -246,6 +245,57 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/files/upload": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Upload a file to the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Upload a file",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/file.UploadFileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/file.UploadFileResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Error"
+                        }
                     }
                 }
             }
@@ -324,7 +374,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.UpdateFullNameRequest"
+                            "$ref": "#/definitions/user.UpdateUsernameRequest"
                         }
                     }
                 ],
@@ -587,21 +637,17 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "fullName",
                 "password",
-                "phone"
+                "username"
             ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "fullName": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string"
                 },
-                "phone": {
+                "username": {
                     "type": "string"
                 }
             }
@@ -613,6 +659,23 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "domain.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "file.UploadFileRequest": {
+            "type": "object"
+        },
+        "file.UploadFileResponse": {
+            "type": "object"
         },
         "user.ChangePasswordRequest": {
             "type": "object",
@@ -649,9 +712,6 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "fullName": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -659,6 +719,9 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "role": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }
@@ -669,14 +732,14 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "full_name": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
                 "is_email_verified": {
                     "type": "boolean"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
@@ -696,17 +759,17 @@ const docTemplate = `{
                 }
             }
         },
-        "user.UpdateFullNameRequest": {
+        "user.UpdateUsernameRequest": {
             "type": "object",
             "required": [
                 "address",
-                "full_name"
+                "username"
             ],
             "properties": {
                 "address": {
                     "type": "string"
                 },
-                "full_name": {
+                "username": {
                     "type": "string"
                 }
             }
@@ -717,10 +780,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "full_name": {
+                "id": {
                     "type": "string"
                 },
-                "id": {
+                "username": {
                     "type": "string"
                 }
             }

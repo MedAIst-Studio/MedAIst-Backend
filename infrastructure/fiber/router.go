@@ -70,11 +70,13 @@ import (
 	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
+	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
 	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
@@ -97,6 +99,17 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
+
+	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
+		Endpoint:        "minio:9000",
+		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
+		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
+		UseSSL:          false,
+		BucketName:      "files",
+		Location:        "us-east-1",
+	})
+
+	fmt.Println("Connected to MinIO at", "localhost:9000")
 
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
@@ -132,11 +145,13 @@ func SetupRoutes(app *fiber.App) {
 	getUserHandler := user.NewGetUserHandler(postgresRepo)
 	getUsersHandler := user.NewGetUsersHandler(postgresRepo, validator)
 	deleteAccountHandler := user.NewDeleteAccountHandler(postgresRepo, sl)
-	updateFullNameHandler := user.NewUpdateFullNameHandler(postgresRepo, validator)
+	updateUsernameHandler := user.NewUpdateUsernameHandler(postgresRepo, validator)
 	getCurrentUserHandler := user.NewGetCurrentUserHandler(postgresRepo)
 	updatePasswordHandler := user.NewChangePasswordHandler(postgresRepo, validator)
 	forgotPasswordHandler := user.NewForgotPasswordHandler(postgresRepo, mailersendService, jweTokenService, sl, validator)
 	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
+
+	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService)
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)
@@ -156,12 +171,15 @@ func SetupRoutes(app *fiber.App) {
 	usersApp := app.Group("/users", middlewareManager.AuthMiddleware)
 	usersApp.Get("/profile", Handle(getCurrentUserHandler, sl))
 	usersApp.Delete("/account", Handle(deleteAccountHandler, sl))
-	usersApp.Patch("/account", Handle(updateFullNameHandler, sl))
+	usersApp.Patch("/account", Handle(updateUsernameHandler, sl))
 	usersApp.Patch("/password", Handle(updatePasswordHandler, sl))
 
 	usersAdminApp := adminApp.Group("/users")
 	usersAdminApp.Get("/", Handle(getUsersHandler, sl))
 	usersAdminApp.Get("/:id", Handle(getUserHandler, sl))
+
+	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
+	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)

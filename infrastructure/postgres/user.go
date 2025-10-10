@@ -14,7 +14,7 @@ import (
 )
 
 func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCurrentUserResponse, error) {
-	row := r.db.QueryRowContext(ctx, "SELECT id, fullname, role, email, is_email_verified, created_at FROM users WHERE id = $1", id)
+	row := r.db.QueryRowContext(ctx, "SELECT id, username, role, email, created_at FROM users WHERE id = $1", id)
 
 	if err := row.Err(); err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCu
 
 	var user user.GetCurrentUserResponse
 
-	err := row.Scan(&user.Id, &user.FullName, &user.Role, &user.Email, &user.IsEmailVerified, &user.CreatedAt)
+	err := row.Scan(&user.Id, &user.Username, &user.Role, &user.Email, &user.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrUserNotFound
@@ -41,10 +41,10 @@ func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (r *Repository) UpdateFullName(ctx context.Context, id uuid.UUID, fullName string) error {
+func (r *Repository) UpdateUsername(ctx context.Context, id uuid.UUID, username string) error {
 	_, err := r.db.ExecContext(ctx,
-		"UPDATE users SET fullname = $1 WHERE id = $2",
-		fullName, id)
+		"UPDATE users SET username = $1 WHERE id = $2",
+		username, id)
 	return err
 }
 
@@ -68,11 +68,11 @@ func (r *Repository) CheckEmail(ctx context.Context, email string) error {
 	return errors.New("email already exists")
 }
 
-func (r *Repository) UpdateAccount(ctx context.Context, id uuid.UUID, fullName string) error {
+func (r *Repository) UpdateAccount(ctx context.Context, id uuid.UUID, username string) error {
 
 	_, err := r.db.ExecContext(ctx,
-		"UPDATE users SET fullname = $1 WHERE id = $2",
-		fullName, id)
+		"UPDATE users SET username = $1 WHERE id = $2",
+		username, id)
 	return err
 }
 
@@ -125,26 +125,26 @@ func (r *Repository) VerifyEmail(ctx context.Context, email string) error {
 }
 
 func (r *Repository) GetUserNameAndEmailByIdForSendingVerificationEmail(ctx context.Context, id uuid.UUID) (string, string, error) {
-	row := r.db.QueryRowContext(ctx, "SELECT fullname, email FROM users WHERE id = $1 AND is_email_verified = false", id)
+	row := r.db.QueryRowContext(ctx, "SELECT username, email FROM users WHERE id = $1 AND is_email_verified = false", id)
 
 	if err := row.Err(); err != nil {
 		return "", "", err
 	}
 
-	var fullName, email string
-	err := row.Scan(&fullName, &email)
+	var username, email string
+	err := row.Scan(&username, &email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", "", domain.ErrEmailAlreadyVerified
 		}
 		return "", "", err
 	}
-	return fullName, email, nil
+	return username, email, nil
 }
 
 func (r *Repository) GetUserByIdForAdmin(ctx context.Context, id uuid.UUID) (*user.GetUserResponse, error) {
 	row := r.db.QueryRowContext(ctx, `
-		SELECT id, fullname, email, is_email_verified 
+		SELECT id, username, email, is_email_verified 
 		FROM users 
 		WHERE id = $1`, id)
 
@@ -154,7 +154,7 @@ func (r *Repository) GetUserByIdForAdmin(ctx context.Context, id uuid.UUID) (*us
 
 	var responseUser user.GetUserResponse
 
-	err := row.Scan(&responseUser.ID, &responseUser.FullName, &responseUser.Email, &responseUser.IsEmailVerified)
+	err := row.Scan(&responseUser.ID, &responseUser.Username, &responseUser.Email, &responseUser.IsEmailVerified)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrUserNotFound
@@ -168,7 +168,7 @@ func (r *Repository) GetUserByIdForAdmin(ctx context.Context, id uuid.UUID) (*us
 func (r *Repository) GetUsers(ctx context.Context, page, limit int) (user.GetUsersResponse, error) {
 	offset := (page - 1) * limit
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, fullname, email 
+		SELECT id, username, email 
 		FROM users 
 		ORDER BY created_at DESC 
 		LIMIT $1 OFFSET $2`, limit, offset)
@@ -180,7 +180,7 @@ func (r *Repository) GetUsers(ctx context.Context, page, limit int) (user.GetUse
 	var users user.GetUsersResponse
 	for rows.Next() {
 		var u user.User
-		if err := rows.Scan(&u.Id, &u.FullName, &u.Email); err != nil {
+		if err := rows.Scan(&u.Id, &u.Username, &u.Email); err != nil {
 			return nil, err
 		}
 		users = append(users, u)

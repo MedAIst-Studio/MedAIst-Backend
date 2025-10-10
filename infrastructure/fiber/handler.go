@@ -3,6 +3,9 @@ package fiber
 import (
 	"context"
 	"errors"
+	"mime/multipart"
+	"reflect"
+	"strings"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 
@@ -21,8 +24,38 @@ func Handle[R Request, Res Response](handler HandlerInterface[R, Res], logger do
 	return func(c *fiber.Ctx) error {
 		var req R
 
-		if err := c.BodyParser(&req); err != nil && !errors.Is(err, fiber.ErrUnprocessableEntity) {
-			return handleError(c, fiber.StatusBadRequest, err, logger)
+		if strings.HasPrefix(c.Get("Content-Type"), "multipart/form-data") {
+			form, err := c.MultipartForm()
+			if err != nil {
+				return handleError(c, fiber.StatusBadRequest, err, logger)
+			}
+
+			val := reflect.ValueOf(&req).Elem()
+			typ := val.Type()
+
+			for i := 0; i < val.NumField(); i++ {
+				field := val.Field(i)
+				fieldType := typ.Field(i)
+				formTag := fieldType.Tag.Get("form")
+
+				if formTag == "" || !field.CanSet() {
+					continue
+				}
+
+				if field.Type() == reflect.TypeOf((*multipart.FileHeader)(nil)) {
+					if files := form.File[formTag]; len(files) > 0 {
+						field.Set(reflect.ValueOf(files[0]))
+					}
+				} else if field.Kind() == reflect.String {
+					if values := form.Value[formTag]; len(values) > 0 {
+						field.SetString(values[0])
+					}
+				}
+			}
+		} else {
+			if err := c.BodyParser(&req); err != nil && !errors.Is(err, fiber.ErrUnprocessableEntity) {
+				return handleError(c, fiber.StatusBadRequest, err, logger)
+			}
 		}
 
 		if err := c.CookieParser(&req); err != nil {

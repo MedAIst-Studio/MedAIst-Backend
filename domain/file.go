@@ -1,0 +1,49 @@
+package domain
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type File struct {
+	Id        uuid.UUID
+	UserId    uuid.UUID
+	Name      string
+	Path      string
+	CreatedAt time.Time
+}
+
+type FileRequires struct {
+	UserId    uuid.UUID
+	Name      string
+	Size      int64
+	Extension string
+}
+
+func NewFile(fr *FileRequires) (*File, error) {
+
+	if !isPDF(fr.Extension) {
+		return nil, ErrNotPDFFile
+	}
+
+	if !isSizeValid(fr.Size) {
+		return nil, ErrFileSizeExceeded
+	}
+	id := uuid.New()
+	return &File{
+		Id:        id,
+		UserId:    fr.UserId,
+		Name:      fr.Name,
+		Path:      "uploads/" + id.String(),
+		CreatedAt: time.Now(),
+	}, nil
+}
+
+func isPDF(extension string) bool {
+	return extension == ".pdf" || extension == "pdf"
+}
+
+func isSizeValid(size int64) bool {
+	return size > 0 && size <= 10*1024*1024
+}

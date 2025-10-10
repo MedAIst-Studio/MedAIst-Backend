@@ -22,22 +22,30 @@ definitions:
     properties:
       email:
         type: string
-      fullName:
-        type: string
       password:
         type: string
-      phone:
+      username:
         type: string
     required:
     - email
-    - fullName
     - password
-    - phone
+    - username
     type: object
   auth.SignupResponse:
     properties:
       role:
         type: string
+    type: object
+  domain.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  file.UploadFileRequest:
+    type: object
+  file.UploadFileResponse:
     type: object
   user.ChangePasswordRequest:
     properties:
@@ -62,25 +70,25 @@ definitions:
         type: string
       email:
         type: string
-      fullName:
-        type: string
       id:
         type: string
       isEmailVerified:
         type: boolean
       role:
         type: string
+      username:
+        type: string
     type: object
   user.GetUserResponse:
     properties:
       email:
         type: string
-      full_name:
-        type: string
       id:
         type: string
       is_email_verified:
         type: boolean
+      username:
+        type: string
     type: object
   user.ResetPasswordRequest:
     properties:
@@ -93,23 +101,23 @@ definitions:
     - password
     - token
     type: object
-  user.UpdateFullNameRequest:
+  user.UpdateUsernameRequest:
     properties:
       address:
         type: string
-      full_name:
+      username:
         type: string
     required:
     - address
-    - full_name
+    - username
     type: object
   user.User:
     properties:
       email:
         type: string
-      full_name:
-        type: string
       id:
+        type: string
+      username:
         type: string
     type: object
   user.VerifiyEmailRequest:
@@ -245,15 +253,6 @@ paths:
       - application/json
       description: Login a user or admin
       parameters:
-      - description: Client language
-        enum:
-        - tr
-        - en
-        - ar
-        in: header
-        name: X-Client-Language
-        required: true
-        type: string
       - description: Login Request
         in: body
         name: request
@@ -314,6 +313,9 @@ paths:
       - Auth
   /auth/signup:
     post:
+      consumes:
+      - application/json
+      description: Signup a new user
       parameters:
       - description: Signup request
         in: body
@@ -321,6 +323,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/auth.SignupRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
@@ -332,6 +336,41 @@ paths:
           description: Conflict
         "500":
           description: Internal Server Error
+      summary: Signup
+      tags:
+      - Auth
+  /files/upload:
+    post:
+      consumes:
+      - application/json
+      description: Upload a file to the server
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/file.UploadFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/file.UploadFileResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.Error'
+      security:
+      - BearerAuth: []
+      summary: Upload a file
+      tags:
+      - Files
   /healthcheck:
     get:
       consumes:
@@ -374,7 +413,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.UpdateFullNameRequest'
+          $ref: '#/definitions/user.UpdateUsernameRequest'
       produces:
       - application/json
       responses:

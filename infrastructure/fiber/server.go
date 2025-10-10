@@ -42,7 +42,10 @@ func registerMiddlewares(app *fiber.App) {
 		AllowHeaders:     "Content-Type,Authorization,X-Requested-With",
 	}))
 
-	app.Use(recover.New())
+	app.Use(recover.New(recover.Config{
+		EnableStackTrace: true,
+	}))
+
 	app.Use(requestid.New(requestid.Config{
 		Header: "X-Request-Id",
 	}))
