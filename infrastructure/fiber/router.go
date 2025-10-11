@@ -75,6 +75,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
+	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
@@ -117,6 +118,8 @@ func SetupRoutes(app *fiber.App) {
 		PreserveContext: true,
 	})
 
+	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
+
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
 	validator := validatorInfra.NewValidator(slogLogger)
@@ -157,7 +160,7 @@ func SetupRoutes(app *fiber.App) {
 	forgotPasswordHandler := user.NewForgotPasswordHandler(postgresRepo, mailersendService, jweTokenService, sl, validator)
 	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
 
-	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, chunker)
+	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, embeddingService, chunker)
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)

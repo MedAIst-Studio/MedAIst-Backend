@@ -342,9 +342,7 @@ func getLastNChars(text string, n int) string {
 	return string(runes[len(runes)-n:])
 }
 
-// Cümle ortasından başlamayı önlemek için ilk cümle sonuna kadar trim et
 func trimToSentenceStart(text string) string {
-	// İlk cümle sonu işaretini bul
 	for i, r := range text {
 		if r == '.' || r == '!' || r == '?' {
 			// Sonraki karakter boşluksa, oradan başla
@@ -353,6 +351,5 @@ func trimToSentenceStart(text string) string {
 			}
 		}
 	}
-	// Cümle sonu bulunamadıysa orijinali döndür
 	return text
 }

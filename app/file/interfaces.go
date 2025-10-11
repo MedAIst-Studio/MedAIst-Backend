@@ -16,7 +16,7 @@ type VectorDB interface {
 }
 
 type EmbeddingService interface {
-	GenerateEmbedding(ctx context.Context, text string) ([]float32, error)
+	GenerateEmbeddingBatch(ctx context.Context, req *EmbeddingRequest) (*EmbeddingResponse, error)
 }
 
 type FileService interface {
@@ -28,6 +28,7 @@ type Chunker interface {
 }
 
 type Chunk struct {
+	Id       int
 	Text     string
 	Metadata ChunkMetadata
 }
