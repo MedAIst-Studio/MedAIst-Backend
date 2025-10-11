@@ -258,7 +258,7 @@ const docTemplate = `{
                 ],
                 "description": "Upload a file to the server",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -286,16 +286,10 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
+                        "description": "Bad Request"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/domain.Error"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -656,17 +650,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "role": {
-                    "type": "string"
-                }
-            }
-        },
-        "domain.Error": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "message": {
                     "type": "string"
                 }
             }

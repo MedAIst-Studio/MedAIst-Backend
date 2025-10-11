@@ -36,13 +36,6 @@ definitions:
       role:
         type: string
     type: object
-  domain.Error:
-    properties:
-      code:
-        type: integer
-      message:
-        type: string
-    type: object
   file.UploadFileRequest:
     type: object
   file.UploadFileResponse:
@@ -342,7 +335,7 @@ paths:
   /files/upload:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: Upload a file to the server
       parameters:
       - description: Request body
@@ -360,12 +353,8 @@ paths:
             $ref: '#/definitions/file.UploadFileResponse'
         "400":
           description: Bad Request
-          schema:
-            $ref: '#/definitions/domain.Error'
         "500":
           description: Internal Server Error
-          schema:
-            $ref: '#/definitions/domain.Error'
       security:
       - BearerAuth: []
       summary: Upload a file
