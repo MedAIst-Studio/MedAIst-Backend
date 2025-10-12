@@ -21,11 +21,13 @@ type UploadFileResponse struct {
 }
 
 type UploadFileHandler struct {
-	repo    Repository
-	fl      FileService
-	vb      VectorDB
-	ems     EmbeddingService
-	chunker Chunker
+	BatchSize int
+	Normalize bool
+	repo      Repository
+	fl        FileService
+	vb        VectorDB
+	ems       EmbeddingService
+	chunker   Chunker
 }
 
 type EmbeddingRequest struct {
@@ -47,34 +49,38 @@ type EmbeddingResponse struct {
 }
 
 type Embedding struct {
-	Id     uuid.UUID `json:"id"`
-	Text   string    `json:"text"`
-	Vector []float32 `json:"vector"`
+	Id          uuid.UUID `json:"id"`
+	Text        string    `json:"text"`
+	Vector      []float32 `json:"vector"`
+	PageNumbers []int     `json:"page_numbers"`
 }
 
-func NewUploadFileHandler(repo Repository, fl FileService, ems EmbeddingService, chunker Chunker) *UploadFileHandler {
+func NewUploadFileHandler(repo Repository, fl FileService, vb VectorDB, ems EmbeddingService, chunker Chunker, batchSize int, normalize bool) *UploadFileHandler {
 	return &UploadFileHandler{
-		repo:    repo,
-		fl:      fl,
-		ems:     ems,
-		chunker: chunker,
+		repo:      repo,
+		fl:        fl,
+		vb:        vb,
+		ems:       ems,
+		chunker:   chunker,
+		BatchSize: batchSize,
+		Normalize: normalize,
 	}
 }
 
 // Handle godoc
 //
-//		@Summary		Upload a file
-//		@Description	Upload a file to the server
-//	 @Description   This endpoint allows authenticated users to upload a file. The file will be processed and stored.
-//		@Tags			Files
-//		@Accept			multipart/form-data
-//		@Produce		json
-//		@Param			request	body		UploadFileRequest	true	"Request body"
-//		@Success		200		{object}	UploadFileResponse
-//		@Failure		400
-//		@Failure		500
-//		@Security		BearerAuth
-//		@Router			/files/upload [post]
+//	@Summary		Upload a file
+//	@Description	Upload a file to the server
+//	@Description	This endpoint allows authenticated users to upload a file. The file will be processed and stored.
+//	@Tags			Files
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			request	body		UploadFileRequest	true	"Request body"
+//	@Success		200		{object}	UploadFileResponse
+//	@Failure		400
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/files/upload [post]
 func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) (*UploadFileResponse, int, error) {
 	file, err := req.FileData.Open()
 	if err != nil {
@@ -124,12 +130,11 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 	}
 
 	fmt.Printf("Generated %d chunks for file %s\n", len(chunks), newFile.Name)
+	fmt.Printf("Chunk metadata for file: %v\n", chunks[10].Metadata)
+	fmt.Printf("Chunk text for file: %v\n", chunks[10].Text)
 
-	BatchSize := 32
-
-	for start := 0; start < len(chunks); start += BatchSize {
-		// chunklari 32 li gruplama
-		end := min(start+BatchSize, len(chunks))
+	for start := 0; start < len(chunks); start += h.BatchSize {
+		end := min(start+h.BatchSize, len(chunks))
 
 		batch := chunks[start:end]
 
@@ -138,6 +143,7 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		for _, chunk := range batch {
 			var embedding Embedding
 			embedding.Id = uuid.New()
+			embedding.PageNumbers = chunk.Metadata.PageNumbers
 			embedding.Text = chunk.Text
 			embeddings = append(embeddings, embedding)
 		}
@@ -154,8 +160,8 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		// requestimiz burada
 		embeddingReq := &EmbeddingRequest{
 			Texts:     texts,
-			Normalize: true,
-			BatchSize: BatchSize,
+			Normalize: h.Normalize,
+			BatchSize: h.BatchSize,
 		}
 
 		embeddingRes, err := h.ems.GenerateEmbeddingBatch(ctx, embeddingReq)
@@ -183,7 +189,20 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 			}
 		}
 
-		// vector db ye kaydet
+		var fileMetadatas []*FileMetadata
+		for _, emb := range embeddings {
+			fm := &FileMetadata{
+				Id:          uuid.New(),
+				Text:        emb.Text,
+				PageNumbers: emb.PageNumbers,
+				Vector:      emb.Vector,
+			}
+			fileMetadatas = append(fileMetadatas, fm)
+		}
+
+		if err := h.vb.InsertEmbeddings(ctx, newFile.Id, fileMetadatas); err != nil {
+			return nil, 500, err
+		}
 
 	}
 

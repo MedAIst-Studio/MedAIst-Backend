@@ -80,6 +80,7 @@ import (
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
 	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
+	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
 	fiberSwagger "github.com/swaggo/fiber-swagger"
@@ -113,12 +114,13 @@ func SetupRoutes(app *fiber.App) {
 	fmt.Println("Connected to MinIO at", "localhost:9000")
 
 	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
-		MaxChunkSize:    1000,
-		OverlapSize:     200,
+		MaxChunkSize:    1024,
+		OverlapSize:     128,
 		PreserveContext: true,
 	})
 
 	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
+	vectorDB := qdrantInfra.NewQdrantVectorDB(os.Getenv("QDRANT_URL"), os.Getenv("QDRANT_COLLECTION_NAME"), 1024)
 
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
@@ -160,7 +162,7 @@ func SetupRoutes(app *fiber.App) {
 	forgotPasswordHandler := user.NewForgotPasswordHandler(postgresRepo, mailersendService, jweTokenService, sl, validator)
 	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
 
-	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, embeddingService, chunker)
+	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)

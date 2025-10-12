@@ -11,8 +11,15 @@ type Repository interface {
 	SaveFileInformation(ctx context.Context, file *domain.File) error
 }
 
+type FileMetadata struct {
+	Id          uuid.UUID
+	Text        string
+	PageNumbers []int
+	Vector      []float32
+}
+
 type VectorDB interface {
-	InsertDocument(ctx context.Context, id uuid.UUID, content []float32) error
+	InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*FileMetadata) error
 }
 
 type EmbeddingService interface {
