@@ -69,7 +69,8 @@ CREATE TABLE IF NOT EXISTS  refresh_tokens (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     token TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    expires_at TIMESTAMP NOT NULL
+    expires_at TIMESTAMP NOT NULL,
+    unique (user_id)
 );
 
 -- CHATS
