@@ -37,9 +37,14 @@ func gracefulShutdown(app *fiber.App) {
 }
 
 func startServer(app *fiber.App) {
-	PORT := ":3000"
+	PORT := os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "3000"
+	}
+	fmt.Println("Starting server on port", PORT)
 
-	if err := app.Listen(PORT); err != nil {
+	addr := ":" + PORT
+	if err := app.Listen(addr); err != nil {
 		panic(fmt.Sprintf("Failed to start server: %v\n", err))
 	}
 
