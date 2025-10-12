@@ -34,7 +34,8 @@ func NewRefreshTokenHandler(repo Repository, ts TokenService) *RefreshTokenHandl
 // @Tags			Auth
 // @Accept			json
 // @Produce		json
-// @Success		204
+// @Param			request	body		RefreshTokenRequest	true	"Refresh Token Request"
+// @Success		200		{object}	RefreshTokenResponse
 // @Failure		401
 // @Failure		500
 // @Router			/auth/refresh [post]

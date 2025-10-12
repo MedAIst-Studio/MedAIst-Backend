@@ -18,6 +18,16 @@ definitions:
       role:
         type: string
     type: object
+  auth.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  auth.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
   auth.SignupRequest:
     properties:
       email:
@@ -292,11 +302,20 @@ paths:
       description: |-
         Generate a new access token using a valid refresh token.
         The API takes refresh token from req body the sends  a new access token.
+      parameters:
+      - description: Refresh Token Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.RefreshTokenRequest'
       produces:
       - application/json
       responses:
-        "204":
-          description: No Content
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.RefreshTokenResponse'
         "401":
           description: Unauthorized
         "500":
@@ -336,7 +355,9 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Upload a file to the server
+      description: |-
+        Upload a file to the server
+        This endpoint allows authenticated users to upload a file. The file will be processed and stored.
       parameters:
       - description: Request body
         in: body
