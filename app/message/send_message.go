@@ -80,7 +80,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 
 	aiReq := domain.NewThirdPartyAIRequest(h.Stream, relevantText, req.Content)
 
-	if !isSubsequentMessage {
+	if isSubsequentMessage {
 		pastMessages, err := h.Repo.GetPastMessages(ctx, userMessage.ChatId, h.PastMessagesLimit)
 		if err != nil {
 			return nil, 500, err
