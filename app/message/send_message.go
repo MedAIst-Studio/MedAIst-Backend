@@ -40,18 +40,17 @@ func NewSendMessageHandler(config Config) *SendMessageHandler {
 	}
 }
 
-// Handle godoc
-//
-//	@Summary		Send a message in a chat
-//	@Description	Sends a message in a chat and gets a response from the AI
-//	@Tags			Message
-//	@Accept			json
-//	@Produce		json
-//	@Param			request	body		SendMessageRequest	true	"Send Message Request"
-//	@Success		200		{object}	SendMessageResponse
-//	@Failure		400
-//	@Failure		500
-//	@Router			/messages [post]
+// @Summary		Send a message in a chat
+// @Description	Sends a message in a chat and gets a response from the AI
+// @Tags			Message
+// @Accept			json
+// @Produce		json
+// @Param			request	body		SendMessageRequest	true	"Send Message Request"
+// @Success		200		{object}	SendMessageResponse
+// @Failure		400
+// @Failure		500
+// @Security		BearerAuth
+// @Router			/messages [post]
 func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest) (*SendMessageResponse, int, error) {
 	userId := domain.GetUserID(ctx)
 

@@ -333,6 +333,11 @@ const docTemplate = `{
         },
         "/messages": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Sends a message in a chat and gets a response from the AI",
                 "consumes": [
                     "application/json"

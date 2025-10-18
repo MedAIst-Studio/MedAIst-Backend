@@ -441,6 +441,8 @@ paths:
           description: Bad Request
         "500":
           description: Internal Server Error
+      security:
+      - BearerAuth: []
       summary: Send a message in a chat
       tags:
       - Message
