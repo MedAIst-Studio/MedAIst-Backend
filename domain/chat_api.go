@@ -1,27 +1,23 @@
 package domain
 
-// AI provider'a gönderilen istek
 type ChatRequest struct {
 	Stream   bool          `json:"stream"`
-	Messages []ChatMessage `json:"messages"` // Input yerine Messages daha açık
+	Messages []ChatMessage `json:"messages"`
 }
 
-// AI provider'dan gelen yanıt
 type ChatResponse struct {
 	Text string `json:"text"`
 }
 
-// Tekil mesaj yapısı
 type ChatMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
-// Constructor'lar
 func NewChatRequest(stream bool, relevantText, userMessage string) *ChatRequest {
 	return &ChatRequest{
 		Stream:   stream,
-		Messages: buildInitialMessages(relevantText, userMessage), // daha açıklayıcı
+		Messages: buildInitialMessages(relevantText, userMessage),
 	}
 }
 
@@ -32,7 +28,6 @@ func NewChatMessage(role, content string) *ChatMessage {
 	}
 }
 
-// Helper methods
 func buildSystemMessage() *ChatMessage {
 	return NewChatMessage(
 		"system",
@@ -48,15 +43,30 @@ func buildInitialMessages(relevantText, userMessage string) []ChatMessage {
 	}
 }
 
-// Request üzerindeki metodlar
 func (r *ChatRequest) AppendUserMessage(content string) {
 	r.Messages = append(r.Messages, *NewChatMessage("user", content))
 }
 
-func (r *ChatRequest) AppendAssistantMessage(content string) { // AIMessage yerine AssistantMessage
+func (r *ChatRequest) AppendAssistantMessage(content string) {
 	r.Messages = append(r.Messages, *NewChatMessage("assistant", content))
 }
 
-func (r *ChatRequest) AppendMessages(messages []ChatMessage) { // PastMessages yerine Messages
+func (r *ChatRequest) AppendMessages(messages []ChatMessage) {
 	r.Messages = append(r.Messages, messages...)
+}
+
+func NewChatTitleRequest(firstUserMessage string) *ChatRequest {
+	return &ChatRequest{
+		Stream:   false,
+		Messages: buildTitleGenerationMessage(firstUserMessage),
+	}
+}
+
+func buildTitleGenerationMessage(firstUserMessage string) []ChatMessage {
+	return []ChatMessage{
+		*NewChatMessage(
+			"system",
+			"Generate a 3-7 word title for this medical document chat: "+firstUserMessage,
+		),
+	}
 }

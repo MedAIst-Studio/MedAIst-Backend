@@ -14,15 +14,12 @@ type Chat struct {
 	CreateAt time.Time `json:"create_at"`
 }
 
-func NewChat(userId, pdfId uuid.UUID) *Chat {
+func NewChat(userId, pdfId uuid.UUID, title string) *Chat {
 	return &Chat{
 		Id:       uuid.New(),
 		UserId:   userId,
 		PdfId:    pdfId,
+		Title:    title,
 		CreateAt: time.Now(),
 	}
-}
-
-func (c *Chat) UpdateTitle(title string) {
-	c.Title = title
 }

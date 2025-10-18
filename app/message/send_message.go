@@ -54,12 +54,19 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	isSubsequentMessage := true
 	if req.ChatId == uuid.Nil {
 		isSubsequentMessage = false
-		// ai request for chat title
-		chat := domain.NewChat(userId, req.PdfId)
-		err := h.Repo.CreateChat(ctx, chat)
+
+		aiResp, err := h.ChatSvc.GenerateChatTitle(ctx, domain.NewChatTitleRequest(req.Content))
 		if err != nil {
 			return nil, 500, err
 		}
+
+		chat := domain.NewChat(userId, req.PdfId, aiResp.Text)
+
+		err = h.Repo.CreateChat(ctx, chat)
+		if err != nil {
+			return nil, 500, err
+		}
+
 		userMessage.UpdateChatId(chat.Id)
 	}
 
