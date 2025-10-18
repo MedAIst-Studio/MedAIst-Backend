@@ -14,11 +14,11 @@ type SendMessageRequest struct {
 }
 
 type SendMessageResponse struct {
-	ChatId        uuid.UUID `json:"chat_id,omitempty"`
-	AiResponse    string    `json:"ai_response"`
-	Title         string    `json:"title,omitempty"`
-	UserMessageId uuid.UUID `json:"user_message_id"`
-	AiMessageId   uuid.UUID `json:"ai_message_id"`
+	ChatId        *uuid.UUID `json:"chat_id,omitempty"`
+	AiResponse    string     `json:"ai_response"`
+	Title         string     `json:"title,omitempty"`
+	UserMessageId uuid.UUID  `json:"user_message_id"`
+	AiMessageId   uuid.UUID  `json:"ai_message_id"`
 }
 
 type Config struct {
@@ -114,12 +114,17 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	return &SendMessageResponse{
-		ChatId:        userMessage.ChatId,
-		AiResponse:    aiResp.Text,
-		Title:         chatTitle,
+	resp := &SendMessageResponse{
+		AiResponse:    "Second some medical infos",
 		UserMessageId: userMessage.Id,
 		AiMessageId:   aiMessage.Id,
-	}, 200, nil
+	}
+
+	if !isSubsequentMessage {
+		resp.Title = chatTitle
+		resp.ChatId = &userMessage.ChatId
+	}
+
+	return resp, 200, nil
 
 }
