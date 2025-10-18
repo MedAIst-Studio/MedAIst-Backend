@@ -21,7 +21,7 @@ type SendMessageResponse struct {
 	AiMessageId   uuid.UUID `json:"ai_message_id"`
 }
 
-type SendMessageHandler struct {
+type Config struct {
 	PastMessagesLimit int  `json:"past_messages_limit"`
 	Stream            bool `json:"stream"`
 	Repo              Repository
@@ -30,12 +30,13 @@ type SendMessageHandler struct {
 	ChatSvc           AIService
 }
 
-func NewSendMessageHandler(repo Repository, vb VectorRepository, ems EmbeddingService, chatSvc AIService) *SendMessageHandler {
+type SendMessageHandler struct {
+	Config `json:"config"`
+}
+
+func NewSendMessageHandler(config Config) *SendMessageHandler {
 	return &SendMessageHandler{
-		Repo:    repo,
-		Vb:      vb,
-		Ems:     ems,
-		ChatSvc: chatSvc,
+		Config: config,
 	}
 }
 
