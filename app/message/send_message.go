@@ -96,7 +96,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	aiReq := domain.NewChatRequest(h.Stream, relevantText, req.Content)
 
 	if isSubsequentMessage {
-		pastMessages, err := h.Repo.GetChatHistory(ctx, userMessage.ChatId, h.PastMessagesLimit)
+		pastMessages, err := h.Repo.GetChatHistoryForAIContext(ctx, userMessage.ChatId, h.PastMessagesLimit)
 		if err != nil {
 			return nil, 500, err
 		}

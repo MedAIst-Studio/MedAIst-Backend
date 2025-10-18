@@ -10,7 +10,7 @@ import (
 type Repository interface {
 	SaveMessage(ctx context.Context, message *domain.Message) error
 	CreateChat(ctx context.Context, chat *domain.Chat) error
-	GetChatHistory(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error)
+	GetChatHistoryForAIContext(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error)
 }
 
 type VectorRepository interface {
