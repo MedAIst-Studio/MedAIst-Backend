@@ -13,21 +13,23 @@ func (r *Repository) SaveMessage(ctx context.Context, message *domain.Message) e
 	return err
 }
 
-func (r *Repository) GetChatHistory(ctx context.Context, chatId uuid.UUID, limit int) ([]*domain.Message, error) {
-	rows, err := r.db.QueryContext(ctx, "SELECT id, chat_id, content, is_user FROM messages WHERE chat_id = $1 LIMIT $2 ORDER BY created_at ASC",
-		chatId, limit)
+func (r *Repository) GetChatHistoryForAIContext(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error) {
+	rows, err := r.db.QueryContext(ctx, "SELECT content, is_user FROM messages WHERE chat_id = $1 LIMIT $2 ORDER BY created_at ASC", chatId, limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var messages []*domain.Message
+	var messages []domain.ChatMessage
 	for rows.Next() {
-		var msg domain.Message
-		if err := rows.Scan(&msg.Id, &msg.ChatId, &msg.Content, &msg.IsUser); err != nil {
+		var msg domain.ChatMessage
+		var isUser bool
+		if err := rows.Scan(&msg.Content, &isUser); err != nil {
 			return nil, err
 		}
-		messages = append(messages, &msg)
+		msg.UpdateRole(isUser)
+		messages = append(messages, msg)
 	}
+
 	return messages, nil
 }

@@ -55,6 +55,14 @@ func (r *ChatRequest) AppendMessages(messages []ChatMessage) {
 	r.Messages = append(r.Messages, messages...)
 }
 
+func (cm *ChatMessage) UpdateRole(isUser bool) {
+	if isUser {
+		cm.Role = "user"
+	} else {
+		cm.Role = "assistant"
+	}
+}
+
 func NewChatTitleRequest(firstUserMessage string) *ChatRequest {
 	return &ChatRequest{
 		Stream:   false,
