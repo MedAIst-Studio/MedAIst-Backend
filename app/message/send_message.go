@@ -52,6 +52,11 @@ func NewSendMessageHandler(config Config) *SendMessageHandler {
 // @Security		BearerAuth
 // @Router			/messages [post]
 func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest) (*SendMessageResponse, int, error) {
+	// TODO add validation
+	// TODO check if chat belongs to user
+	// TODO check if pdf belongs to user
+	// TODO check if the pdf exists
+
 	userId := domain.GetUserID(ctx)
 
 	userMessage := domain.NewMessage(req.ChatId, req.Content, true)
