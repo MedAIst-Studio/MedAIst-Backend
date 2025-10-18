@@ -14,7 +14,8 @@ type SendMessageRequest struct {
 }
 
 type SendMessageResponse struct {
-	ChatId uuid.UUID `json:"chat_id,omitempty"`
+	ChatId     uuid.UUID `json:"chat_id,omitempty"`
+	AiResponse string    `json:"ai_response"`
 }
 
 type SendMessageHandler struct {
@@ -52,6 +53,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	userMessage := domain.NewMessage(req.ChatId, req.Content, true)
 
 	isSubsequentMessage := true
+
 	if req.ChatId == uuid.Nil {
 		isSubsequentMessage = false
 
@@ -66,7 +68,6 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		if err != nil {
 			return nil, 500, err
 		}
-
 		userMessage.UpdateChatId(chat.Id)
 	}
 
@@ -95,7 +96,19 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		aiReq.AppendMessages(pastMessages)
 	}
 
+	aiResp, err := h.ChatSvc.SendChatRequest(ctx, aiReq)
+	if err != nil {
+		return nil, 500, err
+	}
+
+	aiMessage := domain.NewMessage(userMessage.ChatId, aiResp.Text, false)
+	err = h.Repo.SaveMessage(ctx, aiMessage)
+	if err != nil {
+		return nil, 500, err
+	}
+
 	return &SendMessageResponse{
-		ChatId: userMessage.ChatId,
+		ChatId:     userMessage.ChatId,
+		AiResponse: aiResp.Text,
 	}, 200, nil
 }
