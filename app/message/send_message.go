@@ -14,8 +14,11 @@ type SendMessageRequest struct {
 }
 
 type SendMessageResponse struct {
-	ChatId     uuid.UUID `json:"chat_id,omitempty"`
-	AiResponse string    `json:"ai_response"`
+	ChatId        uuid.UUID `json:"chat_id,omitempty"`
+	AiResponse    string    `json:"ai_response"`
+	Title         string    `json:"title,omitempty"`
+	UserMessageId uuid.UUID `json:"user_message_id"`
+	AiMessageId   uuid.UUID `json:"ai_message_id"`
 }
 
 type SendMessageHandler struct {
@@ -54,6 +57,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 
 	isSubsequentMessage := true
 
+	var chatTitle string
 	if req.ChatId == uuid.Nil {
 		isSubsequentMessage = false
 
@@ -68,6 +72,8 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		if err != nil {
 			return nil, 500, err
 		}
+
+		chatTitle = aiResp.Text
 		userMessage.UpdateChatId(chat.Id)
 	}
 
@@ -108,7 +114,11 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	}
 
 	return &SendMessageResponse{
-		ChatId:     userMessage.ChatId,
-		AiResponse: aiResp.Text,
+		ChatId:        userMessage.ChatId,
+		AiResponse:    aiResp.Text,
+		Title:         chatTitle,
+		UserMessageId: userMessage.Id,
+		AiMessageId:   aiMessage.Id,
 	}, 200, nil
+
 }
