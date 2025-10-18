@@ -9,24 +9,24 @@ import (
 
 type SendMessageRequest struct {
 	PdfId   uuid.UUID `json:"pdf_id"`
-	ChatId  uuid.UUID `json:"chat_id"`
+	ChatId  uuid.UUID `json:"chat_id,omitempty"`
 	Content string    `json:"content"`
 }
 
 type SendMessageResponse struct {
-	ChatId uuid.UUID `json:"chat_id"`
+	ChatId uuid.UUID `json:"chat_id,omitempty"`
 }
 
 type SendMessageHandler struct {
 	PastMessagesLimit int  `json:"past_messages_limit"`
 	Stream            bool `json:"stream"`
 	Repo              Repository
-	Vb                VectorDB
+	Vb                VectorRepository
 	Ems               EmbeddingService
-	ChatSvc           ChatService
+	ChatSvc           AIService
 }
 
-func NewSendMessageHandler(repo Repository, vb VectorDB, ems EmbeddingService, chatSvc ChatService) *SendMessageHandler {
+func NewSendMessageHandler(repo Repository, vb VectorRepository, ems EmbeddingService, chatSvc AIService) *SendMessageHandler {
 	return &SendMessageHandler{
 		Repo:    repo,
 		Vb:      vb,
@@ -68,24 +68,24 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	embedding, err := h.Ems.ConvertToEmbedding(ctx, req.Content)
+	embedding, err := h.Ems.GenerateEmbedding(ctx, req.Content)
 	if err != nil {
 		return nil, 500, err
 	}
 
-	relevantText, err := h.Vb.SearchTextByEmbedding(ctx, req.PdfId, embedding)
+	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding)
 	if err != nil {
 		return nil, 500, err
 	}
 
-	aiReq := domain.NewThirdPartyAIRequest(h.Stream, relevantText, req.Content)
+	aiReq := domain.NewChatRequest(h.Stream, relevantText, req.Content)
 
 	if isSubsequentMessage {
-		pastMessages, err := h.Repo.GetPastMessages(ctx, userMessage.ChatId, h.PastMessagesLimit)
+		pastMessages, err := h.Repo.GetChatHistory(ctx, userMessage.ChatId, h.PastMessagesLimit)
 		if err != nil {
 			return nil, 500, err
 		}
-		aiReq.AppendPastMessages(pastMessages)
+		aiReq.AppendMessages(pastMessages)
 	}
 
 	return &SendMessageResponse{

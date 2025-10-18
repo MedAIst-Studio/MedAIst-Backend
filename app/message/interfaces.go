@@ -10,17 +10,18 @@ import (
 type Repository interface {
 	SaveMessage(ctx context.Context, message *domain.Message) error
 	CreateChat(ctx context.Context, chat *domain.Chat) error
-	GetPastMessages(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ThirdPartyAIMessage, error)
+	GetChatHistory(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error)
 }
 
-type VectorDB interface {
-	SearchTextByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) (string, error)
+type VectorRepository interface {
+	SearchByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) (string, error)
 }
 
 type EmbeddingService interface {
-	ConvertToEmbedding(ctx context.Context, text string) ([]float32, error)
+	GenerateEmbedding(ctx context.Context, text string) ([]float32, error)
 }
 
-type ChatService interface {
-	Request(ctx context.Context, req *domain.ThirdPartyAIRequest) (*domain.ThirdPartyAIResponse, error)
+type AIService interface {
+	SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error)
+	GenerateChatTitle(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error)
 }
