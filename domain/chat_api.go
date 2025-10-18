@@ -81,7 +81,7 @@ func NewChatTitleRequest(firstUserMessage string) *ChatRequest {
 func buildTitleGenerationMessage(firstUserMessage string) []ChatMessage {
 	return []ChatMessage{
 		*NewChatMessage(
-			"system",
+			RoleSystem,
 			"Generate a 3-7 word title for this medical document chat: "+firstUserMessage,
 		),
 	}

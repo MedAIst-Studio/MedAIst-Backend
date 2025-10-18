@@ -107,7 +107,6 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		return nil, 500, err
 	}
 
-	// to local via min.io
 	if err := h.fl.UploadFile(ctx, newFile, fileBytes); err != nil {
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, 400, err
@@ -115,7 +114,6 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		return nil, 500, err
 	}
 
-	// postgres
 	if err := h.repo.SaveFileInformation(ctx, newFile); err != nil {
 		// TODO delete from min.io
 		if !errors.Is(err, domain.ErrInternalServer) {
@@ -129,16 +127,11 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		return nil, 500, err
 	}
 
-	fmt.Printf("Generated %d chunks for file %s\n", len(chunks), newFile.Name)
-	fmt.Printf("Chunk metadata for file: %v\n", chunks[10].Metadata)
-	fmt.Printf("Chunk text for file: %v\n", chunks[10].Text)
-
 	for start := 0; start < len(chunks); start += h.BatchSize {
 		end := min(start+h.BatchSize, len(chunks))
 
 		batch := chunks[start:end]
 
-		// text ve embedding vectorleri bir arada tutabilmek icin EmbeddingRequest e id veriyoruz.
 		var embeddings []Embedding
 		for _, chunk := range batch {
 			var embedding Embedding
@@ -148,7 +141,6 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 			embeddings = append(embeddings, embedding)
 		}
 
-		// embedding api nin ihtiyaci olan text yapisi
 		var texts []Text
 		for _, emb := range embeddings {
 			texts = append(texts, Text{
@@ -157,7 +149,6 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 			})
 		}
 
-		// requestimiz burada
 		embeddingReq := &EmbeddingRequest{
 			Texts:     texts,
 			Normalize: h.Normalize,
@@ -169,7 +160,6 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 			return nil, 500, err
 		}
 
-		// id ler uzerinden ilerleyecegimiz icin map e ceviriyoruz
 		embeddingMap := make(map[uuid.UUID]*Embedding)
 		for i := range embeddings {
 			embeddingMap[embeddings[i].Id] = &embeddings[i]

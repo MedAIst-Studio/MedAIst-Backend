@@ -27,5 +27,3 @@ func NewMessage(chatId uuid.UUID, content string, isUser bool) *Message {
 func (m *Message) UpdateChatId(chatId uuid.UUID) {
 	m.ChatId = chatId
 }
-
-var systemPrompt = "You are a helpful AI assistant. Provide concise and accurate answers based on the user's questions and the provided context."
