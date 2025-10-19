@@ -88,12 +88,12 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	embedding, err := h.Ems.GenerateEmbedding(ctx, req.Content)
+	embedding, err := h.Ems.GenerateEmbedding(ctx, &EmbeddingRequest{Text: req.Content})
 	if err != nil {
 		return nil, 500, err
 	}
 
-	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding)
+	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Embedding)
 	if err != nil {
 		return nil, 500, err
 	}

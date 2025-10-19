@@ -17,8 +17,16 @@ type VectorRepository interface {
 	SearchByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) (string, error)
 }
 
+type EmbeddingRequest struct {
+	Text string `json:"text"`
+}
+
+type EmbeddingResponse struct {
+	Embedding []float32 `json:"embedding"`
+}
+
 type EmbeddingService interface {
-	GenerateEmbedding(ctx context.Context, text string) ([]float32, error)
+	GenerateEmbedding(ctx context.Context, req *EmbeddingRequest) (*EmbeddingResponse, error)
 }
 
 type AIService interface {
