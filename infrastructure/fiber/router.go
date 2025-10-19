@@ -169,6 +169,7 @@ func SetupRoutes(app *fiber.App) {
 		PastMessagesLimit: 5,
 		Stream:            false,
 		Repo:              postgresRepo,
+		Ems:               embeddingService,
 	})
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
