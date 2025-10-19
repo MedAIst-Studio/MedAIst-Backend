@@ -26,7 +26,7 @@ func NewEmbeddingService(apiKey, apiDomain string) *EmbeddingService {
 	}
 }
 
-func (c *EmbeddingService) GenerateEmbeddingBatch(ctx context.Context, req *file.EmbeddingRequest) (*file.EmbeddingResponse, error) {
+func (c *EmbeddingService) GenerateEmbeddingBatch(ctx context.Context, req *file.EmbeddingBatchRequest) (*file.EmbeddingResponse, error) {
 	fmt.Printf("Sending embedding request with %d texts\n", len(req.Texts))
 	reqBody, err := json.Marshal(req)
 	if err != nil {

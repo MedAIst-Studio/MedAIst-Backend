@@ -30,7 +30,7 @@ type UploadFileHandler struct {
 	chunker   Chunker
 }
 
-type EmbeddingRequest struct {
+type EmbeddingBatchRequest struct {
 	Texts     []Text `json:"texts"`
 	Normalize bool   `json:"normalize"`
 	BatchSize int    `json:"batch_size"`
@@ -149,7 +149,7 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 			})
 		}
 
-		embeddingReq := &EmbeddingRequest{
+		embeddingReq := &EmbeddingBatchRequest{
 			Texts:     texts,
 			Normalize: h.Normalize,
 			BatchSize: h.BatchSize,
