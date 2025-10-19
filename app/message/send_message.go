@@ -79,7 +79,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 			return nil, 500, err
 		}
 
-		chatTitle = aiResp.Text
+		chatTitle = chat.Title
 		userMessage.UpdateChatId(chat.Id)
 	}
 
@@ -120,7 +120,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	}
 
 	resp := &SendMessageResponse{
-		AiResponse:    "Second some medical infos",
+		AiResponse:    aiResp.Text,
 		UserMessageId: userMessage.Id,
 		AiMessageId:   aiMessage.Id,
 	}

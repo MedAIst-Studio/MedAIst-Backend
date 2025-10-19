@@ -28,14 +28,12 @@ func NewEmbeddingService(apiKey, apiDomain string) *EmbeddingService {
 }
 
 func (c *EmbeddingService) GenerateEmbeddingBatch(ctx context.Context, req *file.EmbeddingBatchRequest) (*file.EmbeddingResponse, error) {
-	fmt.Printf("Sending embedding request with %d texts\n", len(req.Texts))
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal embedding request: %w", err)
 	}
 
 	url := c.APIDomain + "/embed/batch"
-	fmt.Println("Sending embedding request to:", url)
 
 	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(reqBody))
 	if err != nil {
@@ -65,14 +63,12 @@ func (c *EmbeddingService) GenerateEmbeddingBatch(ctx context.Context, req *file
 }
 
 func (c *EmbeddingService) GenerateEmbedding(ctx context.Context, req *message.EmbeddingRequest) (*message.EmbeddingResponse, error) {
-	fmt.Printf("Sending embedding request with text: %s\n", req.Text)
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal embedding request: %w", err)
 	}
 
 	url := c.APIDomain + "/embed"
-	fmt.Println("Sending embedding request to:", url)
 
 	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(reqBody))
 	if err != nil {
