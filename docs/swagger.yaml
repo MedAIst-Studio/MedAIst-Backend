@@ -50,6 +50,28 @@ definitions:
     type: object
   file.UploadFileResponse:
     type: object
+  message.SendMessageRequest:
+    properties:
+      chat_id:
+        type: string
+      content:
+        type: string
+      pdf_id:
+        type: string
+    type: object
+  message.SendMessageResponse:
+    properties:
+      ai_message_id:
+        type: string
+      ai_response:
+        type: string
+      chat_id:
+        type: string
+      title:
+        type: string
+      user_message_id:
+        type: string
+    type: object
   user.ChangePasswordRequest:
     properties:
       new_password:
@@ -396,6 +418,34 @@ paths:
       summary: Healthcheck
       tags:
       - Healthcheck
+  /messages:
+    post:
+      consumes:
+      - application/json
+      description: Sends a message in a chat and gets a response from the AI
+      parameters:
+      - description: Send Message Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/message.SendMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/message.SendMessageResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Send a message in a chat
+      tags:
+      - Message
   /users/account:
     delete:
       description: Delete a user's account

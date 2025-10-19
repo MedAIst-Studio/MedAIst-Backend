@@ -323,6 +323,51 @@
                 }
             }
         },
+        "/messages": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Sends a message in a chat and gets a response from the AI",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Message"
+                ],
+                "summary": "Send a message in a chat",
+                "parameters": [
+                    {
+                        "description": "Send Message Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/message.SendMessageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/message.SendMessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/account": {
             "delete": {
                 "security": [
@@ -681,6 +726,40 @@
         },
         "file.UploadFileResponse": {
             "type": "object"
+        },
+        "message.SendMessageRequest": {
+            "type": "object",
+            "properties": {
+                "chat_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "pdf_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "message.SendMessageResponse": {
+            "type": "object",
+            "properties": {
+                "ai_message_id": {
+                    "type": "string"
+                },
+                "ai_response": {
+                    "type": "string"
+                },
+                "chat_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_message_id": {
+                    "type": "string"
+                }
+            }
         },
         "user.ChangePasswordRequest": {
             "type": "object",

@@ -72,6 +72,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
@@ -164,6 +165,13 @@ func SetupRoutes(app *fiber.App) {
 
 	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
 
+	sendMessageHandler := message.NewSendMessageHandler(message.Config{
+		PastMessagesLimit: 5,
+		Stream:            false,
+		Repo:              postgresRepo,
+		Ems:               embeddingService,
+	})
+
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)
 
@@ -191,6 +199,9 @@ func SetupRoutes(app *fiber.App) {
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
 	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
+
+	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
+	messagesApp.Post("/", Handle(sendMessageHandler, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)

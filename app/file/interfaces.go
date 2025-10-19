@@ -23,7 +23,7 @@ type VectorDB interface {
 }
 
 type EmbeddingService interface {
-	GenerateEmbeddingBatch(ctx context.Context, req *EmbeddingRequest) (*EmbeddingResponse, error)
+	GenerateEmbeddingBatch(ctx context.Context, req *EmbeddingBatchRequest) (*EmbeddingResponse, error)
 }
 
 type FileService interface {
