@@ -93,7 +93,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Embedding)
+	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
 	if err != nil {
 		return nil, 500, err
 	}

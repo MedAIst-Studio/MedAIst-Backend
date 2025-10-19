@@ -22,7 +22,7 @@ type EmbeddingRequest struct {
 }
 
 type EmbeddingResponse struct {
-	Embedding []float32 `json:"embedding"`
+	Vector []float32 `json:"vector"`
 }
 
 type EmbeddingService interface {
