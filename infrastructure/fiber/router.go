@@ -121,7 +121,7 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
-	vectorDB := qdrantInfra.NewQdrantVectorDB(os.Getenv("QDRANT_URL"), os.Getenv("QDRANT_COLLECTION_NAME"), 1024)
+	vectorDB := qdrantInfra.NewQdrantVectorDB(os.Getenv("QDRANT_URL"), os.Getenv("QDRANT_COLLECTION_NAME"), 0.7, 1024)
 
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
@@ -170,6 +170,7 @@ func SetupRoutes(app *fiber.App) {
 		Stream:            false,
 		Repo:              postgresRepo,
 		Ems:               embeddingService,
+		Vb:                vectorDB,
 	})
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
