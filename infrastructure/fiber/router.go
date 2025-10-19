@@ -77,6 +77,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
+	grokInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/grok"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
@@ -122,6 +123,7 @@ func SetupRoutes(app *fiber.App) {
 
 	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
 	vectorDB := qdrantInfra.NewQdrantVectorDB(os.Getenv("QDRANT_URL"), os.Getenv("QDRANT_COLLECTION_NAME"), 0.7, 1024)
+	grok := grokInfra.NewGrokService(os.Getenv("GROK_API_KEY"), "grok-3")
 
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
@@ -171,6 +173,7 @@ func SetupRoutes(app *fiber.App) {
 		Repo:              postgresRepo,
 		Ems:               embeddingService,
 		Vb:                vectorDB,
+		ChatSvc:           grok,
 	})
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
