@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 	"github.com/qdrant/go-client/qdrant"
 
@@ -176,7 +177,7 @@ func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID
 	}
 
 	if len(searchResult.Result) == 0 {
-		return "", fmt.Errorf("no matching vectors found for file_id: %s", fileId.String())
+		return "", domain.ErrNotFoundInPDF
 	}
 
 	payload := searchResult.Result[0].Payload

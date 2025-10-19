@@ -2,6 +2,7 @@ package message
 
 import (
 	"context"
+	"errors"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
@@ -95,6 +96,9 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 
 	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
 	if err != nil {
+		if errors.Is(err, domain.ErrNotFoundInPDF) {
+			return nil, 400, err
+		}
 		return nil, 500, err
 	}
 
