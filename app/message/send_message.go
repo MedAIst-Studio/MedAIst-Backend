@@ -97,8 +97,25 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFoundInPDF) {
-			return nil, 400, err
+			aiMessage := domain.NewMessage(userMessage.ChatId, err.Error(), false)
+			if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
+				return nil, 500, err
+			}
+
+			resp := &SendMessageResponse{
+				AiResponse:    err.Error(),
+				UserMessageId: userMessage.Id,
+				AiMessageId:   aiMessage.Id,
+			}
+
+			if !isSubsequentMessage {
+				resp.Title = chatTitle
+				resp.ChatId = &userMessage.ChatId
+			}
+
+			return resp, 200, nil
 		}
+
 		return nil, 500, err
 	}
 
