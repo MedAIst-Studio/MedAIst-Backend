@@ -10,6 +10,7 @@ type File struct {
 	Id        uuid.UUID
 	UserId    uuid.UUID
 	Name      string
+	Size      int64
 	Path      string
 	CreatedAt time.Time
 }
@@ -35,6 +36,7 @@ func NewFile(fr *FileRequires) (*File, error) {
 		Id:        id,
 		UserId:    fr.UserId,
 		Name:      fr.Name,
+		Size:      fr.Size,
 		Path:      "uploads/" + id.String(),
 		CreatedAt: time.Now(),
 	}, nil
