@@ -20,6 +20,7 @@ func SetupServer() *fiber.App {
 		ReadTimeout:  3 * time.Second,
 		WriteTimeout: 3 * time.Second,
 		Concurrency:  256 * 1024,
+		BodyLimit:    15 * 1024 * 1024,
 		AppName:      "MedAIist-Backend API",
 	})
 
