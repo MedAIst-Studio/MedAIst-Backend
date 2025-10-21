@@ -9,6 +9,7 @@ import (
 
 type Repository interface {
 	SaveFileInformation(ctx context.Context, file *domain.File) error
+	GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]File, error)
 }
 
 type FileMetadata struct {
