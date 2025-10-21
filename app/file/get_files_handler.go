@@ -30,15 +30,16 @@ func NewGetFilesHandler(repo Repository) *GetFilesHandler {
 
 // godoc
 // Handle processes a GetFilesRequest and returns a GetFilesResponse.
-// @Summary Retrieve files for the authenticated user
-// @Description Retrieves a list of files associated with the authenticated user.
-// @Tags Files
-// @Accept json
-// @Produce json
-// @Success 200 {object} GetFilesResponse
-// @Failure 500
-// @Security BearerAuth
-// @Router /files [get]
+//
+//	@Summary		Retrieve files for the authenticated user
+//	@Description	Retrieves a list of files associated with the authenticated user.
+//	@Tags			Files
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	GetFilesResponse
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/files [get]
 func (h *GetFilesHandler) Handle(ctx context.Context, req *GetFilesRequest) (*GetFilesResponse, int, error) {
 	userId := domain.GetUserID(ctx)
 	files, err := h.repo.GetFilesByUserID(ctx, userId)

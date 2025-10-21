@@ -46,6 +46,17 @@ definitions:
       role:
         type: string
     type: object
+  file.File:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      size:
+        type: integer
+      title:
+        type: string
+    type: object
   file.UploadFileRequest:
     type: object
   file.UploadFileResponse:
@@ -373,6 +384,27 @@ paths:
       summary: Signup
       tags:
       - Auth
+  /files:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of files associated with the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/file.File'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Retrieve files for the authenticated user
+      tags:
+      - Files
   /files/upload:
     post:
       consumes:
