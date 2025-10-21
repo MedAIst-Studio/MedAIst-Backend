@@ -166,6 +166,7 @@ func SetupRoutes(app *fiber.App) {
 	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
 
 	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
+	getFilesHandler := file.NewGetFilesHandler(postgresRepo)
 
 	sendMessageHandler := message.NewSendMessageHandler(message.Config{
 		PastMessagesLimit: 5,
@@ -203,6 +204,7 @@ func SetupRoutes(app *fiber.App) {
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
 	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
+	filesApp.Get("/", Handle(getFilesHandler, sl))
 
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
 	messagesApp.Post("/", Handle(sendMessageHandler, sl))
