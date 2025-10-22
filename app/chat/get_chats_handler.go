@@ -2,6 +2,7 @@ package chat
 
 import (
 	"context"
+	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 )
@@ -12,9 +13,9 @@ type GetChatsRequest struct {
 type GetChatsResponse []Chat
 
 type Chat struct {
-	Id        string `json:"id"`
-	Title     string `json:"title"`
-	CreatedAt string `json:"created_at"`
+	Id        string    `json:"id"`
+	Title     string    `json:"title"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type GetChatsHandler struct {
