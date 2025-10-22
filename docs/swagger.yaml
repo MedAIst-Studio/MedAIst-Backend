@@ -46,6 +46,15 @@ definitions:
       role:
         type: string
     type: object
+  chat.Chat:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
   file.File:
     properties:
       created_at:
@@ -384,6 +393,27 @@ paths:
       summary: Signup
       tags:
       - Auth
+  /chats:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of chats associated with the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/chat.Chat'
+            type: array
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Retrieve chats for the authenticated user
+      tags:
+      - Chats
   /files:
     get:
       consumes:
