@@ -166,6 +166,7 @@ func SetupRoutes(app *fiber.App) {
 
 	getChatsHandler := chat.NewGetChatsHandler(postgresRepo)
 	getChatByIDHandler := chat.NewGetChatByIDHandler(postgresRepo)
+	deleteChatHandler := chat.NewDeleteChatHandler(postgresRepo)
 
 	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
 	getFilesHandler := file.NewGetFilesHandler(postgresRepo)
@@ -202,6 +203,7 @@ func SetupRoutes(app *fiber.App) {
 	chatsApp := app.Group("/chats", middlewareManager.AuthMiddleware)
 	chatsApp.Get("/", Handle(getChatsHandler, sl))
 	chatsApp.Get("/:id", Handle(getChatByIDHandler, sl))
+	chatsApp.Delete("/:id", Handle(deleteChatHandler, sl))
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
 	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
