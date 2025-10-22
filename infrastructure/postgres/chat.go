@@ -31,3 +31,26 @@ func (r *Repository) GetChatsByUserID(ctx context.Context, userId uuid.UUID) ([]
 	}
 	return chats, nil
 }
+
+func (r *Repository) GetChatByID(ctx context.Context, chatId uuid.UUID) (*chat.GetChatByIDResponse, error) {
+	rows, err := r.db.QueryContext(ctx, "SELECT is_user, content, created_at FROM messages WHERE chat_id = $1 ORDER BY created_at ASC", chatId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var messages chat.GetChatByIDResponse
+	for rows.Next() {
+		var msg chat.Message
+		if err := rows.Scan(&msg.IsUser, &msg.Content, &msg.Timestamp); err != nil {
+			return nil, err
+		}
+		messages = append(messages, msg)
+	}
+
+	if len(messages) == 0 {
+		return nil, domain.ErrChatNotFound
+	}
+
+	return &messages, nil
+}
