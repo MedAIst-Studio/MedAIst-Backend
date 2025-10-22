@@ -16,7 +16,6 @@ type SignupRequest struct {
 }
 
 type SignupResponse struct {
-	Role         string `json:"role"`
 	RefreshToken string `json:"refreshToken" swaggerignore:"true"`
 	AccessToken  string `json:"accessToken" swaggerignore:"true"`
 }
@@ -73,13 +72,13 @@ func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*Signup
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	accessToken, err := h.ts.GenerateAuthAccessToken(user.Id.String(), user.Role)
+	accessToken, err := h.ts.GenerateAuthAccessToken(user.Id.String())
 	if err != nil {
 		h.logger.Error("error while generating access token: ", err)
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	refreshToken, err := h.ts.GenerateAuthRefreshToken(user.Id.String(), user.Role)
+	refreshToken, err := h.ts.GenerateAuthRefreshToken(user.Id.String())
 	if err != nil {
 		h.logger.Error("error while generating refresh token: ", err)
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
@@ -102,7 +101,6 @@ func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*Signup
 	})
 
 	return &SignupResponse{
-		Role:         user.Role,
 		RefreshToken: refreshToken,
 		AccessToken:  accessToken,
 	}, http.StatusCreated, nil

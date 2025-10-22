@@ -62,7 +62,7 @@ func (h *RefreshTokenHandler) Handle(ctx context.Context, req *RefreshTokenReque
 		return nil, http.StatusUnauthorized, domain.ErrNotExistRefreshToken
 	}
 
-	accessToken, err := h.ts.GenerateAuthAccessToken(payload.UserID, payload.Role)
+	accessToken, err := h.ts.GenerateAuthAccessToken(payload.UserID)
 	if err != nil {
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}

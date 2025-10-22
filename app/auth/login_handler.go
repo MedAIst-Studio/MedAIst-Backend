@@ -78,13 +78,13 @@ func (h *LoginHandler) Handle(ctx context.Context, req *LoginRequest) (*LoginRes
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	accessToken, err := h.ts.GenerateAuthAccessToken(user.Id.String(), user.Role)
+	accessToken, err := h.ts.GenerateAuthAccessToken(user.Id.String())
 	if err != nil {
 		fmt.Println("error while generating access token: ", err)
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	refreshToken, err := h.ts.GenerateAuthRefreshToken(user.Id.String(), user.Role)
+	refreshToken, err := h.ts.GenerateAuthRefreshToken(user.Id.String())
 	if err != nil {
 		fmt.Println("error while generating refresh token: ", err)
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
