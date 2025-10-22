@@ -15,102 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/users": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Fetch users with pagination",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get users for admin",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page size",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/user.User"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/admin/users/{id}": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Retrieves user details by ID for admin purposes.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get user details by ID for admin",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User details",
-                        "schema": {
-                            "$ref": "#/definitions/user.GetUserResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/auth/login": {
             "post": {
                 "description": "Login a user or admin",
@@ -415,6 +319,52 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/files/{id}": {
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a file and its associated data",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Delete a file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -794,9 +744,6 @@ const docTemplate = `{
                 },
                 "refreshToken": {
                     "type": "string"
-                },
-                "role": {
-                    "type": "string"
                 }
             }
         },
@@ -836,12 +783,7 @@ const docTemplate = `{
             }
         },
         "auth.SignupResponse": {
-            "type": "object",
-            "properties": {
-                "role": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "chat.Chat": {
             "type": "object",
@@ -969,26 +911,6 @@ const docTemplate = `{
                 "isEmailVerified": {
                     "type": "boolean"
                 },
-                "role": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.GetUserResponse": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_email_verified": {
-                    "type": "boolean"
-                },
                 "username": {
                     "type": "string"
                 }
@@ -1018,20 +940,6 @@ const docTemplate = `{
             ],
             "properties": {
                 "address": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.User": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "id": {
                     "type": "string"
                 },
                 "username": {

@@ -15,8 +15,6 @@ definitions:
         type: string
       refreshToken:
         type: string
-      role:
-        type: string
     type: object
   auth.RefreshTokenRequest:
     properties:
@@ -42,9 +40,6 @@ definitions:
     - username
     type: object
   auth.SignupResponse:
-    properties:
-      role:
-        type: string
     type: object
   chat.Chat:
     properties:
@@ -128,19 +123,6 @@ definitions:
         type: string
       isEmailVerified:
         type: boolean
-      role:
-        type: string
-      username:
-        type: string
-    type: object
-  user.GetUserResponse:
-    properties:
-      email:
-        type: string
-      id:
-        type: string
-      is_email_verified:
-        type: boolean
       username:
         type: string
     type: object
@@ -164,15 +146,6 @@ definitions:
     required:
     - address
     - username
-    type: object
-  user.User:
-    properties:
-      email:
-        type: string
-      id:
-        type: string
-      username:
-        type: string
     type: object
   user.VerifiyEmailRequest:
     properties:
@@ -240,67 +213,6 @@ info:
   title: MedAIist-Backend API
   version: "1.0"
 paths:
-  /admin/users:
-    get:
-      consumes:
-      - application/json
-      description: Fetch users with pagination
-      parameters:
-      - description: Page number
-        in: query
-        name: page
-        required: true
-        type: integer
-      - description: Page size
-        in: query
-        name: limit
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/user.User'
-            type: array
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Get users for admin
-      tags:
-      - User
-  /admin/users/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Retrieves user details by ID for admin purposes.
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User details
-          schema:
-            $ref: '#/definitions/user.GetUserResponse'
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Get user details by ID for admin
-      tags:
-      - User
   /auth/login:
     post:
       consumes:
@@ -471,6 +383,35 @@ paths:
       security:
       - BearerAuth: []
       summary: Retrieve files for the authenticated user
+      tags:
+      - Files
+  /files/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a file and its associated data
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete a file
       tags:
       - Files
   /files/upload:
