@@ -70,6 +70,7 @@ import (
 	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
@@ -165,6 +166,8 @@ func SetupRoutes(app *fiber.App) {
 	forgotPasswordHandler := user.NewForgotPasswordHandler(postgresRepo, mailersendService, jweTokenService, sl, validator)
 	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
 
+	getChatsHandler := chat.NewGetChatsHandler(postgresRepo)
+
 	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
 	getFilesHandler := file.NewGetFilesHandler(postgresRepo)
 
@@ -201,6 +204,9 @@ func SetupRoutes(app *fiber.App) {
 	usersAdminApp := adminApp.Group("/users")
 	usersAdminApp.Get("/", Handle(getUsersHandler, sl))
 	usersAdminApp.Get("/:id", Handle(getUserHandler, sl))
+
+	chatsApp := app.Group("/chats", middlewareManager.AuthMiddleware)
+	chatsApp.Get("/", Handle(getChatsHandler, sl))
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
 	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
