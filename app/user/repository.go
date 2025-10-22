@@ -19,6 +19,4 @@ type Repository interface {
 	UpdateUsername(ctx context.Context, id uuid.UUID, username string) error
 	VerifyEmail(ctx context.Context, email string) error
 	GetUserNameAndEmailByIdForSendingVerificationEmail(ctx context.Context, id uuid.UUID) (string, string, error)
-	GetUserByIdForAdmin(ctx context.Context, id uuid.UUID) (*GetUserResponse, error)
-	GetUsers(ctx context.Context, page, limit int) (GetUsersResponse, error)
 }

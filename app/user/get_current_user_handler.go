@@ -14,7 +14,6 @@ type GetCurrentUserResponse struct {
 	Id              string    `json:"id"`
 	Username        string    `json:"username"`
 	Email           string    `json:"email"`
-	Role            string    `json:"role"`
 	IsEmailVerified bool      `json:"isEmailVerified"`
 	CreatedAt       time.Time `json:"createdAt"`
 }
