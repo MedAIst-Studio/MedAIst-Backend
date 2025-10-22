@@ -7,10 +7,9 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 )
 
-func (s *Service) GenerateAuthAccessToken(userID, role string) (string, error) {
+func (s *Service) GenerateAuthAccessToken(userID string) (string, error) {
 	claims := AuthClaims{
 		UserID: userID,
-		Role:   role,
 		Iat:    time.Now().Unix(),
 		Exp:    time.Now().Add(s.authAccessTokenDuration).Unix(),
 	}
@@ -27,6 +26,5 @@ func (s *Service) ValidateAuthAccessToken(tokenString string) (*auth.TokenPayloa
 	}
 	return &auth.TokenPayload{
 		UserID: claims.UserID,
-		Role:   claims.Role,
 	}, nil
 }

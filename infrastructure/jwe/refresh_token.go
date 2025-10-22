@@ -7,10 +7,9 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 )
 
-func (s *Service) GenerateAuthRefreshToken(userID, role string) (string, error) {
+func (s *Service) GenerateAuthRefreshToken(userID string) (string, error) {
 	claims := AuthClaims{
 		UserID: userID,
-		Role:   role,
 		Iat:    time.Now().Unix(),
 		Exp:    time.Now().Add(s.authRefreshTokenDuration).Unix(),
 	}
@@ -28,6 +27,5 @@ func (s *Service) ValidateAuthRefreshToken(tokenString string) (*auth.TokenPaylo
 
 	return &auth.TokenPayload{
 		UserID: claims.UserID,
-		Role:   claims.Role,
 	}, nil
 }

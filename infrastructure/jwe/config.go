@@ -32,7 +32,6 @@ type Service struct {
 
 type AuthClaims struct {
 	UserID string `json:"userID"`
-	Role   string `json:"role"`
 	Iat    int64  `json:"iat"`
 	Exp    int64  `json:"exp"`
 }
