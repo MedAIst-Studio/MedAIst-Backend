@@ -89,3 +89,11 @@ func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data [
 	}
 	return nil
 }
+
+func (s *MinioService) DeleteFile(ctx context.Context, filePath string) error {
+	err := s.minioClient.RemoveObject(ctx, s.BucketName, filePath, minio.RemoveObjectOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to delete file from minio: %w", err)
+	}
+	return nil
+}
