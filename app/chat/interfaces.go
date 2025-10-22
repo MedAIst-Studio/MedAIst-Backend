@@ -8,4 +8,5 @@ import (
 
 type Repository interface {
 	GetChatsByUserID(ctx context.Context, userId uuid.UUID) ([]Chat, error)
+	GetChatByID(ctx context.Context, chatId uuid.UUID) (*GetChatByIDResponse, error)
 }
