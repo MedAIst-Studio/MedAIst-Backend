@@ -197,3 +197,30 @@ func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID
 
 	return text, nil
 }
+func (q *QdrantVectorDB) DeleteEmbeddingsByFileId(ctx context.Context, fileId uuid.UUID) error {
+	_, err := q.client.Delete(ctx, &qdrant.DeletePoints{
+		CollectionName: q.collectionName,
+		Points: &qdrant.PointsSelector{
+			PointsSelectorOneOf: &qdrant.PointsSelector_Filter{
+				Filter: &qdrant.Filter{
+					Must: []*qdrant.Condition{
+						{
+							ConditionOneOf: &qdrant.Condition_Field{
+								Field: &qdrant.FieldCondition{
+									Key: "file_id",
+									Match: &qdrant.Match{
+										MatchValue: &qdrant.Match_Keyword{
+											Keyword: fileId.String(),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	)
+	return err
+}
