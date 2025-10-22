@@ -64,8 +64,8 @@ var (
 	ErrEmailAlreadyExists   = errors.New("email already exists")
 	ErrMissingRefreshToken  = errors.New("missing refresh token")
 
-	ErrNotFoundInPDF = errors.New("pdf'de istediğiniz bilgi bulunamadı, lütfen farklı bir soru deneyin")
-	ErrChatNotFound  = errors.New("bulmak istediginiz sohbet mevcut degil")
-
+	ErrNotFoundInPDF  = errors.New("pdf'de istediğiniz bilgi bulunamadı, lütfen farklı bir soru deneyin")
+	ErrChatNotFound   = errors.New("bulmak istediginiz sohbet mevcut degil")
+	ErrFileNotFound   = errors.New("dosya mevcut degil")
 	ErrInternalServer = errors.New("internal server error")
 )

@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	SaveFileInformation(ctx context.Context, file *domain.File) error
 	GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]File, error)
+	DeleteFileById(ctx context.Context, id uuid.UUID) error
 }
 
 type FileMetadata struct {
@@ -21,6 +22,7 @@ type FileMetadata struct {
 
 type VectorDB interface {
 	InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*FileMetadata) error
+	DeleteEmbeddingsByFileId(ctx context.Context, fileId uuid.UUID) error
 }
 
 type EmbeddingService interface {
@@ -29,6 +31,7 @@ type EmbeddingService interface {
 
 type FileService interface {
 	UploadFile(ctx context.Context, file *domain.File, data []byte) error
+	DeleteFile(ctx context.Context, filePath string) error
 }
 
 type Chunker interface {
