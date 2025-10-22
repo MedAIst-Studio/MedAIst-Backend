@@ -37,6 +37,7 @@ func NewDeleteChatHandler(repo Repository) *DeleteChatHandler {
 //	@Security		BearerAuth
 //	@Router			/chats/{id} [delete]
 func (h *DeleteChatHandler) Handle(ctx context.Context, req *DeleteChatRequest) (*DeleteChatResponse, int, error) {
+	// TODO check if the user owns the chat before deleting
 	err := h.repo.DeleteChat(ctx, req.Id)
 	if err != nil {
 		if errors.Is(err, domain.ErrChatNotFound) {

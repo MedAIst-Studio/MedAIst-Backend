@@ -44,6 +44,7 @@ func NewGetChatByIDHandler(repo Repository) *GetChatByIDHandler {
 //	@Security		BearerAuth
 //	@Router			/chats/{id} [get]
 func (h *GetChatByIDHandler) Handle(ctx context.Context, req *GetChatByIDRequest) (*GetChatByIDResponse, int, error) {
+	// TODO check if the user owns the chat before retrieving
 	chat, err := h.repo.GetChatByID(ctx, req.ChatID)
 	if err != nil {
 		if errors.Is(err, domain.ErrChatNotFound) {

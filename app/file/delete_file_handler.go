@@ -46,6 +46,7 @@ func NewDeleteFileHandler(repo Repository, fl FileService, vb VectorDB) *DeleteF
 //
 //	@Router			/files/{id} [delete]
 func (h *DeleteFileHandler) Handle(ctx context.Context, req *DeleteFileRequest) (*DeleteFileResponse, int, error) {
+	// TODO check if the user owns the file before deleting
 	if err := h.repo.DeleteFileById(ctx, req.Id); err != nil {
 		if errors.Is(err, domain.ErrFileNotFound) {
 			return nil, 404, err
