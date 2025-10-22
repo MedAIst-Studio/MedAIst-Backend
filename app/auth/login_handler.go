@@ -15,7 +15,6 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Role         string `json:"role"`
 	RefreshToken string `json:"refreshToken"`
 	AccessToken  string `json:"accessToken"`
 }
@@ -100,7 +99,6 @@ func (h *LoginHandler) Handle(ctx context.Context, req *LoginRequest) (*LoginRes
 	}
 
 	return &LoginResponse{
-		Role:         user.Role,
 		RefreshToken: refreshToken,
 		AccessToken:  accessToken,
 	}, http.StatusOK, nil
