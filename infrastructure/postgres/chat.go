@@ -54,3 +54,14 @@ func (r *Repository) GetChatByID(ctx context.Context, chatId uuid.UUID) (*chat.G
 
 	return &messages, nil
 }
+
+func (r *Repository) DeleteChat(ctx context.Context, chatId uuid.UUID) error {
+	result, err := r.db.ExecContext(ctx, "DELETE FROM chats WHERE id = $1", chatId)
+	if err != nil {
+		return err
+	}
+	if rowsAffected, _ := result.RowsAffected(); rowsAffected == 0 {
+		return domain.ErrChatNotFound
+	}
+	return nil
+}
