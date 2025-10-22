@@ -336,6 +336,30 @@ paths:
       tags:
       - Chats
   /chats/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a chat by its ID.
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Delete Chat
+      tags:
+      - Chats
     get:
       consumes:
       - application/json
