@@ -14,7 +14,7 @@ import (
 )
 
 func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCurrentUserResponse, error) {
-	row := r.db.QueryRowContext(ctx, "SELECT id, username, role, email, created_at FROM users WHERE id = $1", id)
+	row := r.db.QueryRowContext(ctx, "SELECT id, username,  email, created_at FROM users WHERE id = $1", id)
 
 	if err := row.Err(); err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCu
 
 	var user user.GetCurrentUserResponse
 
-	err := row.Scan(&user.Id, &user.Username, &user.Role, &user.Email, &user.CreatedAt)
+	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.CreatedAt)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrUserNotFound
@@ -140,55 +140,4 @@ func (r *Repository) GetUserNameAndEmailByIdForSendingVerificationEmail(ctx cont
 		return "", "", err
 	}
 	return username, email, nil
-}
-
-func (r *Repository) GetUserByIdForAdmin(ctx context.Context, id uuid.UUID) (*user.GetUserResponse, error) {
-	row := r.db.QueryRowContext(ctx, `
-		SELECT id, username, email, is_email_verified 
-		FROM users 
-		WHERE id = $1`, id)
-
-	if err := row.Err(); err != nil {
-		return nil, err
-	}
-
-	var responseUser user.GetUserResponse
-
-	err := row.Scan(&responseUser.ID, &responseUser.Username, &responseUser.Email, &responseUser.IsEmailVerified)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, domain.ErrUserNotFound
-		}
-		return nil, err
-	}
-
-	return &responseUser, nil
-}
-
-func (r *Repository) GetUsers(ctx context.Context, page, limit int) (user.GetUsersResponse, error) {
-	offset := (page - 1) * limit
-	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, username, email 
-		FROM users 
-		ORDER BY created_at DESC 
-		LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var users user.GetUsersResponse
-	for rows.Next() {
-		var u user.User
-		if err := rows.Scan(&u.Id, &u.Username, &u.Email); err != nil {
-			return nil, err
-		}
-		users = append(users, u)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return users, nil
 }

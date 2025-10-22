@@ -48,7 +48,6 @@ func runTableMigrations(db *sql.DB) {
 CREATE TABLE IF NOT EXISTS  users (
     id UUID PRIMARY KEY UNIQUE NOT NULL,
     username TEXT NOT NULL,
-	role TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL, -- encrypted
     created_at TIMESTAMP NOT NULL

@@ -30,8 +30,8 @@ func (r *Repository) CreateSignupData(ctx context.Context, signupData *auth.Sign
 
 func (r *Repository) createUser(tx *sql.Tx, user *domain.User) error {
 	_, err := tx.ExecContext(context.Background(),
-		"INSERT INTO users (id, username, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
-		user.Id, user.Username, user.Email, user.Password, user.Role, user.CreatedAt)
+		"INSERT INTO users (id, username, email, password,  created_at) VALUES ($1, $2, $3, $4, $5, $6)",
+		user.Id, user.Username, user.Email, user.Password, user.CreatedAt)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
 			return domain.ErrEmailAlreadyExists
@@ -49,14 +49,14 @@ func (r *Repository) createRefreshToken(tx *sql.Tx, record *domain.RefreshToken)
 }
 
 func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
-	row := r.db.QueryRowContext(ctx, "SELECT id, email, role, password FROM users WHERE email = $1", email)
+	row := r.db.QueryRowContext(ctx, "SELECT id, email,  password FROM users WHERE email = $1", email)
 
 	if err := row.Err(); err != nil {
 		return nil, err
 	}
 
 	var user domain.User
-	err := row.Scan(&user.Id, &user.Email, &user.Role, &user.Password)
+	err := row.Scan(&user.Id, &user.Email, &user.Password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrEmailNotFound
