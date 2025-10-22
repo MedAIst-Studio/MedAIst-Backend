@@ -157,8 +157,6 @@ func SetupRoutes(app *fiber.App) {
 
 	logoutHandler := auth.NewLogoutHandler(postgresRepo)
 	refreshTokenHandler := auth.NewRefreshTokenHandler(postgresRepo, jweTokenService)
-	getUserHandler := user.NewGetUserHandler(postgresRepo)
-	getUsersHandler := user.NewGetUsersHandler(postgresRepo, validator)
 	deleteAccountHandler := user.NewDeleteAccountHandler(postgresRepo, sl)
 	updateUsernameHandler := user.NewUpdateUsernameHandler(postgresRepo, validator)
 	getCurrentUserHandler := user.NewGetCurrentUserHandler(postgresRepo)
@@ -184,8 +182,6 @@ func SetupRoutes(app *fiber.App) {
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)
 
-	adminApp := app.Group("/admin", middlewareManager.AuthMiddleware, middlewareManager.AdminMiddleware)
-
 	authApp := app.Group("/auth")
 	authApp.Post("/signup", Handle(signupHandler, sl))
 	authApp.Post("/login", Handle(loginHandler, sl))
@@ -201,10 +197,6 @@ func SetupRoutes(app *fiber.App) {
 	usersApp.Delete("/account", Handle(deleteAccountHandler, sl))
 	usersApp.Patch("/account", Handle(updateUsernameHandler, sl))
 	usersApp.Patch("/password", Handle(updatePasswordHandler, sl))
-
-	usersAdminApp := adminApp.Group("/users")
-	usersAdminApp.Get("/", Handle(getUsersHandler, sl))
-	usersAdminApp.Get("/:id", Handle(getUserHandler, sl))
 
 	chatsApp := app.Group("/chats", middlewareManager.AuthMiddleware)
 	chatsApp.Get("/", Handle(getChatsHandler, sl))

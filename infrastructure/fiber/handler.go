@@ -75,18 +75,14 @@ func Handle[R Request, Res Response](handler HandlerInterface[R, Res], logger do
 		}
 
 		if c.Locals("requireAuth") == true {
-			role, ok := c.Locals("role").(string)
-			if !ok {
-				return handleError(c, fiber.StatusUnauthorized, errors.New("invalid role in context"), logger)
-			}
 
 			userID, ok := c.Locals("userID").(string)
 			if !ok {
 				return handleError(c, fiber.StatusUnauthorized, errors.New("invalid user_id in context"), logger)
 			}
 
-			ctx := context.WithValue(c.UserContext(), domain.RoleKey, role)
-			ctx = context.WithValue(ctx, domain.UserIDKey, userID)
+			ctx := context.WithValue(c.UserContext(), domain.UserIDKey, userID)
+
 			c.SetUserContext(ctx)
 		}
 

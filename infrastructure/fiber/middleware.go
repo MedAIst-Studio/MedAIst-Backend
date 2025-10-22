@@ -48,19 +48,6 @@ func (m *MiddlewareManager) AuthMiddleware(c *fiber.Ctx) error {
 		})
 	}
 	c.Locals("userID", payload.UserID)
-	c.Locals("role", payload.Role)
-	return c.Next()
-}
-
-func (m *MiddlewareManager) AdminMiddleware(c *fiber.Ctx) error {
-	role := c.Locals("role").(string)
-	if role != "ADMIN" {
-		return c.Status(fiber.StatusForbidden).JSON(domain.Error{
-			Message: domain.ErrForbidden.Error(),
-			Code:    fiber.StatusForbidden,
-		})
-	}
-
 	return c.Next()
 }
 
