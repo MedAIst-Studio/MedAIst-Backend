@@ -35,3 +35,16 @@ func (r *Repository) GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]
 	}
 	return files, nil
 }
+
+func (r *Repository) DeleteFileById(ctx context.Context, id uuid.UUID) error {
+	result, err := r.db.ExecContext(ctx, "DELETE FROM files WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected, _ := result.RowsAffected(); rowsAffected == 0 {
+		return domain.ErrFileNotFound
+	}
+
+	return nil
+}
