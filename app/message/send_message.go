@@ -3,6 +3,7 @@ package message
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
@@ -73,7 +74,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 			return nil, 500, err
 		}
 
-		chat := domain.NewChat(userId, req.PdfId, aiResp.Text)
+		chat := domain.NewChat(userId, req.PdfId, trimTitle(aiResp.Text))
 
 		err = h.Repo.CreateChat(ctx, chat)
 		if err != nil {
@@ -153,4 +154,8 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 
 	return resp, 200, nil
 
+}
+
+func trimTitle(title string) string {
+	return strings.TrimSpace(title)
 }
