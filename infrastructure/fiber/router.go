@@ -171,6 +171,7 @@ func SetupRoutes(app *fiber.App) {
 	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
 	getFilesHandler := file.NewGetFilesHandler(postgresRepo)
 	deleteFileByIdHandler := file.NewDeleteFileHandler(postgresRepo, minioInfraService, vectorDB)
+	getFileHandler := file.NewGetFileHandler(postgresRepo, minioInfraService)
 
 	sendMessageHandler := message.NewSendMessageHandler(message.Config{
 		PastMessagesLimit: 5,
@@ -209,6 +210,7 @@ func SetupRoutes(app *fiber.App) {
 	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
 	filesApp.Get("/", Handle(getFilesHandler, sl))
 	filesApp.Delete("/:id", Handle(deleteFileByIdHandler, sl))
+	filesApp.Get("/:id", Handle(getFileHandler, sl))
 
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
 	messagesApp.Post("/", Handle(sendMessageHandler, sl))

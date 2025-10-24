@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 
 	"github.com/gofiber/fiber/v2"
@@ -94,6 +95,11 @@ func Handle[R Request, Res Response](handler HandlerInterface[R, Res], logger do
 		// I send 204 status code if the response is nil
 		if res == nil {
 			return c.SendStatus(code)
+		}
+
+		if getFileRes, ok := any(res).(*file.GetFileResponse); ok {
+			c.Set("Content-Type", "application/pdf")
+			return c.Send(getFileRes.FileBytes)
 		}
 
 		return c.Status(code).JSON(res)
