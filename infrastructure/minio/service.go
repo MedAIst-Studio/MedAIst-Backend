@@ -8,6 +8,7 @@ import (
 	"mime"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -96,4 +97,22 @@ func (s *MinioService) DeleteFile(ctx context.Context, filePath string) error {
 		return fmt.Errorf("failed to delete file from minio: %w", err)
 	}
 	return nil
+}
+
+func (s *MinioService) GetFile(ctx context.Context, fileId uuid.UUID) ([]byte, error) {
+	objectName := fmt.Sprintf("uploads/%s%s", fileId.String(), ".pdf")
+
+	object, err := s.minioClient.GetObject(ctx, s.BucketName, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file from minio: %w", err)
+	}
+	defer object.Close()
+
+	buf := new(bytes.Buffer)
+	_, err = buf.ReadFrom(object)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file from minio object: %w", err)
+	}
+
+	return buf.Bytes(), nil
 }
