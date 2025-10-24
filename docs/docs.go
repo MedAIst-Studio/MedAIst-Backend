@@ -365,6 +365,45 @@ const docTemplate = `{
             }
         },
         "/files/{id}": {
+            "get": {
+                "description": "Retrieve a file by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/pdf"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Get File",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "delete": {
                 "security": [
                     {
