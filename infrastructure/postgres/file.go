@@ -48,3 +48,13 @@ func (r *Repository) DeleteFileById(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
+
+func (r *Repository) DoesUserHaveFile(ctx context.Context, userId uuid.UUID, fileId uuid.UUID) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM files WHERE id = $1 AND user_id = $2)`
+	err := r.db.QueryRowContext(ctx, query, fileId, userId).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
