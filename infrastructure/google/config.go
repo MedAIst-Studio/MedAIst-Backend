@@ -1,8 +1,6 @@
 package google
 
 import (
-	"fmt"
-
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"golang.org/x/oauth2"
@@ -26,10 +24,6 @@ type GoogleOAuthService struct {
 }
 
 func NewGoogleOAuthService(cfg *GoogleOAuthDependenciesConfig) *GoogleOAuthService {
-	fmt.Println("Initializing Google OAuth Service with Client ID:", cfg.ClientID)
-	fmt.Println("Initializing Google OAuth Service with Redirect URL:", cfg.RedirectURL)
-	fmt.Println("FRONTEND URL", cfg.FrontendURL)
-
 	return &GoogleOAuthService{
 		GoogleOAuthDependenciesConfig: *cfg,
 		config: &oauth2.Config{
