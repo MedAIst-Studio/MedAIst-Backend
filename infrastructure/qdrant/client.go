@@ -13,16 +13,23 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type Config struct {
+	Addr           string
+	CollectionName string
+	MinScore       float32
+	VectorSize     uint64
+	ChunkLimit     uint64
+}
+
 type QdrantVectorDB struct {
-	minScore          float32
+	Config
 	client            qdrant.PointsClient
 	collectionsClient qdrant.CollectionsClient
-	collectionName    string
 	conn              *grpc.ClientConn
 }
 
-func NewQdrantVectorDB(addr, collectionName string, minScore float32, vectorSize uint64) *QdrantVectorDB {
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
+	conn, err := grpc.NewClient(cfg.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to Qdrant: %w", err))
 	}
@@ -30,13 +37,11 @@ func NewQdrantVectorDB(addr, collectionName string, minScore float32, vectorSize
 	q := &QdrantVectorDB{
 		client:            qdrant.NewPointsClient(conn),
 		collectionsClient: qdrant.NewCollectionsClient(conn),
-		collectionName:    collectionName,
 		conn:              conn,
-		minScore:          minScore,
+		Config:            cfg,
 	}
 
-	// Collection'ı oluştur veya kontrol et
-	if err := q.ensureCollection(context.Background(), vectorSize); err != nil {
+	if err := q.ensureCollection(context.Background(), cfg.VectorSize); err != nil {
 		conn.Close()
 		panic(err)
 	}
@@ -46,7 +51,7 @@ func NewQdrantVectorDB(addr, collectionName string, minScore float32, vectorSize
 
 func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64) error {
 	_, err := q.collectionsClient.Get(ctx, &qdrant.GetCollectionInfoRequest{
-		CollectionName: q.collectionName,
+		CollectionName: q.Config.CollectionName,
 	})
 
 	if err == nil {
@@ -54,7 +59,7 @@ func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64
 	}
 
 	_, err = q.collectionsClient.Create(ctx, &qdrant.CreateCollection{
-		CollectionName: q.collectionName,
+		CollectionName: q.Config.CollectionName,
 		VectorsConfig: &qdrant.VectorsConfig{
 			Config: &qdrant.VectorsConfig_Params{
 				Params: &qdrant.VectorParams{
@@ -121,7 +126,7 @@ func (q *QdrantVectorDB) InsertEmbeddings(ctx context.Context, fileId uuid.UUID,
 	}
 
 	_, err := q.client.Upsert(ctx, &qdrant.UpsertPoints{
-		CollectionName: q.collectionName,
+		CollectionName: q.Config.CollectionName,
 		Points:         points,
 		// Wait:           true,
 	})
@@ -144,10 +149,10 @@ func convertPageNumbers(pageNumbers []int) []*qdrant.Value {
 
 func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) (string, error) {
 	searchRequest := &qdrant.SearchPoints{
-		CollectionName: q.collectionName,
+		CollectionName: q.Config.CollectionName,
 		Vector:         embedding,
-		Limit:          1, // Get the top match
-		ScoreThreshold: &q.minScore,
+		Limit:          q.Config.ChunkLimit,
+		ScoreThreshold: &q.Config.MinScore,
 		WithPayload: &qdrant.WithPayloadSelector{
 			SelectorOptions: &qdrant.WithPayloadSelector_Enable{
 				Enable: true,
@@ -199,7 +204,7 @@ func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID
 }
 func (q *QdrantVectorDB) DeleteEmbeddingsByFileId(ctx context.Context, fileId uuid.UUID) error {
 	_, err := q.client.Delete(ctx, &qdrant.DeletePoints{
-		CollectionName: q.collectionName,
+		CollectionName: q.Config.CollectionName,
 		Points: &qdrant.PointsSelector{
 			PointsSelectorOneOf: &qdrant.PointsSelector_Filter{
 				Filter: &qdrant.Filter{

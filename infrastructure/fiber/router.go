@@ -123,7 +123,15 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
-	vectorDB := qdrantInfra.NewQdrantVectorDB(os.Getenv("QDRANT_URL"), os.Getenv("QDRANT_COLLECTION_NAME"), 0.7, 1024)
+
+	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
+		Addr:           os.Getenv("QDRANT_URL"),
+		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
+		MinScore:       0.7,
+		VectorSize:     1024,
+		ChunkLimit:     5,
+	})
+
 	grok := grokInfra.NewGrokService(os.Getenv("GROK_API_KEY"), "grok-3")
 
 	slogLogger := slogInfra.NewLogger()
