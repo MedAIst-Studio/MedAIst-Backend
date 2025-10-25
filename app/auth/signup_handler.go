@@ -84,7 +84,7 @@ func (h *SignupHandler) Handle(ctx context.Context, req *SignupRequest) (*Signup
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	if err = h.repo.CreateSignupData(ctx, &SignupData{
+	if err = h.repo.CreateUser(ctx, &SignupData{
 		User:         user,
 		RefreshToken: domain.NewRefreshToken(user.Id, refreshToken),
 	}); err != nil {
