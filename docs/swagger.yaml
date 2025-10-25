@@ -45,6 +45,8 @@ definitions:
     properties:
       created_at:
         type: string
+      file_id:
+        type: string
       id:
         type: string
       title:

@@ -868,6 +868,9 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "file_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
