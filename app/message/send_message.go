@@ -157,5 +157,5 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 }
 
 func trimTitle(title string) string {
-	return strings.TrimSpace(title)
+	return strings.Trim(title, " ")
 }
