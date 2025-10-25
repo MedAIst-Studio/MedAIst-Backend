@@ -78,7 +78,9 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
+	googleInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/google"
 	grokInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/grok"
+	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
@@ -86,6 +88,7 @@ import (
 	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
+
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	"github.com/gofiber/fiber/v2"
@@ -137,8 +140,11 @@ func SetupRoutes(app *fiber.App) {
 	slogLogger := slogInfra.NewLogger()
 	sl := slogLogger
 	validator := validatorInfra.NewValidator(slogLogger)
-	// redisClient := redisInfra.NewRedisClient(os.Getenv("REDIS_URL"))
-	// fmt.Print(redisClient)
+
+	inMemoryClient := inMemoryInfra.NewInMemoryClient(inMemoryInfra.InMemoryConfig{
+		OAuthStateTTL:   time.Minute * 1,
+		OAuthSessionTTL: time.Minute * 15,
+	})
 
 	middlewareManager := NewMiddlewareManager(jweTokenService, slogLogger)
 
@@ -160,6 +166,19 @@ func SetupRoutes(app *fiber.App) {
 		Repo:         postgresRepo,
 		TokenService: jweTokenService,
 		Validator:    validator,
+		Logger:       slogLogger,
+	})
+
+	exchangeHandler := auth.NewExchangeHandler(inMemoryClient)
+
+	googleOAuthService := googleInfra.NewGoogleOAuthService(&googleInfra.GoogleOAuthDependenciesConfig{
+		Repo:         postgresRepo,
+		TokenService: jweTokenService,
+		Cache:        inMemoryClient,
+		FrontendURL:  os.Getenv("FRONTEND_URL"),
+		ClientID:     os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("GOOGLE_OAUTH_REDIRECT_URL"),
 		Logger:       slogLogger,
 	})
 
@@ -198,6 +217,10 @@ func SetupRoutes(app *fiber.App) {
 	authApp.Post("/login", Handle(loginHandler, sl))
 	authApp.Post("/logout", Handle(logoutHandler, sl))
 	authApp.Post("/refresh", Handle(refreshTokenHandler, sl))
+	authApp.Post("/exchange", Handle(exchangeHandler, sl))
+	authApp.Get("/google", googleOAuthService.RedirectHandler)
+
+	app.Get("/api/auth/google/callback", googleOAuthService.Callback)
 
 	usersPublicApp := app.Group("/users")
 	usersPublicApp.Post("/forgot-password", Handle(forgotPasswordHandler, sl))
