@@ -15,6 +15,7 @@ type GetChatsResponse []Chat
 type Chat struct {
 	Id        string    `json:"id"`
 	Title     string    `json:"title"`
+	FileId    string    `json:"file_id"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

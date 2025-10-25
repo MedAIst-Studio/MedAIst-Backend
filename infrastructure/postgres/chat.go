@@ -15,7 +15,7 @@ func (r *Repository) CreateChat(ctx context.Context, chat *domain.Chat) error {
 }
 
 func (r *Repository) GetChatsByUserID(ctx context.Context, userId uuid.UUID) ([]chat.Chat, error) {
-	rows, err := r.db.QueryContext(ctx, "SELECT id, title, created_at FROM chats WHERE user_id = $1", userId)
+	rows, err := r.db.QueryContext(ctx, "SELECT id, title, file_id, created_at FROM chats WHERE user_id = $1", userId)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (r *Repository) GetChatsByUserID(ctx context.Context, userId uuid.UUID) ([]
 	var chats []chat.Chat
 	for rows.Next() {
 		var chat chat.Chat
-		if err := rows.Scan(&chat.Id, &chat.Title, &chat.CreatedAt); err != nil {
+		if err := rows.Scan(&chat.Id, &chat.Title, &chat.FileId, &chat.CreatedAt); err != nil {
 			return nil, err
 		}
 		chats = append(chats, chat)
