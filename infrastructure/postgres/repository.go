@@ -49,7 +49,9 @@ CREATE TABLE IF NOT EXISTS  users (
     id UUID PRIMARY KEY UNIQUE NOT NULL,
     username TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL, -- encrypted
+    password TEXT, -- encrypted
+    oauth_provider TEXT,
+    oauth_id TEXT,
     created_at TIMESTAMP NOT NULL
 );
 
