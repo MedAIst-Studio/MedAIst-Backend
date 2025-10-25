@@ -15,7 +15,7 @@ func (r *Repository) CreateChat(ctx context.Context, chat *domain.Chat) error {
 }
 
 func (r *Repository) GetChatsByUserID(ctx context.Context, userId uuid.UUID) ([]chat.Chat, error) {
-	rows, err := r.db.QueryContext(ctx, "SELECT id, title, file_id, created_at FROM chats WHERE user_id = $1", userId)
+	rows, err := r.db.QueryContext(ctx, "SELECT id, title, file_id, created_at FROM chats WHERE user_id = $1 ORDER BY created_at DESC", userId)
 	if err != nil {
 		return nil, err
 	}
