@@ -7,10 +7,11 @@ import (
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
-func (r *Repository) CreateSignupData(ctx context.Context, signupData *auth.SignupData) error {
+func (r *Repository) CreateUser(ctx context.Context, signupData *auth.SignupData) error {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -32,6 +33,37 @@ func (r *Repository) createUser(tx *sql.Tx, user *domain.User) error {
 	_, err := tx.ExecContext(context.Background(),
 		"INSERT INTO users (id, username, email, password,  created_at) VALUES ($1, $2, $3, $4, $5)",
 		user.Id, user.Username, user.Email, user.Password, user.CreatedAt)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
+			return domain.ErrEmailAlreadyExists
+		}
+		return err
+	}
+	return nil
+}
+
+func (r *Repository) CreateUserByOAuth(ctx context.Context, signupData *auth.SignupData) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer rollbackTx(tx)
+
+	if err := r.createUserByOAuth(tx, signupData.User); err != nil {
+		return err
+	}
+
+	if err := r.createRefreshToken(tx, signupData.RefreshToken); err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (r *Repository) createUserByOAuth(tx *sql.Tx, user *domain.User) error {
+	_, err := tx.ExecContext(context.Background(),
+		"INSERT INTO users (id, username, email, oauth_provider, oauth_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
+		user.Id, user.Username, user.Email, user.OAuthInfo.Provider, user.OAuthInfo.Id, user.CreatedAt)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
 			return domain.ErrEmailAlreadyExists
@@ -105,4 +137,22 @@ func (r *Repository) RefreshTokenExists(ctx context.Context, token string) (bool
 		return false, err
 	}
 	return true, nil
+}
+
+func (r *Repository) UserExistsByOAuthID(ctx context.Context, provider string, oauthID string) (uuid.UUID, error) {
+	row := r.db.QueryRowContext(ctx, "SELECT id FROM users WHERE oauth_provider = $1 AND oauth_id = $2", provider, oauthID)
+
+	if err := row.Err(); err != nil {
+		return uuid.Nil, err
+	}
+
+	var userID uuid.UUID
+	err := row.Scan(&userID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return uuid.Nil, nil
+		}
+		return uuid.Nil, err
+	}
+	return userID, nil
 }
