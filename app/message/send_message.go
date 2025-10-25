@@ -73,7 +73,6 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		if err != nil {
 			return nil, 500, err
 		}
-
 		chat := domain.NewChat(userId, req.PdfId, trimTitle(aiResp.Text))
 
 		err = h.Repo.CreateChat(ctx, chat)
@@ -156,6 +155,6 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 
 }
 
-func trimTitle(title string) string {
-	return strings.Trim(title, " ")
+func trimTitle(s string) string {
+	return strings.ReplaceAll(s, "\"", "")
 }
