@@ -184,7 +184,7 @@ func SetupRoutes(app *fiber.App) {
 
 	logoutHandler := auth.NewLogoutHandler(postgresRepo)
 	refreshTokenHandler := auth.NewRefreshTokenHandler(postgresRepo, jweTokenService)
-	deleteAccountHandler := user.NewDeleteAccountHandler(postgresRepo, sl)
+	deleteAccountHandler := user.NewDeleteAccountHandler(postgresRepo, sl, minioInfraService, vectorDB)
 	updateUsernameHandler := user.NewUpdateUsernameHandler(postgresRepo, validator)
 	getCurrentUserHandler := user.NewGetCurrentUserHandler(postgresRepo)
 	updatePasswordHandler := user.NewChangePasswordHandler(postgresRepo, validator)
