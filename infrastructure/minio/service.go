@@ -116,3 +116,29 @@ func (s *MinioService) GetFile(ctx context.Context, fileId uuid.UUID) ([]byte, e
 
 	return buf.Bytes(), nil
 }
+
+func (s *MinioService) DeleteFiles(ctx context.Context, fileIds []string) error {
+	if len(fileIds) == 0 {
+		return nil
+	}
+
+	var errors []error
+	for _, fileId := range fileIds {
+		objectName := formatFilePath(fileId)
+		err := s.minioClient.RemoveObject(ctx, s.BucketName, objectName, minio.RemoveObjectOptions{})
+		if err != nil {
+			errors = append(errors, fmt.Errorf("failed to delete file %s: %w", objectName, err))
+		}
+	}
+
+	// Return combined errors if any occurred
+	if len(errors) > 0 {
+		return fmt.Errorf("failed to delete %d file(s): %v", len(errors), errors)
+	}
+
+	return nil
+}
+
+func formatFilePath(fileId string) string {
+	return "/uploads/" + fileId + ".pdf"
+}
