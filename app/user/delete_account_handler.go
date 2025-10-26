@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/google/uuid"
 )
 
 type DeleteAccountRequest struct {
@@ -39,18 +40,28 @@ func (h *DeleteAccountHandler) Handle(ctx context.Context, req *DeleteAccountReq
 
 	userId := domain.GetUserID(ctx)
 
-	fileIds, err := h.repo.DeleteAccount(ctx, userId)
+	fileUUIDs, err := h.repo.DeleteAccount(ctx, userId)
 	if err != nil {
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
+
+	fileIds := convertToStringSlice(fileUUIDs)
 
 	if err := h.fs.DeleteFiles(ctx, fileIds); err != nil {
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
-	if err := h.vb.DeleteVectors(ctx, fileIds); err != nil {
+	if err := h.vb.DeleteEmbeddingsByFileIDs(ctx, fileIds); err != nil {
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
 	return nil, http.StatusNoContent, nil
+}
+
+func convertToStringSlice(uuids []uuid.UUID) []string {
+	var strIds []string
+	for _, id := range uuids {
+		strIds = append(strIds, id.String())
+	}
+	return strIds
 }

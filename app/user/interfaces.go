@@ -32,9 +32,9 @@ type MailService interface {
 }
 
 type FileService interface {
-	DeleteFiles(ctx context.Context, ids []uuid.UUID) error
+	DeleteFiles(ctx context.Context, ids []string) error
 }
 
 type VectorRepository interface {
-	DeleteVectors(ctx context.Context, ids []uuid.UUID) error
+	DeleteEmbeddingsByFileIDs(ctx context.Context, ids []string) error
 }
