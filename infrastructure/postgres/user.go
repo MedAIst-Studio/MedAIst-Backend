@@ -32,13 +32,41 @@ func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCu
 	return &user, nil
 }
 
-func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) error {
-
-	_, err := r.db.ExecContext(ctx, "DELETE FROM users WHERE id = $1", id)
+func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) ([]uuid.UUID, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	defer tx.Rollback()
+
+	var fileIds []uuid.UUID
+	rows, err := tx.QueryContext(ctx, "SELECT id FROM files WHERE user_id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var fileId uuid.UUID
+		if err := rows.Scan(&fileId); err != nil {
+			return nil, err
+		}
+		fileIds = append(fileIds, fileId)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if _, err := tx.ExecContext(ctx, "DELETE FROM users WHERE id = $1", id); err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return fileIds, nil
 }
 
 func (r *Repository) UpdateUsername(ctx context.Context, id uuid.UUID, username string) error {
