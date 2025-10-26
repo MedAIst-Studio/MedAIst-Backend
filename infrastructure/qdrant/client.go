@@ -229,3 +229,42 @@ func (q *QdrantVectorDB) DeleteEmbeddingsByFileId(ctx context.Context, fileId uu
 	)
 	return err
 }
+
+func (q *QdrantVectorDB) DeleteEmbeddingsByFileIDs(ctx context.Context, fileIds []string) error {
+	if len(fileIds) == 0 {
+		return nil
+	}
+
+	filter := &qdrant.Filter{
+		Must: []*qdrant.Condition{
+			{
+				ConditionOneOf: &qdrant.Condition_Field{
+					Field: &qdrant.FieldCondition{
+						Key: "file_id",
+						Match: &qdrant.Match{
+							MatchValue: &qdrant.Match_Keywords{
+								Keywords: &qdrant.RepeatedStrings{
+									Strings: fileIds,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	_, err := q.client.Delete(ctx, &qdrant.DeletePoints{
+		CollectionName: q.CollectionName,
+		Points: &qdrant.PointsSelector{
+			PointsSelectorOneOf: &qdrant.PointsSelector_Filter{
+				Filter: filter,
+			},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete embeddings for file IDs: %w", err)
+	}
+
+	return nil
+}
