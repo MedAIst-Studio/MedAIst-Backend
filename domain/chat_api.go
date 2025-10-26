@@ -22,10 +22,10 @@ type ChatMessage struct {
 	Content string `json:"content"`
 }
 
-func NewChatRequest(stream bool, relevantText, userMessage string) *ChatRequest {
+func NewChatRequest(stream bool, relevantTexts []string, userMessage string) *ChatRequest {
 	return &ChatRequest{
 		Stream:   stream,
-		Messages: buildInitialMessages(relevantText, userMessage),
+		Messages: buildInitialMessages(relevantTexts, userMessage),
 	}
 }
 
@@ -43,12 +43,17 @@ func buildSystemMessage() *ChatMessage {
 	)
 }
 
-func buildInitialMessages(relevantText, userMessage string) []ChatMessage {
-	return []ChatMessage{
+func buildInitialMessages(relevantTexts []string, userMessage string) []ChatMessage {
+	messages := []ChatMessage{
 		*buildSystemMessage(),
-		*NewChatMessage(RoleUser, "Here are the relevant excerpts from the medical document:\n"+relevantText),
-		*NewChatMessage(RoleUser, userMessage),
 	}
+
+	for _, text := range relevantTexts {
+		messages = append(messages, *NewChatMessage(RoleUser, "Here are the relevant excerpts from the medical document:\n"+text))
+	}
+
+	messages = append(messages, *NewChatMessage(RoleUser, userMessage))
+	return messages
 }
 
 func (r *ChatRequest) AppendUserMessage(content string) {
