@@ -64,8 +64,8 @@ var (
 	ErrEmailAlreadyExists   = errors.New("E-posta zaten kayıtlı")
 	ErrMissingRefreshToken  = errors.New("Yenileme token'ı eksik")
 
-	ErrNotFoundInPDF  = errors.New("PDF'de aradığınız bilgi bulunamadı, lütfen farklı bir soru deneyin")
-	ErrChatNotFound   = errors.New("Sohbet mevcut değil")
-	ErrFileNotFound   = errors.New("Dosya mevcut değil")
-	ErrInternalServer = errors.New("Sunucu hatası")
+	ErrInfoNotFoundInPDF = errors.New("PDF'de aradığınız bilgi bulunamadı, lütfen farklı bir soru deneyin")
+	ErrChatNotFound      = errors.New("Sohbet mevcut değil")
+	ErrFileNotFound      = errors.New("Dosya mevcut değil")
+	ErrInternalServer    = errors.New("Sunucu hatası")
 )

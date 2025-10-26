@@ -96,7 +96,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 
 	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
 	if err != nil {
-		if errors.Is(err, domain.ErrNotFoundInPDF) {
+		if errors.Is(err, domain.ErrInfoNotFoundInPDF) {
 			aiMessage := domain.NewMessage(userMessage.ChatId, err.Error(), false)
 			if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
 				return nil, 500, err

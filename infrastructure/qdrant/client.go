@@ -182,7 +182,7 @@ func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID
 	}
 
 	if len(searchResult.Result) == 0 {
-		return "", domain.ErrNotFoundInPDF
+		return "", domain.ErrInfoNotFoundInPDF
 	}
 
 	payload := searchResult.Result[0].Payload
