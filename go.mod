@@ -12,10 +12,10 @@ require (
 	github.com/mailersend/mailersend-go v1.6.1
 	github.com/minio/minio-go/v7 v7.0.95
 	github.com/qdrant/go-client v1.15.2
-	github.com/redis/go-redis/v9 v9.14.0
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.42.0
+	golang.org/x/oauth2 v0.32.0
 	google.golang.org/grpc v1.66.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
@@ -26,8 +26,6 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -58,7 +56,6 @@ require (
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/oauth2 v0.32.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
