@@ -147,16 +147,18 @@ func convertPageNumbers(pageNumbers []int) []*qdrant.Value {
 	return values
 }
 
-func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) (string, error) {
+func (q *QdrantVectorDB) SearchByEmbedding(
+	ctx context.Context,
+	fileId uuid.UUID,
+	embedding []float32,
+) ([]string, error) {
 	searchRequest := &qdrant.SearchPoints{
 		CollectionName: q.Config.CollectionName,
 		Vector:         embedding,
 		Limit:          q.Config.ChunkLimit,
 		ScoreThreshold: &q.Config.MinScore,
 		WithPayload: &qdrant.WithPayloadSelector{
-			SelectorOptions: &qdrant.WithPayloadSelector_Enable{
-				Enable: true,
-			},
+			SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true},
 		},
 		Filter: &qdrant.Filter{
 			Must: []*qdrant.Condition{
@@ -176,32 +178,42 @@ func (q *QdrantVectorDB) SearchByEmbedding(ctx context.Context, fileId uuid.UUID
 		},
 	}
 
+	// Qdrant sorgusunu çalıştır
 	searchResult, err := q.client.Search(ctx, searchRequest)
 	if err != nil {
-		return "", fmt.Errorf("failed to search vectors: %w", err)
+		return nil, fmt.Errorf("vector search failed: %w", err)
 	}
 
 	if len(searchResult.Result) == 0 {
-		return "", domain.ErrInfoNotFoundInPDF
+		return nil, domain.ErrInfoNotFoundInPDF
 	}
 
-	payload := searchResult.Result[0].Payload
-	if payload == nil {
-		return "", fmt.Errorf("no payload found in search result")
+	var texts []string
+	for _, point := range searchResult.Result {
+		if point.Payload == nil {
+			continue
+		}
+
+		val, ok := point.Payload["text"]
+		if !ok || val == nil {
+			continue
+		}
+
+		text := val.GetStringValue()
+		if text == "" {
+			continue
+		}
+
+		texts = append(texts, text)
 	}
 
-	textValue, ok := payload["text"]
-	if !ok {
-		return "", fmt.Errorf("text field not found in payload")
+	if len(texts) == 0 {
+		return nil, fmt.Errorf("no valid text payloads found in results")
 	}
 
-	text := textValue.GetStringValue()
-	if text == "" {
-		return "", fmt.Errorf("text content is empty")
-	}
-
-	return text, nil
+	return texts, nil
 }
+
 func (q *QdrantVectorDB) DeleteEmbeddingsByFileId(ctx context.Context, fileId uuid.UUID) error {
 	_, err := q.client.Delete(ctx, &qdrant.DeletePoints{
 		CollectionName: q.Config.CollectionName,
