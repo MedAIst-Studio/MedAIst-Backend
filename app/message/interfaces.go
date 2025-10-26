@@ -14,7 +14,7 @@ type Repository interface {
 }
 
 type VectorRepository interface {
-	SearchByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) (string, error)
+	SearchByEmbedding(ctx context.Context, fileId uuid.UUID, embedding []float32) ([]string, error)
 }
 
 type EmbeddingRequest struct {

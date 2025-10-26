@@ -94,7 +94,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	relevantText, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
+	relevantTexts, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
 	if err != nil {
 		if errors.Is(err, domain.ErrInfoNotFoundInPDF) {
 			aiMessage := domain.NewMessage(userMessage.ChatId, err.Error(), false)
@@ -119,7 +119,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	aiReq := domain.NewChatRequest(h.Stream, relevantText, req.Content)
+	aiReq := domain.NewChatRequest(h.Stream, relevantTexts, req.Content)
 
 	if isSubsequentMessage {
 		pastMessages, err := h.Repo.GetChatHistoryForAIContext(ctx, userMessage.ChatId, h.PastMessagesLimit)
