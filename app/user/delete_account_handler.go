@@ -15,10 +15,12 @@ type DeleteAccountResponse struct{}
 type DeleteAccountHandler struct {
 	repo   Repository
 	logger domain.Logger
+	fs     FileService
+	vb     VectorRepository
 }
 
-func NewDeleteAccountHandler(repo Repository, logger domain.Logger) *DeleteAccountHandler {
-	return &DeleteAccountHandler{repo: repo, logger: logger}
+func NewDeleteAccountHandler(repo Repository, logger domain.Logger, fs FileService, vb VectorRepository) *DeleteAccountHandler {
+	return &DeleteAccountHandler{repo: repo, logger: logger, fs: fs, vb: vb}
 }
 
 // Handle processes the request to delete a user's account.
@@ -37,7 +39,16 @@ func (h *DeleteAccountHandler) Handle(ctx context.Context, req *DeleteAccountReq
 
 	userId := domain.GetUserID(ctx)
 
-	if err := h.repo.DeleteAccount(ctx, userId); err != nil {
+	fileIds, err := h.repo.DeleteAccount(ctx, userId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, domain.ErrInternalServer
+	}
+
+	if err := h.fs.DeleteFiles(ctx, fileIds); err != nil {
+		return nil, http.StatusInternalServerError, domain.ErrInternalServer
+	}
+
+	if err := h.vb.DeleteVectors(ctx, fileIds); err != nil {
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer
 	}
 
