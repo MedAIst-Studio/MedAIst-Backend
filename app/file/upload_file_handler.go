@@ -115,7 +115,7 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 	}
 
 	if err := h.repo.SaveFileInformation(ctx, newFile); err != nil {
-		// TODO delete from min.io
+		h.fl.DeleteFile(ctx, formatFilePath(newFile.Id))
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, 400, err
 		}
@@ -124,6 +124,10 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 
 	chunks, err := h.chunker.ChunkPDF(ctx, fileBytes, newFile.Id.String())
 	if err != nil {
+		h.recover(ctx, newFile.Id)
+		if !errors.Is(err, domain.ErrInternalServer) {
+			return nil, 400, err
+		}
 		return nil, 500, err
 	}
 
@@ -157,6 +161,7 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 
 		embeddingRes, err := h.ems.GenerateEmbeddingBatch(ctx, embeddingReq)
 		if err != nil {
+			h.recover(ctx, newFile.Id)
 			return nil, 500, err
 		}
 
@@ -169,12 +174,14 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 			if emb, exists := embeddingMap[resultEmb.Id]; exists {
 				emb.Vector = resultEmb.Vector
 			} else {
+				h.recover(ctx, newFile.Id)
 				return nil, 500, fmt.Errorf("embedding ID %s not found in batch", resultEmb.Id)
 			}
 		}
 
 		for _, emb := range embeddings {
 			if len(emb.Vector) == 0 {
+				h.recover(ctx, newFile.Id)
 				return nil, 500, fmt.Errorf("embedding %s has no vector", emb.Id)
 			}
 		}
@@ -191,10 +198,17 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		}
 
 		if err := h.vb.InsertEmbeddings(ctx, newFile.Id, fileMetadatas); err != nil {
+			h.recover(ctx, newFile.Id)
 			return nil, 500, err
 		}
 
 	}
 
 	return nil, 200, nil
+}
+
+func (h *UploadFileHandler) recover(ctx context.Context, fileId uuid.UUID) {
+	h.repo.DeleteFileById(ctx, fileId)
+	h.fl.DeleteFile(ctx, formatFilePath(fileId))
+	h.vb.DeleteEmbeddingsByFileId(ctx, fileId)
 }
