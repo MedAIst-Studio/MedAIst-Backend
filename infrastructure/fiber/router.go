@@ -78,6 +78,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
+	facebookInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/facebook"
 	googleInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/google"
 	grokInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/grok"
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
@@ -182,6 +183,17 @@ func SetupRoutes(app *fiber.App) {
 		Logger:       slogLogger,
 	})
 
+	facebookOAuthService := facebookInfra.NewFacebookOAuthService(&facebookInfra.FacebookOAuthDependenciesConfig{
+		Repo:         postgresRepo,
+		TokenService: jweTokenService,
+		Cache:        inMemoryClient,
+		FrontendURL:  os.Getenv("FRONTEND_URL"),
+		ClientID:     os.Getenv("FACEBOOK_OAUTH_CLIENT_ID"),
+		ClientSecret: os.Getenv("FACEBOOK_OAUTH_CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("FACEBOOK_OAUTH_REDIRECT_URL"),
+		Logger:       slogLogger,
+	})
+
 	logoutHandler := auth.NewLogoutHandler(postgresRepo)
 	refreshTokenHandler := auth.NewRefreshTokenHandler(postgresRepo, jweTokenService)
 	deleteAccountHandler := user.NewDeleteAccountHandler(postgresRepo, sl, minioInfraService, vectorDB)
@@ -219,8 +231,10 @@ func SetupRoutes(app *fiber.App) {
 	authApp.Post("/refresh", Handle(refreshTokenHandler, sl))
 	authApp.Post("/exchange", Handle(exchangeHandler, sl))
 	authApp.Get("/google", googleOAuthService.RedirectHandler)
+	authApp.Get("/facebook", facebookOAuthService.RedirectHandler)
 
 	app.Get("/api/auth/google/callback", googleOAuthService.Callback)
+	app.Get("/api/auth/facebook/callback", facebookOAuthService.Callback)
 
 	usersPublicApp := app.Group("/users")
 	usersPublicApp.Post("/forgot-password", Handle(forgotPasswordHandler, sl))
