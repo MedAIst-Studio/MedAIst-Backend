@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS oauth (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE NO ACTION,
     oauth_provider TEXT NOT NULL,
     oauth_id TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE (oauth_provider, oauth_id, user_id)
 );
 
