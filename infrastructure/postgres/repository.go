@@ -41,8 +41,8 @@ func rollbackTx(tx *sql.Tx) {
 }
 
 func runTableMigrations(db *sql.DB) {
+	// TODO make email unique
 	createTableQuery := `
-
 
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS  users (
@@ -50,9 +50,16 @@ CREATE TABLE IF NOT EXISTS  users (
     username TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT, -- encrypted
-    oauth_provider TEXT,
-    oauth_id TEXT,
     created_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS oauth (
+    id UUID PRIMARY KEY UNIQUE NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+    oauth_provider TEXT NOT NULL,
+    oauth_id TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    UNIQUE (oauth_provider, oauth_id, user_id)
 );
 
 -- FILES TABLE
