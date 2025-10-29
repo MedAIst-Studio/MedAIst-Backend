@@ -64,10 +64,7 @@
 package fiber
 
 import (
-	"fmt"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
@@ -76,19 +73,6 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
-	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
-	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
-	facebookInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/facebook"
-	googleInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/google"
-	grokInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/grok"
-	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
-	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
-	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
-	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
-	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
-	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
-	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
-	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
 
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
@@ -96,58 +80,9 @@ import (
 )
 
 func SetupRoutes(app *fiber.App) {
-	postgresRepo := postgresInfra.NewRepository(os.Getenv("DATABASE_URL"))
-	fmt.Println("Connected to database")
+	dc := NewAuthDependencyContainer()
 
-	jweTokenService := jwe.NewJWETokenService(&jwe.Config{
-		AccessTokenEncryptionKey:  "12345678901234567890123456789012",
-		RefreshTokenEncryptionKey: "12345678901234567890123456789012",
-		SecureEmailEncryptionKey:  "12345678901234567890123456789012",
-		AuthAccessTokenDuration:   time.Minute * 15,
-		AuthRefreshTokenDuration:  time.Hour * 24 * 30,
-		SecureEmailTokenDuration:  time.Minute * 11,
-	})
-
-	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
-
-	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
-		Endpoint:        "minio:9000",
-		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
-		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
-		UseSSL:          false,
-		BucketName:      "files",
-		Location:        "us-east-1",
-	})
-	fmt.Println("Connected to MinIO at", "localhost:9000")
-
-	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
-		MaxChunkSize:    1024,
-		OverlapSize:     128,
-		PreserveContext: true,
-	})
-
-	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
-
-	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
-		Addr:           os.Getenv("QDRANT_URL"),
-		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
-		MinScore:       0.7,
-		VectorSize:     1024,
-		ChunkLimit:     5,
-	})
-
-	grok := grokInfra.NewGrokService(os.Getenv("GROK_API_KEY"), "grok-3")
-
-	slogLogger := slogInfra.NewLogger()
-	sl := slogLogger
-	validator := validatorInfra.NewValidator(slogLogger)
-
-	inMemoryClient := inMemoryInfra.NewInMemoryClient(inMemoryInfra.InMemoryConfig{
-		OAuthStateTTL:   time.Minute * 1,
-		OAuthSessionTTL: time.Minute * 15,
-	})
-
-	middlewareManager := NewMiddlewareManager(jweTokenService, slogLogger)
+	middlewareManager := NewMiddlewareManager(dc.jweTokenService, dc.slogLogger)
 
 	healthcheckHandler := healthcheck.NewHealthcheckHandler()
 
@@ -156,71 +91,53 @@ func SetupRoutes(app *fiber.App) {
 	}
 
 	signupHandler := auth.NewSignupHandler(&auth.SignupConfig{
-		Repo:         postgresRepo,
-		TokenService: jweTokenService,
-		EmailService: mailersendService,
-		Validator:    validator,
-		Logger:       slogLogger,
+		Repo:         dc.Repo,
+		TokenService: dc.jweTokenService,
+		EmailService: dc.mailerSender,
+		Validator:    dc.Validator,
+		Logger:       dc.slogLogger,
 	})
 
 	loginHandler := auth.NewLoginHandler(&auth.LoginConfig{
-		Repo:         postgresRepo,
-		TokenService: jweTokenService,
-		Validator:    validator,
-		Logger:       slogLogger,
+		Repo:         dc.Repo,
+		TokenService: dc.jweTokenService,
+		Validator:    dc.Validator,
+		Logger:       dc.slogLogger,
 	})
 
-	exchangeHandler := auth.NewExchangeHandler(inMemoryClient)
+	exchangeHandler := auth.NewExchangeHandler(dc.inMemoryClient)
 
-	googleOAuthService := googleInfra.NewGoogleOAuthService(&googleInfra.GoogleOAuthDependenciesConfig{
-		Repo:         postgresRepo,
-		TokenService: jweTokenService,
-		Cache:        inMemoryClient,
-		FrontendURL:  os.Getenv("FRONTEND_URL"),
-		ClientID:     os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
-		ClientSecret: os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"),
-		RedirectURL:  os.Getenv("GOOGLE_OAUTH_REDIRECT_URL"),
-		Logger:       slogLogger,
-	})
+	googleOAuthService := NewGoogleOAuthService(dc)
+	facebookOAuthService := NewFacebookOAuthService(dc)
 
-	facebookOAuthService := facebookInfra.NewFacebookOAuthService(&facebookInfra.FacebookOAuthDependenciesConfig{
-		Repo:         postgresRepo,
-		TokenService: jweTokenService,
-		Cache:        inMemoryClient,
-		FrontendURL:  os.Getenv("FRONTEND_URL"),
-		ClientID:     os.Getenv("FACEBOOK_OAUTH_CLIENT_ID"),
-		ClientSecret: os.Getenv("FACEBOOK_OAUTH_CLIENT_SECRET"),
-		RedirectURL:  os.Getenv("FACEBOOK_OAUTH_REDIRECT_URL"),
-		Logger:       slogLogger,
-	})
+	logoutHandler := auth.NewLogoutHandler(dc.Repo)
+	refreshTokenHandler := auth.NewRefreshTokenHandler(dc.Repo, dc.jweTokenService)
+	deleteAccountHandler := user.NewDeleteAccountHandler(dc.Repo, dc.slogLogger, dc.FileStorage, dc.VectorDB)
+	updateUsernameHandler := user.NewUpdateUsernameHandler(dc.Repo, dc.Validator)
+	getCurrentUserHandler := user.NewGetCurrentUserHandler(dc.Repo)
+	updatePasswordHandler := user.NewChangePasswordHandler(dc.Repo, dc.Validator)
+	forgotPasswordHandler := user.NewForgotPasswordHandler(dc.Repo, dc.mailerSender, dc.jweTokenService, dc.slogLogger, dc.Validator)
+	resetPasswordHandler := user.NewResetPasswordHandler(dc.Repo, dc.jweTokenService, dc.slogLogger, dc.Validator)
 
-	logoutHandler := auth.NewLogoutHandler(postgresRepo)
-	refreshTokenHandler := auth.NewRefreshTokenHandler(postgresRepo, jweTokenService)
-	deleteAccountHandler := user.NewDeleteAccountHandler(postgresRepo, sl, minioInfraService, vectorDB)
-	updateUsernameHandler := user.NewUpdateUsernameHandler(postgresRepo, validator)
-	getCurrentUserHandler := user.NewGetCurrentUserHandler(postgresRepo)
-	updatePasswordHandler := user.NewChangePasswordHandler(postgresRepo, validator)
-	forgotPasswordHandler := user.NewForgotPasswordHandler(postgresRepo, mailersendService, jweTokenService, sl, validator)
-	resetPasswordHandler := user.NewResetPasswordHandler(postgresRepo, jweTokenService, sl, validator)
+	getChatsHandler := chat.NewGetChatsHandler(dc.Repo)
+	getChatByIDHandler := chat.NewGetChatByIDHandler(dc.Repo)
+	deleteChatHandler := chat.NewDeleteChatHandler(dc.Repo)
 
-	getChatsHandler := chat.NewGetChatsHandler(postgresRepo)
-	getChatByIDHandler := chat.NewGetChatByIDHandler(postgresRepo)
-	deleteChatHandler := chat.NewDeleteChatHandler(postgresRepo)
-
-	uploadFileHandler := file.NewUploadFileHandler(postgresRepo, minioInfraService, vectorDB, embeddingService, chunker, 48, true)
-	getFilesHandler := file.NewGetFilesHandler(postgresRepo)
-	deleteFileByIdHandler := file.NewDeleteFileHandler(postgresRepo, minioInfraService, vectorDB)
-	getFileHandler := file.NewGetFileHandler(postgresRepo, minioInfraService)
+	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, dc.Embedding, dc.Chunker, 48, true)
+	getFilesHandler := file.NewGetFilesHandler(dc.Repo)
+	deleteFileByIdHandler := file.NewDeleteFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB)
+	getFileHandler := file.NewGetFileHandler(dc.Repo, dc.FileStorage)
 
 	sendMessageHandler := message.NewSendMessageHandler(message.Config{
 		PastMessagesLimit: 5,
 		Stream:            false,
-		Repo:              postgresRepo,
-		Ems:               embeddingService,
-		Vb:                vectorDB,
-		ChatSvc:           grok,
+		Repo:              dc.Repo,
+		Ems:               dc.Embedding,
+		Vb:                dc.VectorDB,
+		ChatSvc:           dc.grokClient,
 	})
 
+	sl := dc.slogLogger
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)
 
