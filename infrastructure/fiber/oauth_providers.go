@@ -19,7 +19,7 @@ func NewGoogleOAuthService(container *DependencyContainer) *oauth.OAuthProvider 
 			ClientID:       os.Getenv("GOOGLE_OAUTH_CLIENT_ID"),
 			ClientSecret:   os.Getenv("GOOGLE_OAUTH_CLIENT_SECRET"),
 			RedirectURL:    os.Getenv("GOOGLE_OAUTH_REDIRECT_URL"),
-			GetUserInfoURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+			GetUserInfoURL: "https://www.googleapis.com/oauth2/v2/userinfo",
 			Logger:         container.slogLogger,
 		}, google.Endpoint, []string{
 			"https://www.googleapis.com/auth/userinfo.email",
