@@ -14,22 +14,15 @@ const (
 )
 
 type User struct {
-	Id              uuid.UUID  `json:"id" validate:"required"`
-	Username        string     `json:"username" validate:"required"`
-	Password        string     `json:"password" validate:"required"`
-	IsEmailVerified bool       `json:"isEmailVerified" validate:"required"`
-	CreatedAt       time.Time  `json:"createdAt" validate:"required"`
-	Email           string     `json:"email" validate:"required"`
-	OAuthInfo       *OAuthInfo `json:"oauthInfo,omitempty"`
-}
-
-type OAuthInfo struct {
-	Id       string
-	Provider string
+	Id              uuid.UUID `json:"id" validate:"required"`
+	Username        string    `json:"username" validate:"required"`
+	Password        string    `json:"password" validate:"required"`
+	IsEmailVerified bool      `json:"isEmailVerified" validate:"required"`
+	CreatedAt       time.Time `json:"createdAt" validate:"required"`
+	Email           string    `json:"email" validate:"required"`
 }
 
 func NewUser(username, password, email string) (*User, error) {
-
 	if err := ValidateUsername(username); err != nil {
 		return nil, err
 	}
@@ -50,22 +43,6 @@ func NewUser(username, password, email string) (*User, error) {
 		Email:     email,
 		CreatedAt: time.Now(),
 	}, nil
-}
-
-func NewOAuthUser(username, email, provider, oauthID string) *User {
-	{
-		return &User{
-			Id:       uuid.New(),
-			Username: username,
-			Password: "",
-			Email:    email,
-			OAuthInfo: &OAuthInfo{
-				Id:       oauthID,
-				Provider: provider,
-			},
-			CreatedAt: time.Now(),
-		}
-	}
 }
 
 func (u *User) ValidatePassword(password string) error {
