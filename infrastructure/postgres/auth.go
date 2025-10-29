@@ -62,15 +62,19 @@ func (r *Repository) CreateUserByOAuth(ctx context.Context, signupData *auth.Sig
 
 func (r *Repository) createUserByOAuth(tx *sql.Tx, user *domain.User) error {
 	_, err := tx.ExecContext(context.Background(),
-		"INSERT INTO users (id, username, email, oauth_provider, oauth_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
-		user.Id, user.Username, user.Email, user.OAuthInfo.Provider, user.OAuthInfo.Id, user.CreatedAt)
+		"INSERT INTO users (id, username, email, created_at) VALUES ($1, $2, $3, $4)",
+		user.Id, user.Username, user.Email, user.CreatedAt)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == "23505" {
 			return domain.ErrEmailAlreadyExists
 		}
 		return err
 	}
-	return nil
+
+	_, err = tx.ExecContext(context.Background(),
+		"INSERT INTO oauth (id, user_id, oauth_provider, oauth_id, created_at) VALUES ($1, $2, $3, $4, $5)",
+		uuid.New(), user.Id, user.OAuthInfo.Provider, user.OAuthInfo.Id, user.CreatedAt)
+	return err
 }
 
 func (r *Repository) createRefreshToken(tx *sql.Tx, record *domain.RefreshToken) error {
