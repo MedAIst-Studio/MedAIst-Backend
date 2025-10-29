@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 )
 
 type InMemoryConfig struct {
@@ -106,7 +106,7 @@ func (c *InMemoryClient) DeleteOAuthState(ctx context.Context, state string) err
 	return nil
 }
 
-func (c *InMemoryClient) SaveOAuthSession(ctx context.Context, session *auth.OAuthSession) error {
+func (c *InMemoryClient) SaveOAuthSession(ctx context.Context, session *domain.OAuthSession) error {
 	data := map[string]interface{}{
 		"access_token":  session.AccessToken,
 		"refresh_token": session.RefreshToken,
@@ -122,7 +122,7 @@ func (c *InMemoryClient) SaveOAuthSession(ctx context.Context, session *auth.OAu
 	return nil
 }
 
-func (c *InMemoryClient) GetOAuthSession(ctx context.Context, sessionKey string) (*auth.OAuthSession, error) {
+func (c *InMemoryClient) GetOAuthSession(ctx context.Context, sessionKey string) (*domain.OAuthSession, error) {
 	data, err := c.get(sessionKey)
 	if err != nil {
 		return nil, fmt.Errorf("session not found")
@@ -133,7 +133,7 @@ func (c *InMemoryClient) GetOAuthSession(ctx context.Context, sessionKey string)
 		return nil, fmt.Errorf("failed to unmarshal session: %w", err)
 	}
 
-	session := &auth.OAuthSession{
+	session := &domain.OAuthSession{
 		SessionKey:   sessionData["session_key"].(string),
 		AccessToken:  sessionData["access_token"].(string),
 		RefreshToken: sessionData["refresh_token"].(string),
