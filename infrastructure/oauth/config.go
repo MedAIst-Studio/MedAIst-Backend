@@ -7,15 +7,16 @@ import (
 )
 
 type OAuthDependenciesConfig struct {
-	Provider     string
-	Repository   auth.Repository
-	TokenService auth.TokenService
-	Cache        auth.Cache
-	Logger       domain.Logger
-	ClientID     string
-	ClientSecret string
-	RedirectURL  string
-	FrontendURL  string
+	Provider       string
+	Repository     auth.Repository
+	TokenService   auth.TokenService
+	Cache          auth.Cache
+	Logger         domain.Logger
+	ClientID       string
+	ClientSecret   string
+	RedirectURL    string
+	FrontendURL    string
+	GetUserInfoURL string
 }
 
 type OAuthProvider struct {

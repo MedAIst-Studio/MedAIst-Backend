@@ -16,7 +16,6 @@ import (
 )
 
 func (h *OAuthProvider) Callback(ctx *fiber.Ctx) error {
-	fmt.Println("Facebook OAuth callback invoked")
 	code := ctx.Query("code")
 	state := ctx.Query("state")
 
@@ -37,8 +36,7 @@ func (h *OAuthProvider) Callback(ctx *fiber.Ctx) error {
 		return h.redirectToFrontendWithError(ctx, "token_exchange_failed")
 	}
 
-	userInfo, err := h.getFacebookUserInfo(token)
-	fmt.Printf("user Facebook Info: %v\n", userInfo)
+	userInfo, err := h.getUserInfo(token)
 	if err != nil {
 		h.Logger.Error("failed to get user info: ", err)
 		return h.redirectToFrontendWithError(ctx, "user_info_failed")
@@ -51,7 +49,6 @@ func (h *OAuthProvider) Callback(ctx *fiber.Ctx) error {
 		return h.redirectToFrontendWithError(ctx, "user_handling_failed")
 	}
 
-	// Session oluştur
 	sessionKey := generateSessionKey()
 	fmt.Printf("sessionKey: %v\n", sessionKey)
 	session := &auth.OAuthSession{
@@ -68,21 +65,21 @@ func (h *OAuthProvider) Callback(ctx *fiber.Ctx) error {
 	return h.redirectToFrontendCallback(ctx, sessionKey)
 }
 
-type FacebookUserInfo struct {
+type OAuthUserInfo struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
 	Name  string `json:"name"`
 }
 
-func (h *OAuthProvider) getFacebookUserInfo(token *oauth2.Token) (*FacebookUserInfo, error) {
+func (h *OAuthProvider) getUserInfo(token *oauth2.Token) (*OAuthUserInfo, error) {
 	client := h.config.Client(context.Background(), token)
-	resp, err := client.Get("https://graph.facebook.com/me?fields=id,name,email")
+	resp, err := client.Get(h.GetUserInfoURL)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	var info FacebookUserInfo
+	var info OAuthUserInfo
 	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		return nil, err
 	}
@@ -94,15 +91,15 @@ type Tokens struct {
 	Access  string
 }
 
-func (h *OAuthProvider) handleUser(ctx *fiber.Ctx, facebookUser *FacebookUserInfo) (*Tokens, error) {
-	currentUserId, err := h.Repository.UserExistsByOAuthID(ctx.Context(), "FACEBOOK", facebookUser.ID)
+func (h *OAuthProvider) handleUser(ctx *fiber.Ctx, oauthUser *OAuthUserInfo) (*Tokens, error) {
+	currentUserId, err := h.Repository.UserExistsByOAuthID(ctx.Context(), h.Provider, oauthUser.ID)
 	if err != nil {
 		return nil, err
 	}
 	fmt.Printf("currentUserId: %v\n", currentUserId)
 	isNewUser := currentUserId == uuid.Nil
 
-	user := domain.NewOAuthUser(facebookUser.Name, facebookUser.Email, "FACEBOOK", facebookUser.ID)
+	user := domain.NewOAuthUser(oauthUser.Name, oauthUser.Email, h.Provider, oauthUser.ID)
 
 	if isNewUser {
 		currentUserId = user.Id
