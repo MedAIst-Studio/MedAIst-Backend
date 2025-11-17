@@ -89,49 +89,63 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	embedding, err := h.Ems.GenerateEmbedding(ctx, &EmbeddingRequest{Text: req.Content})
+	// Router LLM: Mesajın basit mi karmaşık mı olduğuna karar ver
+	routerDecision, err := h.ChatSvc.RouteMessage(ctx, domain.NewRouterRequest(req.Content))
 	if err != nil {
 		return nil, 500, err
 	}
 
-	relevantTexts, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
-	if err != nil {
-		if errors.Is(err, domain.ErrInfoNotFoundInPDF) {
-			aiMessage := domain.NewMessage(userMessage.ChatId, err.Error(), false)
-			if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
-				return nil, 500, err
-			}
+	var aiResp *domain.ChatResponse
 
-			resp := &SendMessageResponse{
-				AiResponse:    err.Error(),
-				UserMessageId: userMessage.Id,
-				AiMessageId:   aiMessage.Id,
-			}
-
-			if !isSubsequentMessage {
-				resp.Title = chatTitle
-				resp.ChatId = &userMessage.ChatId
-			}
-
-			return resp, 200, nil
+	if routerDecision.QueryType == domain.QueryTypeSimple {
+		aiResp = &domain.ChatResponse{
+			Text: routerDecision.SimpleResponse,
 		}
-
-		return nil, 500, err
-	}
-
-	aiReq := domain.NewChatRequest(h.Stream, relevantTexts, req.Content)
-
-	if isSubsequentMessage {
-		pastMessages, err := h.Repo.GetChatHistoryForAIContext(ctx, userMessage.ChatId, h.PastMessagesLimit)
+	} else {
+		embedding, err := h.Ems.GenerateEmbedding(ctx, &EmbeddingRequest{Text: req.Content})
 		if err != nil {
 			return nil, 500, err
 		}
-		aiReq.AppendMessages(pastMessages)
-	}
 
-	aiResp, err := h.ChatSvc.SendChatRequest(ctx, aiReq)
-	if err != nil {
-		return nil, 500, err
+		relevantTexts, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
+		if err != nil {
+			if errors.Is(err, domain.ErrInfoNotFoundInPDF) {
+				aiMessage := domain.NewMessage(userMessage.ChatId, err.Error(), false)
+				if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
+					return nil, 500, err
+				}
+
+				resp := &SendMessageResponse{
+					AiResponse:    err.Error(),
+					UserMessageId: userMessage.Id,
+					AiMessageId:   aiMessage.Id,
+				}
+
+				if !isSubsequentMessage {
+					resp.Title = chatTitle
+					resp.ChatId = &userMessage.ChatId
+				}
+
+				return resp, 200, nil
+			}
+
+			return nil, 500, err
+		}
+
+		aiReq := domain.NewChatRequest(h.Stream, relevantTexts, req.Content)
+
+		if isSubsequentMessage {
+			pastMessages, err := h.Repo.GetChatHistoryForAIContext(ctx, userMessage.ChatId, h.PastMessagesLimit)
+			if err != nil {
+				return nil, 500, err
+			}
+			aiReq.AppendMessages(pastMessages)
+		}
+
+		aiResp, err = h.ChatSvc.SendChatRequest(ctx, aiReq)
+		if err != nil {
+			return nil, 500, err
+		}
 	}
 
 	aiMessage := domain.NewMessage(userMessage.ChatId, aiResp.Text, false)

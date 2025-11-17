@@ -8,6 +8,19 @@ const (
 	RoleAssistant Role = "assistant"
 )
 
+type QueryType string
+
+const (
+	QueryTypeSimple  QueryType = "simple"  // Basit soru, doküman gerektirmiyor
+	QueryTypeComplex QueryType = "complex" // PDF context gerekiyor
+)
+
+type RouterDecision struct {
+	QueryType      QueryType `json:"query_type"`
+	SimpleResponse string    `json:"simple_response,omitempty"` // QueryTypeSimple için hazır cevap
+	Reasoning      string    `json:"reasoning,omitempty"`       // Debug için
+}
+
 type ChatRequest struct {
 	Stream   bool          `json:"stream"`
 	Messages []ChatMessage `json:"messages"`
@@ -35,21 +48,56 @@ func NewChatMessage(role Role, content string) *ChatMessage {
 		Content: content,
 	}
 }
+func buildSystemMessage(context []string, message string) *ChatMessage {
+	contextStr := ""
+	for _, text := range context {
+		contextStr += text + "\n"
+	}
 
-func buildSystemMessage() *ChatMessage {
-	return NewChatMessage(
-		RoleSystem,
-		"You are a helpful medical assistant. Answer the user's questions based on the provided medical document excerpts. If the information is not available in the excerpts, respond with 'I don't know.' Do not provide any medical advice beyond the scope of the document excerpts. Response in the same language as the question.",
-	)
+	systemPrompt := `[ROL VE KİŞİLİK]
+Sen, tıp fakültesi öğrencilerine rehberlik eden, deneyimli ve destekleyici bir Akademik Mentorsün. Görevin, sana sunulan kaynak metinleri kullanarak karmaşık tıp konularını öğretmek. Üslubun profesyonel, akademik ve destekleyicidir.
+
+[TEMEL GÖREV]
+Sana <context>...etiketleri arasında bir PDF metni ve<user_question>...</user_question> etiketleri arasında bir öğrenci sorusu verilecek. Görevin, bu soruyu cevaplamak.
+
+[CEVAPLAMA KURALLARI]
+
+BAĞLAMA MUTLAK SADAKAT: Cevapların SADECE VE SADECE <context> etiketleri içindeki bilgilere dayanmalıdır. ASLA bu metnin dışına çıkma veya bilgi uydurma.
+
+Eğer cevap <context> içinde yoksa, net bir şekilde: Bu spesifik bilgi şu an önümdeki kaynak metinde bulunmuyor. de.
+DURUMSAL DETAY (Gerektiği Kadar):
+
+Kullanıcının sorusuna her zaman net, kısa ve doğrudan bir cevap ver.
+Kullanıcıyı bilgiye boğma. Soru basitse (örn: X nedir?), cevap da basit ve net olmalıdır.
+LLM'in görevi, gerektiği kadar detay vermektir.
+OPSİYONEL KLİNİK KÖPRÜ:
+
+Eğer <context> içindeki bilgi, çok bariz bir klinik bağlantı (hastalık, belirti, tanı) içeriyorsa VE soru buna uygunsa, cevaba kısa bir Klinik Not: veya Pratik Bilgi: başlığı altında bu bağlantıyı ekleyebilirsin.
+Bu bir zorunluluk DEĞİLDİR. Basit tanım soruları için bu adımı atla.
+GEREKSİZ SORU SORMA:
+
+Cevabını verdikten sonra, kullanıcı sormadıkça veya sohbeti devam ettirmediği sürece cevabın sonuna pekiştirme sorusu EKLEME. Bu, sohbeti yavaşlatır.
+TEMİZLİK KURALI (En Önemli):
+
+Cevabında ASLA <context>, </context>, <user_question> gibi etiketlerden veya 'prompt' kelimesinden bahsetme. Bu etiketler sadece senin için talimattır, kullanıcı için değil.
+[GİRDİLER VE CEVAP AKIŞI]
+Aşağıdaki girdileri al ve [CEVAPLAMA KURALLARI]'na göre cevabını oluştur.
+
+<context>
+` + contextStr + `
+</context>
+
+<user_question>
+` + message + `
+</user_question>`
+
+	return NewChatMessage(RoleSystem, systemPrompt)
 }
 
 func buildInitialMessages(relevantTexts []string, userMessage string) []ChatMessage {
-	messages := []ChatMessage{
-		*buildSystemMessage(),
-	}
 
-	for _, text := range relevantTexts {
-		messages = append(messages, *NewChatMessage(RoleUser, "Here are the relevant excerpts from the medical document:\n"+text))
+	messages := []ChatMessage{
+		*buildSystemMessage(relevantTexts, userMessage),
 	}
 
 	messages = append(messages, *NewChatMessage(RoleUser, userMessage))
@@ -88,6 +136,45 @@ func buildTitleGenerationMessage(firstUserMessage string) []ChatMessage {
 		*NewChatMessage(
 			RoleSystem,
 			"Generate a 3-7 word title for this medical document chat: "+firstUserMessage,
+		),
+	}
+}
+
+func NewRouterRequest(userMessage string) *ChatRequest {
+	return &ChatRequest{
+		Stream:   false,
+		Messages: buildRouterMessage(userMessage),
+	}
+}
+
+func buildRouterMessage(userMessage string) []ChatMessage {
+	return []ChatMessage{
+		*NewChatMessage(
+			RoleSystem,
+			`You are a query router for a medical education chatbot. Your job is to determine if a user's question requires searching through PDF documents or can be answered directly.
+
+Classify the query as:
+- "simple": Greetings, general questions, casual conversation, or questions that don't require specific medical document content
+- "complex": Questions that require specific medical knowledge from documents (symptoms, diagnoses, treatments, anatomy, etc.)
+
+For "simple" queries, provide a friendly, helpful response directly.
+For "complex" queries, just classify them without answering.
+
+Respond ONLY with valid JSON in this exact format:
+{"query_type": "simple" or "complex", "simple_response": "your response here (only for simple)", "reasoning": "brief explanation"}
+
+Examples:
+User: "Merhaba!"
+Response: {"query_type": "simple", "simple_response": "Merhaba! Size nasıl yardımcı olabilirim? Tıbbi dokümanlardaki konular hakkında sorularınızı cevaplayabilirim.", "reasoning": "greeting"}
+
+User: "Kalp yetmezliğinin belirtileri nelerdir?"
+Response: {"query_type": "complex", "reasoning": "requires medical document content"}
+
+User: "how are you?"
+Response: {"query_type": "simple", "simple_response": "I'm doing well, thank you! I'm here to help you with questions about medical documents. What would you like to know?", "reasoning": "casual conversation"}
+
+Now classify this query:
+`+userMessage,
 		),
 	}
 }

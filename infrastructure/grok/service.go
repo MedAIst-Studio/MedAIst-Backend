@@ -95,6 +95,38 @@ func (s *GrokService) GenerateChatTitle(ctx context.Context, req *domain.ChatReq
 	return s.makeRequest(ctx, grokReq)
 }
 
+func (s *GrokService) RouteMessage(ctx context.Context, req *domain.ChatRequest) (*domain.RouterDecision, error) {
+	messages := make([]grokMessage, 0, len(req.Messages))
+
+	for _, msg := range req.Messages {
+		messages = append(messages, grokMessage{
+			Role:    string(msg.Role),
+			Content: msg.Content,
+		})
+	}
+
+	grokReq := grokRequest{
+		Messages: messages,
+		Model:    s.model,
+		Stream:   false,
+	}
+
+	resp, err := s.makeRequest(ctx, grokReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get router decision: %w", err)
+	}
+
+	var decision domain.RouterDecision
+	if err := json.Unmarshal([]byte(resp.Text), &decision); err != nil {
+		return &domain.RouterDecision{
+			QueryType: domain.QueryTypeComplex,
+			Reasoning: "failed to parse router response, defaulting to complex",
+		}, nil
+	}
+
+	return &decision, nil
+}
+
 func (s *GrokService) makeRequest(ctx context.Context, grokReq grokRequest) (*domain.ChatResponse, error) {
 	jsonData, err := json.Marshal(grokReq)
 	if err != nil {

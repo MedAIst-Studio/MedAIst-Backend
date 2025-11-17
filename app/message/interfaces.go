@@ -32,4 +32,5 @@ type EmbeddingService interface {
 type AIService interface {
 	SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error)
 	GenerateChatTitle(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error)
+	RouteMessage(ctx context.Context, req *domain.ChatRequest) (*domain.RouterDecision, error)
 }
