@@ -16,8 +16,8 @@ func (r *Repository) SaveMessage(ctx context.Context, message *domain.Message) e
 func (r *Repository) GetChatHistoryForAIContext(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error) {
 	// En son N mesajı al (DESC), yeni mesaj henüz kaydedilmediği için OFFSET gerekmez
 	// limit parametresi direkt olarak istenen mesaj sayısıdır
-	rows, err := r.db.QueryContext(ctx, 
-		"SELECT content, is_user FROM messages WHERE chat_id = $1 ORDER BY created_at DESC LIMIT $2", 
+	rows, err := r.db.QueryContext(ctx,
+		"SELECT content, is_user FROM messages WHERE chat_id = $1 ORDER BY created_at DESC LIMIT $2",
 		chatId, limit)
 	if err != nil {
 		return nil, err
