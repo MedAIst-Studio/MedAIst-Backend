@@ -135,6 +135,7 @@ func SetupRoutes(app *fiber.App) {
 		Ems:               dc.Embedding,
 		Vb:                dc.VectorDB,
 		ChatSvc:           dc.grokClient,
+		Logger:            dc.slogLogger,
 	})
 
 	sl := dc.slogLogger

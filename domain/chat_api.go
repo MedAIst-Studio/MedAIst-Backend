@@ -95,12 +95,11 @@ Aşağıdaki girdileri al ve [CEVAPLAMA KURALLARI]'na göre cevabını oluştur.
 }
 
 func buildInitialMessages(relevantTexts []string, userMessage string) []ChatMessage {
-
+	// System message zaten user question'ı içeriyor, tekrar eklemeye gerek yok
 	messages := []ChatMessage{
 		*buildSystemMessage(relevantTexts, userMessage),
 	}
 
-	messages = append(messages, *NewChatMessage(RoleUser, userMessage))
 	return messages
 }
 

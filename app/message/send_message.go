@@ -30,6 +30,7 @@ type Config struct {
 	Vb                VectorRepository
 	Ems               EmbeddingService
 	ChatSvc           AIService
+	Logger            domain.Logger
 }
 
 type SendMessageHandler struct {
@@ -84,12 +85,6 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		userMessage.UpdateChatId(chat.Id)
 	}
 
-	err := h.Repo.SaveMessage(ctx, userMessage)
-	if err != nil {
-		return nil, 500, err
-	}
-
-	// Router LLM: Mesajın basit mi karmaşık mı olduğuna karar ver
 	routerDecision, err := h.ChatSvc.RouteMessage(ctx, domain.NewRouterRequest(req.Content))
 	if err != nil {
 		return nil, 500, err
@@ -98,17 +93,21 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	var aiResp *domain.ChatResponse
 
 	if routerDecision.QueryType == domain.QueryTypeSimple {
+
 		aiResp = &domain.ChatResponse{
 			Text: routerDecision.SimpleResponse,
 		}
 	} else {
+
 		embedding, err := h.Ems.GenerateEmbedding(ctx, &EmbeddingRequest{Text: req.Content})
 		if err != nil {
+
 			return nil, 500, err
 		}
 
 		relevantTexts, err := h.Vb.SearchByEmbedding(ctx, req.PdfId, embedding.Vector)
 		if err != nil {
+
 			if errors.Is(err, domain.ErrInfoNotFoundInPDF) {
 				aiMessage := domain.NewMessage(userMessage.ChatId, err.Error(), false)
 				if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
@@ -139,6 +138,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 			if err != nil {
 				return nil, 500, err
 			}
+
 			aiReq.AppendMessages(pastMessages)
 		}
 
@@ -146,6 +146,12 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		if err != nil {
 			return nil, 500, err
 		}
+	}
+
+	// Artık user ve AI mesajlarını kaydet
+	err = h.Repo.SaveMessage(ctx, userMessage)
+	if err != nil {
+		return nil, 500, err
 	}
 
 	aiMessage := domain.NewMessage(userMessage.ChatId, aiResp.Text, false)
