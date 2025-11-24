@@ -70,9 +70,9 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
 		Addr:           os.Getenv("QDRANT_URL"),
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
-		MinScore:       0.7,
+		MinScore:       0.3,
 		VectorSize:     1024,
-		ChunkLimit:     5,
+		ChunkLimit:     10,
 	})
 
 	grok := grokInfra.NewGrokService(os.Getenv("GROK_API_KEY"), "grok-3")
