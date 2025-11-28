@@ -30,6 +30,20 @@ const (
 	- General: Greetings, casual conversation, or questions unrelated to the document (e.g., "hello", "who are you")
 
 	Respond with exactly one word: "PDFSearch", "Clarification", or "General". When uncertain, default to "PDFSearch" for any medical-related content.`
+
+	QueryExpansionSystemPrompt = `You are a search query expansion specialist. Your task is to generate exactly 5 diverse search queries that capture different aspects of the user's original intent.
+
+	Requirements:
+	1. Preserve the core intent - do not change what the user is asking about
+	2. Use different phrasings, synonyms, and perspectives
+	3. Vary specificity (some broader, some more specific)
+	4. Include different keyword combinations
+	5. Do NOT add information not present in the original query
+	6. Do NOT make assumptions about user context
+
+	Respond ONLY with valid JSON in this exact format:
+	{"queries": ["...", "...", "...", "...", "..."]}
+`
 )
 
 type ChatRequest struct {
@@ -39,6 +53,10 @@ type ChatRequest struct {
 
 type ChatResponse struct {
 	Text string `json:"text"`
+}
+
+type QueryExpansionResponse struct {
+	Queries []string `json:"queries"`
 }
 
 type ChatMessage struct {

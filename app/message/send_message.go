@@ -158,7 +158,7 @@ type searchResult struct {
 }
 
 func (h *SendMessageHandler) addPdfContext(ctx context.Context, req *SendMessageRequest, crm *domain.ChatRequestManager) error {
-	generatedQueries, err := h.ChatSvc.GenerateQuery(ctx, crm.Req)
+	generatedQueries, err := h.ChatSvc.ExpandQuery(ctx, req.Content)
 	if err != nil {
 		return err
 	}
@@ -167,6 +167,7 @@ func (h *SendMessageHandler) addPdfContext(ctx context.Context, req *SendMessage
 	var wg sync.WaitGroup
 
 	for _, query := range generatedQueries {
+		fmt.Printf("query: %v\n", query)
 		wg.Add(1)
 		go func(q string) {
 			defer wg.Done()
@@ -201,12 +202,10 @@ func (h *SendMessageHandler) addPdfContext(ctx context.Context, req *SendMessage
 	}
 
 	uniqueChunks := deduplicateChunks(allChunks)
-
 	rerankedChunks, err := h.ChatSvc.RerankChunks(ctx, uniqueChunks, req.Content)
 	if err != nil {
 		return fmt.Errorf("reranking failed: %w", err)
 	}
-
 	crm.Req.AddRelevantExcerpts(rerankedChunks)
 	return nil
 }
