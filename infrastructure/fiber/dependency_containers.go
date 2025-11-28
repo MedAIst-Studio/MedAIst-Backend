@@ -6,8 +6,10 @@ import (
 	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
+	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
 
 	grokInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/grok"
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
@@ -20,6 +22,10 @@ import (
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
 )
 
+type AIService interface {
+	message.AIService
+}
+
 type DependencyContainer struct {
 	Repo            *postgresInfra.Repository
 	Chunker         *chunkerInfra.PdfChunkingService
@@ -31,7 +37,7 @@ type DependencyContainer struct {
 	slogLogger      *slogInfra.SlogLogger
 	Validator       *validatorInfra.Validator
 	mailerSender    *mailersendInfra.MailerSendService
-	grokClient      *grokInfra.GrokService
+	AIService       AIService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
@@ -77,6 +83,13 @@ func NewAuthDependencyContainer() *DependencyContainer {
 
 	grok := grokInfra.NewGrokService(os.Getenv("GROK_API_KEY"), "grok-3")
 
+	jina := jina.NewService(os.Getenv("JINA_API_KEY"))
+
+	aiService := &MultiModelService{
+		grok,
+		jina,
+	}
+
 	slogLogger := slogInfra.NewLogger()
 	validator := validatorInfra.NewValidator(slogLogger)
 
@@ -96,6 +109,11 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		Validator:       validator,
 		slogLogger:      slogLogger,
 		mailerSender:    mailersendService,
-		grokClient:      grok,
+		AIService:       aiService,
 	}
+}
+
+type MultiModelService struct {
+	*grokInfra.GrokService
+	*jina.Service
 }
