@@ -114,6 +114,23 @@ definitions:
       user_message_id:
         type: string
     type: object
+  quiz.Answer:
+    properties:
+      question_no:
+        minimum: 1
+        type: integer
+      selected_option:
+        enum:
+        - A
+        - B
+        - C
+        - D
+        - E
+        type: string
+    required:
+    - question_no
+    - selected_option
+    type: object
   quiz.GenerateQuizRequest:
     properties:
       endPage:
@@ -129,6 +146,15 @@ definitions:
     - fileName
     type: object
   quiz.GenerateQuizResponse:
+    type: object
+  quiz.GetQuizAttemptsResponse:
+    properties:
+      attempts:
+        items:
+          $ref: '#/definitions/quiz.QuizAttemptDetail'
+        type: array
+      total_count:
+        type: integer
     type: object
   quiz.GetQuizByIdResponse:
     properties:
@@ -161,6 +187,25 @@ definitions:
       text:
         type: string
     type: object
+  quiz.QuizAttemptDetail:
+    properties:
+      completed_at:
+        type: string
+      id:
+        type: string
+      percentage:
+        type: number
+      quiz_id:
+        type: string
+      quiz_title:
+        type: string
+      score:
+        type: integer
+      time_spent_seconds:
+        type: integer
+      total_questions:
+        type: integer
+    type: object
   quiz.QuizSummary:
     properties:
       createdAt:
@@ -169,6 +214,29 @@ definitions:
         type: string
       title:
         type: string
+    type: object
+  quiz.SolveQuizRequest:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/quiz.Answer'
+        type: array
+      id:
+        type: string
+    required:
+    - answers
+    - id
+    type: object
+  quiz.SolveQuizResponse:
+    properties:
+      attempt_id:
+        type: string
+      percentage:
+        type: number
+      score:
+        type: integer
+      total_questions:
+        type: integer
     type: object
   user.ChangePasswordRequest:
     properties:
@@ -699,6 +767,69 @@ paths:
         "404":
           description: Not Found
       summary: Get Quiz by ID
+      tags:
+      - Quiz
+  /quizzes/{id}/solve:
+    post:
+      consumes:
+      - application/json
+      description: Submit answers for a quiz and get the score
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Solve Quiz request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/quiz.SolveQuizRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/quiz.SolveQuizResponse'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Solve Quiz
+      tags:
+      - Quiz
+  /quizzes/attempts:
+    get:
+      consumes:
+      - application/json
+      description: Get all quiz attempts for the current user
+      parameters:
+      - default: 10
+        description: Limit
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/quiz.GetQuizAttemptsResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: Get Quiz Attempts
       tags:
       - Quiz
   /users/account:

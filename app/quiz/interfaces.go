@@ -13,6 +13,7 @@ type Repository interface {
 	GetQuizById(ctx context.Context, quizId uuid.UUID) (*GetQuizByIdResponse, error)
 	GetQuizAnswersById(ctx context.Context, quizID uuid.UUID) (map[int]string, int, error)
 	SaveQuizAttempt(ctx context.Context, attempt *QuizAttempt) error
+	GetQuizAttemptsByUserId(ctx context.Context, userID uuid.UUID, limit, offset int) ([]QuizAttemptDetail, int, error)
 }
 
 type AIService interface {

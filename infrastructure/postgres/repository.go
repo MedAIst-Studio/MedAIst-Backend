@@ -141,10 +141,7 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     quiz_id UUID NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id),
     score INTEGER,
-    total_questions INTEGER,
-    started_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    completed_at TIMESTAMP,
-    time_spent_seconds INTEGER
+    total_questions INTEGER
 );
 
 -- USER ANSWERS
@@ -157,18 +154,6 @@ CREATE TABLE IF NOT EXISTS user_quiz_answers (
     answered_at TIMESTAMP DEFAULT NOW(),
     UNIQUE(attempt_id, question_id)  -- Aynı soruya iki kez cevap verilmesin
 );
-
-CREATE OR REPLACE VIEW quiz_statistics AS
-SELECT 
-    q.id,
-    q.title,
-    COUNT(DISTINCT qa.id) as total_attempts,
-    AVG(qa.score) as average_score,
-    MAX(qa.score) as highest_score
-FROM quizzes q
-LEFT JOIN quiz_attempts qa ON q.id = qa.quiz_id
-WHERE qa.completed_at IS NOT NULL
-GROUP BY q.id, q.title;
 
 
 -- INDEXES

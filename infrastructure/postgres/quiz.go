@@ -264,10 +264,8 @@ func (r *Repository) SaveQuizAttempt(ctx context.Context, attempt *quiz.QuizAtte
 			quiz_id, 
 			user_id, 
 			score, 
-			total_questions, 
-			started_at, 
-			completed_at 
-		) VALUES ($1, $2, $3, $4, $5, $6, $7)
+			total_questions
+		) VALUES ($1, $2, $3, $4, $5)
 	`
 
 	_, err := r.db.ExecContext(
@@ -278,9 +276,67 @@ func (r *Repository) SaveQuizAttempt(ctx context.Context, attempt *quiz.QuizAtte
 		attempt.UserID,
 		attempt.Score,
 		attempt.TotalQuestions,
-		attempt.StartedAt,
-		attempt.CompletedAt,
 	)
 
 	return err
+}
+
+// GetQuizAttemptsByUserId returns all quiz attempts for a user with pagination
+func (r *Repository) GetQuizAttemptsByUserId(ctx context.Context, userID uuid.UUID, limit, offset int) ([]quiz.QuizAttemptDetail, int, error) {
+	query := `
+		SELECT 
+			qa.id,
+			qa.quiz_id,
+			q.title as quiz_title,
+			qa.score,
+			qa.total_questions,
+			COUNT(*) OVER() as total_count
+		FROM quiz_attempts qa
+		INNER JOIN quizzes q ON qa.quiz_id = q.id
+		WHERE qa.user_id = $1
+		LIMIT $2 OFFSET $3
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, userID, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var attempts []quiz.QuizAttemptDetail
+	totalCount := 0
+
+	for rows.Next() {
+		var attempt quiz.QuizAttemptDetail
+		var total int
+
+		err := rows.Scan(
+			&attempt.ID,
+			&attempt.QuizID,
+			&attempt.QuizTitle,
+			&attempt.Score,
+			&attempt.TotalQuestions,
+			&total,
+		)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		if attempt.TotalQuestions > 0 {
+			attempt.Percentage = (float64(attempt.Score) / float64(attempt.TotalQuestions)) * 100
+		}
+
+		attempts = append(attempts, attempt)
+		totalCount = total
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	if attempts == nil {
+		attempts = []quiz.QuizAttemptDetail{}
+	}
+
+	return attempts, totalCount, nil
 }

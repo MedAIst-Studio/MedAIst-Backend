@@ -620,6 +620,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/quizzes/attempts": {
+            "get": {
+                "description": "Get all quiz attempts for the current user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get Quiz Attempts",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/quiz.GetQuizAttemptsResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/quizzes/{id}": {
             "get": {
                 "description": "Retrieve a quiz by its ID for the authenticated user",
@@ -651,6 +696,56 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/quizzes/{id}/solve": {
+            "post": {
+                "description": "Submit answers for a quiz and get the score",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Solve Quiz",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Quiz ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Solve Quiz request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/quiz.SolveQuizRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/quiz.SolveQuizResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -1112,6 +1207,29 @@ const docTemplate = `{
                 }
             }
         },
+        "quiz.Answer": {
+            "type": "object",
+            "required": [
+                "question_no",
+                "selected_option"
+            ],
+            "properties": {
+                "question_no": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "selected_option": {
+                    "type": "string",
+                    "enum": [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "E"
+                    ]
+                }
+            }
+        },
         "quiz.GenerateQuizRequest": {
             "type": "object",
             "required": [
@@ -1135,6 +1253,20 @@ const docTemplate = `{
         },
         "quiz.GenerateQuizResponse": {
             "type": "object"
+        },
+        "quiz.GetQuizAttemptsResponse": {
+            "type": "object",
+            "properties": {
+                "attempts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/quiz.QuizAttemptDetail"
+                    }
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
         },
         "quiz.GetQuizByIdResponse": {
             "type": "object",
@@ -1184,6 +1316,35 @@ const docTemplate = `{
                 }
             }
         },
+        "quiz.QuizAttemptDetail": {
+            "type": "object",
+            "properties": {
+                "completed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "quiz_id": {
+                    "type": "string"
+                },
+                "quiz_title": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "time_spent_seconds": {
+                    "type": "integer"
+                },
+                "total_questions": {
+                    "type": "integer"
+                }
+            }
+        },
         "quiz.QuizSummary": {
             "type": "object",
             "properties": {
@@ -1195,6 +1356,41 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "quiz.SolveQuizRequest": {
+            "type": "object",
+            "required": [
+                "answers",
+                "id"
+            ],
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/quiz.Answer"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.SolveQuizResponse": {
+            "type": "object",
+            "properties": {
+                "attempt_id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "total_questions": {
+                    "type": "integer"
                 }
             }
         },

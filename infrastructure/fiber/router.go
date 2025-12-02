@@ -142,6 +142,7 @@ func SetupRoutes(app *fiber.App) {
 	getQuizzesHandler := quiz.NewGetQuizzesHandler(dc.Repo)
 	getQuizByIdHandler := quiz.NewGetQuizByIdHandler(dc.Repo)
 	solveQuizHandler := quiz.NewSolveQuizHandler(dc.Repo)
+	getQuizAttemptsHandler := quiz.NewGetQuizAttemptsHandler(dc.Repo)
 
 	sl := dc.slogLogger
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
@@ -186,8 +187,9 @@ func SetupRoutes(app *fiber.App) {
 	quizApp := app.Group("/quizzes", middlewareManager.AuthMiddleware)
 	quizApp.Post("/", Handle(generateQuizHandler, sl))
 	quizApp.Get("/", Handle(getQuizzesHandler, sl))
-	quizApp.Get("/:id", Handle(getQuizByIdHandler, sl))
+	quizApp.Get("/attempts", Handle(getQuizAttemptsHandler, sl))
 	quizApp.Post("/:id/solve", Handle(solveQuizHandler, sl))
+	quizApp.Get("/:id", Handle(getQuizByIdHandler, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)
