@@ -138,6 +138,9 @@ func SetupRoutes(app *fiber.App) {
 		ChatSvc:           dc.AIService,
 	})
 
+	generateQuizHandler := quiz.NewGenerateQuizHandler(dc.AIService, dc.Repo, dc.VectorDB)
+	getQuizzesHandler := quiz.NewGetQuizzesHandler(dc.Repo)
+
 	sl := dc.slogLogger
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)
@@ -178,10 +181,9 @@ func SetupRoutes(app *fiber.App) {
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
 	messagesApp.Post("/", Handle(sendMessageHandler, sl))
 
-	quizApp := app.Group("/quizes", middlewareManager.AuthMiddleware)
-	generateQuizHandler := quiz.NewGenerateQuizHandler(dc.AIService, dc.Repo, dc.VectorDB)
-
+	quizApp := app.Group("/quizzes", middlewareManager.AuthMiddleware)
 	quizApp.Post("/", Handle(generateQuizHandler, sl))
+	quizApp.Get("/", Handle(getQuizzesHandler, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)

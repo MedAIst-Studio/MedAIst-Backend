@@ -48,7 +48,7 @@ type questionResult struct {
 // @Success     200 {object} GenerateQuizResponse
 // @Failure     400
 // @Failure     500
-// @Router      /quizes [post]
+// @Router      /quizzes [post]
 func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizRequest) (*GenerateQuizResponse, int, error) {
 	userId := domain.GetUserID(ctx)
 	quiz := domain.NewQuiz(userId, req.FileId, req.FileName)

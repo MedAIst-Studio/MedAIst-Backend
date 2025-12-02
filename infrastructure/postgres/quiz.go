@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/quiz"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 )
@@ -70,4 +72,36 @@ func (r *Repository) SaveQuiz(ctx context.Context, quiz *domain.Quiz) error {
 	}
 
 	return nil
+}
+
+func (r *Repository) GetQuizzesByUserID(ctx context.Context, userId uuid.UUID) (*quiz.GetQuizzesResponse, error) {
+	query := `
+		SELECT id, title, created_at
+		FROM quizzes
+		WHERE user_id = $1
+		ORDER BY created_at DESC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query quizzes: %w", err)
+	}
+	defer rows.Close()
+	var quizzes quiz.GetQuizzesResponse
+	for rows.Next() {
+		var q quiz.QuizSummary
+		var createdAt sql.NullTime
+		if err := rows.Scan(&q.QuizId, &q.Title, &createdAt); err != nil {
+			return nil, fmt.Errorf("failed to scan quiz row: %w", err)
+		}
+		q.CreatedAt = createdAt.Time.Format("2006-01-02 15:04:05")
+		quizzes = append(quizzes, q)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over quiz rows: %w", err)
+	}
+
+	return &quizzes, nil
+
 }
