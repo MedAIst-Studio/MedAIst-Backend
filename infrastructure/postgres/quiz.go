@@ -209,3 +209,78 @@ func (r *Repository) GetQuizById(ctx context.Context, quizId uuid.UUID) (*quiz.G
 
 	return response, nil
 }
+
+// GetQuizAnswersById returns a map of question_no -> correct_option_label and total question count
+func (r *Repository) GetQuizAnswersById(ctx context.Context, quizID uuid.UUID) (map[int]string, int, error) {
+	query := `
+		SELECT 
+			qq.question_no,
+			qo.option_label,
+			COUNT(*) OVER() as total_questions
+		FROM quiz_questions qq
+		INNER JOIN quiz_question_options qo ON qq.id = qo.question_id
+		WHERE qq.quiz_id = $1 AND qo.is_correct = true
+		ORDER BY qq.question_no
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, quizID)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	answers := make(map[int]string)
+	totalQuestions := 0
+
+	for rows.Next() {
+		var questionNo int
+		var correctOption string
+		var total int
+
+		if err := rows.Scan(&questionNo, &correctOption, &total); err != nil {
+			return nil, 0, err
+		}
+
+		answers[questionNo] = correctOption
+		totalQuestions = total
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, 0, err
+	}
+
+	if len(answers) == 0 {
+		return nil, 0, errors.New("quiz not found")
+	}
+
+	return answers, totalQuestions, nil
+}
+
+// SaveQuizAttempt saves the quiz attempt to database
+func (r *Repository) SaveQuizAttempt(ctx context.Context, attempt *quiz.QuizAttempt) error {
+	query := `
+		INSERT INTO quiz_attempts (
+			id, 
+			quiz_id, 
+			user_id, 
+			score, 
+			total_questions, 
+			started_at, 
+			completed_at 
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+
+	_, err := r.db.ExecContext(
+		ctx,
+		query,
+		attempt.ID,
+		attempt.QuizID,
+		attempt.UserID,
+		attempt.Score,
+		attempt.TotalQuestions,
+		attempt.StartedAt,
+		attempt.CompletedAt,
+	)
+
+	return err
+}
