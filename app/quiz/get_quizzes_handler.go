@@ -27,14 +27,14 @@ func NewGetQuizzesHandler(repository Repository) *GetQuizzesHandler {
 	}
 }
 
-// @Summary     Get Quizzes
-// @Description Retrieve a list of quizzes for the authenticated user
-// @Tags        Quiz
-// @Accept      json
-// @Produce     json
-// @Success     200 {object} GetQuizzesResponse
-// @Failure     500
-// @Router      /quizzes [get]
+// @Summary		Get Quizzes
+// @Description	Retrieve a list of quizzes for the authenticated user
+// @Tags			Quiz
+// @Accept			json
+// @Produce		json
+// @Success		200	{object}	GetQuizzesResponse
+// @Failure		500
+// @Router			/quizzes [get]
 func (h *GetQuizzesHandler) Handle(ctx context.Context, req *GetQuizzesRequest) (*GetQuizzesResponse, int, error) {
 	userId := domain.GetUserID(ctx)
 	quizzes, err := h.repository.GetQuizzesByUserID(ctx, userId)

@@ -39,16 +39,16 @@ type questionResult struct {
 	err      error
 }
 
-// @Summary     Generate Quiz
-// @Description Generate a quiz based on the provided file
-// @Tags        Quiz
-// @Accept      json
-// @Produce     json
-// @Param       request body GenerateQuizRequest true "Generate Quiz request"
-// @Success     200 {object} GenerateQuizResponse
-// @Failure     400
-// @Failure     500
-// @Router      /quizzes [post]
+// @Summary		Generate Quiz
+// @Description	Generate a quiz based on the provided file
+// @Tags			Quiz
+// @Accept			json
+// @Produce		json
+// @Param			request	body		GenerateQuizRequest	true	"Generate Quiz request"
+// @Success		200		{object}	GenerateQuizResponse
+// @Failure		400
+// @Failure		500
+// @Router			/quizzes [post]
 func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizRequest) (*GenerateQuizResponse, int, error) {
 	userId := domain.GetUserID(ctx)
 	quiz := domain.NewQuiz(userId, req.FileId, req.FileName)

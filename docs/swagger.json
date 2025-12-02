@@ -545,6 +545,108 @@
                 }
             }
         },
+        "/quizzes": {
+            "get": {
+                "description": "Retrieve a list of quizzes for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get Quizzes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/quiz.QuizSummary"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "description": "Generate a quiz based on the provided file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Generate Quiz",
+                "parameters": [
+                    {
+                        "description": "Generate Quiz request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/quiz.GenerateQuizRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/quiz.GenerateQuizResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/quizzes/{id}": {
+            "get": {
+                "description": "Retrieve a quiz by its ID for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get Quiz by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Quiz ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/quiz.GetQuizByIdResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/users/account": {
             "delete": {
                 "security": [
@@ -965,12 +1067,17 @@
         },
         "message.SendMessageRequest": {
             "type": "object",
+            "required": [
+                "content",
+                "pdf_id"
+            ],
             "properties": {
                 "chat_id": {
                     "type": "string"
                 },
                 "content": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                 },
                 "pdf_id": {
                     "type": "string"
@@ -993,6 +1100,92 @@
                     "type": "string"
                 },
                 "user_message_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.GenerateQuizRequest": {
+            "type": "object",
+            "required": [
+                "fileId",
+                "fileName"
+            ],
+            "properties": {
+                "endPage": {
+                    "type": "integer"
+                },
+                "fileId": {
+                    "type": "string"
+                },
+                "fileName": {
+                    "type": "string"
+                },
+                "startPage": {
+                    "type": "integer"
+                }
+            }
+        },
+        "quiz.GenerateQuizResponse": {
+            "type": "object"
+        },
+        "quiz.GetQuizByIdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/quiz.Question"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.Option": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.Question": {
+            "type": "object",
+            "properties": {
+                "correct_option": {
+                    "type": "string"
+                },
+                "no": {
+                    "type": "integer"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/quiz.Option"
+                    }
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.QuizSummary": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "quizId": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }

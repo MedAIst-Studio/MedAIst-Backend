@@ -202,25 +202,30 @@ Text: %s
 
 Requirements:
 - Create one question that tests understanding of the text
-- Question should be about 10-20 words long.
+- Question should be detailed and comprehensive, around 20-40 words long
 - Provide exactly 5 options (A, B, C, D, E)
 - Mark exactly one option as correct (isCorrect: true)
 - Option numbers should be 1, 2, 3, 4, 5
 - Option labels should be "A", "B", "C", "D", "E"
 - Make the question clear and specific
 - Ensure incorrect options are plausible but clearly wrong
+- CRITICAL: Randomly place the correct answer in ANY position (A, B, C, D, or E), NOT always in position B
+- Vary the position of the correct answer across different questions
 
-IMPORTANT: Respond ONLY with valid JSON in this exact format and the same language as the input text, no other text, put the true option randomly among the options:):
+IMPORTANT: Respond ONLY with valid JSON in this exact format and the same language as the input text, no other text:
+
 {
-  "questionText": "Your question here",
+  "questionText": "Your detailed question here (20-40 words)",
   "options": [
     {"no": 1, "label": "A", "text": "Option A text", "isCorrect": false},
-    {"no": 2, "label": "B", "text": "Option B text", "isCorrect": true},
-    {"no": 3, "label": "C", "text": "Option C text", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "Option D text", "isCorrect": false}
+    {"no": 2, "label": "B", "text": "Option B text", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Option C text", "isCorrect": true},
+    {"no": 4, "label": "D", "text": "Option D text", "isCorrect": false},
     {"no": 5, "label": "E", "text": "Option E text", "isCorrect": false}
   ]
-}`, chunk)
+}
+
+Remember: The correct answer position should vary randomly - it could be A, B, C, D, or E.`, chunk)
 
 	requestBody := map[string]interface{}{
 		"model": s.model,

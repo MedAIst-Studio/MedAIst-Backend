@@ -93,9 +93,13 @@ definitions:
       chat_id:
         type: string
       content:
+        minLength: 1
         type: string
       pdf_id:
         type: string
+    required:
+    - content
+    - pdf_id
     type: object
   message.SendMessageResponse:
     properties:
@@ -108,6 +112,62 @@ definitions:
       title:
         type: string
       user_message_id:
+        type: string
+    type: object
+  quiz.GenerateQuizRequest:
+    properties:
+      endPage:
+        type: integer
+      fileId:
+        type: string
+      fileName:
+        type: string
+      startPage:
+        type: integer
+    required:
+    - fileId
+    - fileName
+    type: object
+  quiz.GenerateQuizResponse:
+    type: object
+  quiz.GetQuizByIdResponse:
+    properties:
+      id:
+        type: string
+      questions:
+        items:
+          $ref: '#/definitions/quiz.Question'
+        type: array
+      title:
+        type: string
+    type: object
+  quiz.Option:
+    properties:
+      label:
+        type: string
+      text:
+        type: string
+    type: object
+  quiz.Question:
+    properties:
+      correct_option:
+        type: string
+      "no":
+        type: integer
+      options:
+        items:
+          $ref: '#/definitions/quiz.Option'
+        type: array
+      text:
+        type: string
+    type: object
+  quiz.QuizSummary:
+    properties:
+      createdAt:
+        type: string
+      quizId:
+        type: string
+      title:
         type: string
     type: object
   user.ChangePasswordRequest:
@@ -574,6 +634,73 @@ paths:
       summary: Send a message in a chat
       tags:
       - Message
+  /quizzes:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of quizzes for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/quiz.QuizSummary'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: Get Quizzes
+      tags:
+      - Quiz
+    post:
+      consumes:
+      - application/json
+      description: Generate a quiz based on the provided file
+      parameters:
+      - description: Generate Quiz request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/quiz.GenerateQuizRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/quiz.GenerateQuizResponse'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Generate Quiz
+      tags:
+      - Quiz
+  /quizzes/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a quiz by its ID for the authenticated user
+      parameters:
+      - description: Quiz ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/quiz.GetQuizByIdResponse'
+        "404":
+          description: Not Found
+      summary: Get Quiz by ID
+      tags:
+      - Quiz
   /users/account:
     delete:
       description: Delete a user's account

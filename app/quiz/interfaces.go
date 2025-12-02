@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	SaveQuiz(ctx context.Context, quiz *domain.Quiz) error
 	GetQuizzesByUserID(ctx context.Context, userId uuid.UUID) (*GetQuizzesResponse, error)
+	GetQuizById(ctx context.Context, quizId uuid.UUID) (*GetQuizByIdResponse, error)
 }
 
 type AIService interface {
