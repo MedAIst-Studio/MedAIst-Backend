@@ -71,6 +71,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/quiz"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 
@@ -176,6 +177,11 @@ func SetupRoutes(app *fiber.App) {
 
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
 	messagesApp.Post("/", Handle(sendMessageHandler, sl))
+
+	quizApp := app.Group("/quizes", middlewareManager.AuthMiddleware)
+	generateQuizHandler := quiz.NewGenerateQuizHandler(dc.AIService, dc.Repo, dc.VectorDB)
+
+	quizApp.Post("/", Handle(generateQuizHandler, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)

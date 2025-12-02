@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
@@ -22,10 +21,6 @@ import (
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
 )
 
-type AIService interface {
-	message.AIService
-}
-
 type DependencyContainer struct {
 	Repo            *postgresInfra.Repository
 	Chunker         *chunkerInfra.PdfChunkingService
@@ -37,7 +32,7 @@ type DependencyContainer struct {
 	slogLogger      *slogInfra.SlogLogger
 	Validator       *validatorInfra.Validator
 	mailerSender    *mailersendInfra.MailerSendService
-	AIService       AIService
+	AIService       *MultiModelService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
