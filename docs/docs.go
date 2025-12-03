@@ -665,6 +665,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/quizzes/attempts/{id}": {
+            "get": {
+                "description": "Retrieve a specific quiz attempt by its ID for the authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Quiz"
+                ],
+                "summary": "Get Quiz Attempt by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Attempt ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/quiz.GetAttemptByIdResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
         "/quizzes/{id}": {
             "get": {
                 "description": "Retrieve a quiz by its ID for the authenticated user",
@@ -702,7 +737,7 @@ const docTemplate = `{
         },
         "/quizzes/{id}/solve": {
             "post": {
-                "description": "Submit answers for a quiz and get the score",
+                "description": "Submit answers for a quiz and get the score with detailed feedback",
                 "consumes": [
                     "application/json"
                 ],
@@ -1230,11 +1265,55 @@ const docTemplate = `{
                 }
             }
         },
+        "quiz.AnswerFeedback": {
+            "type": "object",
+            "properties": {
+                "correct_option": {
+                    "type": "string"
+                },
+                "explanation": {
+                    "description": "Doğru cevap açıklaması",
+                    "type": "string"
+                },
+                "is_correct": {
+                    "type": "boolean"
+                },
+                "question_no": {
+                    "type": "integer"
+                },
+                "selected_option": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.AttemptAnswerDetail": {
+            "type": "object",
+            "properties": {
+                "correct_option": {
+                    "type": "string"
+                },
+                "explanation": {
+                    "type": "string"
+                },
+                "is_correct": {
+                    "type": "boolean"
+                },
+                "question_no": {
+                    "type": "integer"
+                },
+                "question_text": {
+                    "type": "string"
+                },
+                "selected_option": {
+                    "type": "string"
+                }
+            }
+        },
         "quiz.GenerateQuizRequest": {
             "type": "object",
             "required": [
                 "fileId",
-                "fileName"
+                "quizName"
             ],
             "properties": {
                 "endPage": {
@@ -1243,7 +1322,7 @@ const docTemplate = `{
                 "fileId": {
                     "type": "string"
                 },
-                "fileName": {
+                "quizName": {
                     "type": "string"
                 },
                 "startPage": {
@@ -1252,7 +1331,44 @@ const docTemplate = `{
             }
         },
         "quiz.GenerateQuizResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "quizId": {
+                    "type": "string"
+                }
+            }
+        },
+        "quiz.GetAttemptByIdResponse": {
+            "type": "object",
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/quiz.AttemptAnswerDetail"
+                    }
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "quiz_id": {
+                    "type": "string"
+                },
+                "quiz_title": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "total_questions": {
+                    "type": "integer"
+                }
+            }
         },
         "quiz.GetQuizAttemptsResponse": {
             "type": "object",
@@ -1302,6 +1418,9 @@ const docTemplate = `{
                 "correct_option": {
                     "type": "string"
                 },
+                "explanation": {
+                    "type": "string"
+                },
                 "no": {
                     "type": "integer"
                 },
@@ -1335,9 +1454,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "score": {
-                    "type": "integer"
-                },
-                "time_spent_seconds": {
                     "type": "integer"
                 },
                 "total_questions": {
@@ -1380,6 +1496,13 @@ const docTemplate = `{
         "quiz.SolveQuizResponse": {
             "type": "object",
             "properties": {
+                "answers": {
+                    "description": "Detaylı cevap bilgisi",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/quiz.AnswerFeedback"
+                    }
+                },
                 "attempt_id": {
                     "type": "string"
                 },

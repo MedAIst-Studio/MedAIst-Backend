@@ -64,18 +64,18 @@ func NewSolveQuizHandler(repo Repository) *SolveQuizHandler {
 	return &SolveQuizHandler{repo: repo}
 }
 
-// @Summary     Solve Quiz
-// @Description Submit answers for a quiz and get the score with detailed feedback
-// @Tags        Quiz
-// @Accept      json
-// @Produce     json
-// @Param       id      path        string              true    "Quiz ID"
-// @Param       request body        SolveQuizRequest    true    "Solve Quiz request"
-// @Success     200     {object}    SolveQuizResponse
-// @Failure     400
-// @Failure     404
-// @Failure     500
-// @Router      /quizzes/{id}/solve [post]
+// @Summary		Solve Quiz
+// @Description	Submit answers for a quiz and get the score with detailed feedback
+// @Tags			Quiz
+// @Accept			json
+// @Produce		json
+// @Param			id		path		string				true	"Quiz ID"
+// @Param			request	body		SolveQuizRequest	true	"Solve Quiz request"
+// @Success		200		{object}	SolveQuizResponse
+// @Failure		400
+// @Failure		404
+// @Failure		500
+// @Router			/quizzes/{id}/solve [post]
 func (h *SolveQuizHandler) Handle(ctx context.Context, req *SolveQuizRequest) (*SolveQuizResponse, int, error) {
 	userID := domain.GetUserID(ctx)
 
@@ -136,7 +136,6 @@ func (h *SolveQuizHandler) Handle(ctx context.Context, req *SolveQuizRequest) (*
 		CompletedAt:    time.Now(),
 	}
 
-	// Attempt'i ve cevapları kaydet
 	if err := h.repo.SaveQuizAttemptWithAnswers(ctx, attempt, attemptAnswers); err != nil {
 		return nil, 500, err
 	}

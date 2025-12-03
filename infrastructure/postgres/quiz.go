@@ -13,7 +13,6 @@ import (
 )
 
 func (r *Repository) SaveQuiz(ctx context.Context, quiz *domain.Quiz) error {
-	fmt.Println("Saving quiz to database...")
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)

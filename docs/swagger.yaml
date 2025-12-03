@@ -131,21 +131,74 @@ definitions:
     - question_no
     - selected_option
     type: object
+  quiz.AnswerFeedback:
+    properties:
+      correct_option:
+        type: string
+      explanation:
+        description: Doğru cevap açıklaması
+        type: string
+      is_correct:
+        type: boolean
+      question_no:
+        type: integer
+      selected_option:
+        type: string
+    type: object
+  quiz.AttemptAnswerDetail:
+    properties:
+      correct_option:
+        type: string
+      explanation:
+        type: string
+      is_correct:
+        type: boolean
+      question_no:
+        type: integer
+      question_text:
+        type: string
+      selected_option:
+        type: string
+    type: object
   quiz.GenerateQuizRequest:
     properties:
       endPage:
         type: integer
       fileId:
         type: string
-      fileName:
+      quizName:
         type: string
       startPage:
         type: integer
     required:
     - fileId
-    - fileName
+    - quizName
     type: object
   quiz.GenerateQuizResponse:
+    properties:
+      quizId:
+        type: string
+    type: object
+  quiz.GetAttemptByIdResponse:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/quiz.AttemptAnswerDetail'
+        type: array
+      completed_at:
+        type: string
+      id:
+        type: string
+      percentage:
+        type: number
+      quiz_id:
+        type: string
+      quiz_title:
+        type: string
+      score:
+        type: integer
+      total_questions:
+        type: integer
     type: object
   quiz.GetQuizAttemptsResponse:
     properties:
@@ -178,6 +231,8 @@ definitions:
     properties:
       correct_option:
         type: string
+      explanation:
+        type: string
       "no":
         type: integer
       options:
@@ -200,8 +255,6 @@ definitions:
       quiz_title:
         type: string
       score:
-        type: integer
-      time_spent_seconds:
         type: integer
       total_questions:
         type: integer
@@ -229,6 +282,11 @@ definitions:
     type: object
   quiz.SolveQuizResponse:
     properties:
+      answers:
+        description: Detaylı cevap bilgisi
+        items:
+          $ref: '#/definitions/quiz.AnswerFeedback'
+        type: array
       attempt_id:
         type: string
       percentage:
@@ -773,7 +831,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Submit answers for a quiz and get the score
+      description: Submit answers for a quiz and get the score with detailed feedback
       parameters:
       - description: Quiz ID
         in: path
@@ -830,6 +888,30 @@ paths:
         "500":
           description: Internal Server Error
       summary: Get Quiz Attempts
+      tags:
+      - Quiz
+  /quizzes/attempts/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a specific quiz attempt by its ID for the authenticated
+        user
+      parameters:
+      - description: Attempt ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/quiz.GetAttemptByIdResponse'
+        "404":
+          description: Not Found
+      summary: Get Quiz Attempt by ID
       tags:
       - Quiz
   /users/account:
