@@ -71,7 +71,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
 		Addr:           os.Getenv("QDRANT_URL"),
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
-		MinScore:       0.3,
+		MinScore:       0.5,
 		VectorSize:     1024,
 		ChunkLimit:     10,
 	})
