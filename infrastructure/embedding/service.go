@@ -23,7 +23,7 @@ func NewEmbeddingService(apiKey, apiDomain string) *EmbeddingService {
 	return &EmbeddingService{
 		APIKey:     apiKey,
 		APIDomain:  apiDomain,
-		HTTPClient: &http.Client{Timeout: 30 * time.Second},
+		HTTPClient: &http.Client{Timeout: 300 * time.Second},
 	}
 }
 
