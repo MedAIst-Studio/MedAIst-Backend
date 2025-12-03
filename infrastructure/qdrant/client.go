@@ -320,7 +320,8 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 		}
 	}
 
-	if len(allChunks) <= 5 {
+	limit := int(q.Config.ChunkLimit)
+	if len(allChunks) <= limit {
 		return allChunks, nil
 	}
 
@@ -328,7 +329,7 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 		allChunks[i], allChunks[j] = allChunks[j], allChunks[i]
 	})
 
-	return allChunks[:5], nil
+	return allChunks[:limit], nil
 }
 
 func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID, pageRange []int) ([]string, error) {
@@ -416,17 +417,18 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 
 	fmt.Println("Total chunks found:", len(matchingChunks))
 
-	// Eğer 5'ten az varsa hepsini döndür
-	if len(matchingChunks) <= 5 {
+	limit := int(q.Config.ChunkLimit)
+	// Eğer limit'ten az varsa hepsini döndür
+	if len(matchingChunks) <= limit {
 		return matchingChunks, nil
 	}
 
-	// Random 5 chunk seç
+	// Random chunk seç
 	rand.Shuffle(len(matchingChunks), func(i, j int) {
 		matchingChunks[i], matchingChunks[j] = matchingChunks[j], matchingChunks[i]
 	})
 
-	return matchingChunks[:5], nil
+	return matchingChunks[:limit], nil
 }
 
 // Helper functions
