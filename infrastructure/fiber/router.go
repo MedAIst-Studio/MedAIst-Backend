@@ -143,6 +143,7 @@ func SetupRoutes(app *fiber.App) {
 	getQuizByIdHandler := quiz.NewGetQuizByIdHandler(dc.Repo)
 	solveQuizHandler := quiz.NewSolveQuizHandler(dc.Repo)
 	getQuizAttemptsHandler := quiz.NewGetQuizAttemptsHandler(dc.Repo)
+	getQuizAttemptByIdHandler := quiz.NewGetAttemptByIdHandler(dc.Repo)
 
 	sl := dc.slogLogger
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
@@ -188,6 +189,7 @@ func SetupRoutes(app *fiber.App) {
 	quizApp.Post("/", Handle(generateQuizHandler, sl))
 	quizApp.Get("/", Handle(getQuizzesHandler, sl))
 	quizApp.Get("/attempts", Handle(getQuizAttemptsHandler, sl))
+	quizApp.Get("/attempts/:id", Handle(getQuizAttemptByIdHandler, sl))
 	quizApp.Post("/:id/solve", Handle(solveQuizHandler, sl))
 	quizApp.Get("/:id", Handle(getQuizByIdHandler, sl))
 

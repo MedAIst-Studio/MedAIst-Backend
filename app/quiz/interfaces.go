@@ -17,6 +17,8 @@ type Repository interface {
 	GetQuizAttemptsByUserId(ctx context.Context, userID uuid.UUID, limit, offset int) ([]QuizAttemptDetail, int, error)
 	GetQuizDataForSolving(ctx context.Context, quizID uuid.UUID) (*QuizSolvingData, error)
 	SaveQuizAttemptWithAnswers(ctx context.Context, attempt *QuizAttempt, answers []QuizAttemptAnswer) error
+	GetQuizAttemptById(ctx context.Context, attemptId uuid.UUID) (*QuizAttemptDetail, error)
+	GetAttemptAnswers(ctx context.Context, attemptId uuid.UUID) ([]AttemptAnswerDetail, error)
 }
 
 type AIService interface {

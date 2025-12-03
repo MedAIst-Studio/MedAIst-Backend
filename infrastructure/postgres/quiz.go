@@ -571,3 +571,86 @@ func (r *Repository) GetAttemptDetails(ctx context.Context, attemptID uuid.UUID,
 	response.Answers = answers
 	return response, nil
 }
+
+func (r *Repository) GetQuizAttemptById(ctx context.Context, attemptId uuid.UUID) (*quiz.QuizAttemptDetail, error) {
+	query := `
+		SELECT 
+			qa.id,
+			qa.quiz_id,
+			q.title as quiz_title,
+			qa.score,
+			qa.total_questions,
+			ROUND((qa.score::numeric / qa.total_questions::numeric * 100), 2) as percentage,
+			qa.completed_at 
+		FROM quiz_attempts qa
+		JOIN quizzes q ON qa.quiz_id = q.id
+		WHERE qa.id = $1
+	`
+
+	var attempt quiz.QuizAttemptDetail
+	err := r.db.QueryRowContext(ctx, query, attemptId).Scan(
+		&attempt.ID,
+		&attempt.QuizID,
+		&attempt.QuizTitle,
+		&attempt.Score,
+		&attempt.TotalQuestions,
+		&attempt.Percentage,
+		&attempt.CompletedAt,
+	)
+
+	if err == sql.ErrNoRows {
+		return nil, fmt.Errorf("quiz attempt not found")
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to get quiz attempt: %w", err)
+	}
+
+	return &attempt, nil
+}
+
+// GetAttemptAnswers - Belirli bir attempt'e ait tüm cevapları getirir
+func (r *Repository) GetAttemptAnswers(ctx context.Context, attemptId uuid.UUID) ([]quiz.AttemptAnswerDetail, error) {
+	query := `
+		SELECT 
+			qaa.question_no,
+			qq.question_text,
+			qaa.selected_option,
+			qaa.correct_option,
+			qaa.is_correct,
+			COALESCE(qq.explanation, '') as explanation
+		FROM quiz_attempt_answers qaa
+		JOIN quiz_attempts qa ON qaa.attempt_id = qa.id
+		JOIN quiz_questions qq ON qq.quiz_id = qa.quiz_id AND qq.question_no = qaa.question_no
+		WHERE qaa.attempt_id = $1
+		ORDER BY qaa.question_no ASC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, attemptId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query attempt answers: %w", err)
+	}
+	defer rows.Close()
+
+	var answers []quiz.AttemptAnswerDetail
+	for rows.Next() {
+		var answer quiz.AttemptAnswerDetail
+		err := rows.Scan(
+			&answer.QuestionNo,
+			&answer.QuestionText,
+			&answer.SelectedOption,
+			&answer.CorrectOption,
+			&answer.IsCorrect,
+			&answer.Explanation,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan attempt answer: %w", err)
+		}
+		answers = append(answers, answer)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating attempt answers: %w", err)
+	}
+
+	return answers, nil
+}
