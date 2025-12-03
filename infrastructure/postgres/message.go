@@ -33,3 +33,8 @@ func (r *Repository) GetChatHistoryForAIContext(ctx context.Context, chatId uuid
 
 	return messages[:len(messages)-1], nil
 }
+
+func (r *Repository) DeleteMessage(ctx context.Context, messageId uuid.UUID) error {
+	_, err := r.db.ExecContext(ctx, "DELETE FROM messages WHERE id = $1", messageId)
+	return err
+}

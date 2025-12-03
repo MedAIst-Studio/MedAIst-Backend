@@ -1,16 +1,11 @@
 package domain
 
 import (
-	"crypto/rand"
-
 	"github.com/google/uuid"
 )
 
-const (
-	letters = "abcdefghijklmnopqrstuvwxyz"
-)
-
 type Quiz struct {
+	Id         uuid.UUID      `json:"id"`
 	UserId     uuid.UUID      `json:"userId"`
 	DocumentId uuid.UUID      `json:"documentId"`
 	Title      string         `json:"title"`
@@ -21,6 +16,7 @@ type QuizQuestion struct {
 	QuestionText       string   `json:"questionText"`
 	Options            []Option `json:"options"`
 	CorrectOptionLabel string   `json:"correctOptionLabel"`
+	Explanation        string   `json:"explanation,omitempty"`
 }
 
 type Option struct {
@@ -32,9 +28,10 @@ type Option struct {
 
 func NewQuiz(userId, documentId uuid.UUID, title string) *Quiz {
 	return &Quiz{
+		Id:         uuid.New(),
 		UserId:     userId,
 		DocumentId: documentId,
-		Title:      formatTitle(title),
+		Title:      title,
 	}
 }
 
@@ -49,19 +46,4 @@ func (qo *QuizQuestion) AddOption() *Option {
 		}
 	}
 	return nil
-}
-
-func formatTitle(title string) string {
-	b := make([]byte, 6)
-
-	_, err := rand.Read(b)
-	if err != nil {
-		panic(err)
-	}
-
-	for i := range b {
-		b[i] = letters[int(b[i])%len(letters)]
-	}
-
-	return title + "-" + string(b)
 }

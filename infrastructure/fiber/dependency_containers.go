@@ -10,11 +10,11 @@ import (
 	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
 
-	grokInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/grok"
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
+	openaiInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openai"
 	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
 	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
@@ -76,12 +76,19 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		ChunkLimit:     10,
 	})
 
-	grok := grokInfra.NewGrokService(os.Getenv("GROK_API_KEY"), "grok-3")
+	openai := openaiInfra.NewOpenAIService(openaiInfra.OpenAIConfig{
+		ApiKey:                 os.Getenv("OPENAI_API_KEY"),
+		ChatModel:              "gpt-4o",
+		GenerateQuestionModel:  "gpt-4o",
+		ExpandQuestionModel:    "gpt-4o-mini",
+		CheckUserQueryModel:    "gpt-4o-mini",
+		GenerateChatTitleModel: "gpt-4o-mini",
+	})
 
 	jina := jina.NewService(os.Getenv("JINA_API_KEY"))
 
 	aiService := &MultiModelService{
-		grok,
+		openai,
 		jina,
 	}
 
@@ -109,6 +116,6 @@ func NewAuthDependencyContainer() *DependencyContainer {
 }
 
 type MultiModelService struct {
-	*grokInfra.GrokService
+	*openaiInfra.OpenAIService
 	*jina.Service
 }

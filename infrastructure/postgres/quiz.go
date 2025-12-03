@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/quiz"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
@@ -19,33 +20,33 @@ func (r *Repository) SaveQuiz(ctx context.Context, quiz *domain.Quiz) error {
 	}
 	defer tx.Rollback()
 
-	quizId := uuid.New()
 	quizQuery := `
-		INSERT INTO quizzes (id, user_id, document_id, title, created_at)
-		VALUES ($1, $2, $3, $4, NOW())
-	`
-	_, err = tx.ExecContext(ctx, quizQuery, quizId, quiz.UserId, quiz.DocumentId, quiz.Title)
+        INSERT INTO quizzes (id, user_id, document_id, title, created_at)
+        VALUES ($1, $2, $3, $4, NOW())
+    `
+	_, err = tx.ExecContext(ctx, quizQuery, quiz.Id, quiz.UserId, quiz.DocumentId, quiz.Title)
 	if err != nil {
 		return fmt.Errorf("failed to insert quiz: %w", err)
 	}
 
 	questionQuery := `
-		INSERT INTO quiz_questions (id, quiz_id, question_no, question_text)
-		VALUES ($1, $2, $3, $4)
-	`
+        INSERT INTO quiz_questions (id, quiz_id, question_no, question_text, explanation)
+        VALUES ($1, $2, $3, $4, $5)
+    `
+
 	optionQuery := `
-		INSERT INTO quiz_question_options (id, question_id, option_label, option_text, is_correct, display_order)
-		VALUES ($1, $2, $3, $4, $5, $6)
-	`
+        INSERT INTO quiz_question_options (id, question_id, option_label, option_text, is_correct, display_order)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `
 
 	for i, question := range quiz.Questions {
 		questionId := uuid.New()
-
 		_, err = tx.ExecContext(ctx, questionQuery,
 			questionId,
-			quizId,
+			quiz.Id,
 			i+1, // question_no starts from 1
 			question.QuestionText,
+			question.Explanation, // Yeni alan
 		)
 		if err != nil {
 			return fmt.Errorf("failed to insert question %d: %w", i+1, err)
@@ -53,7 +54,6 @@ func (r *Repository) SaveQuiz(ctx context.Context, quiz *domain.Quiz) error {
 
 		for _, option := range question.Options {
 			optionId := uuid.New()
-
 			_, err = tx.ExecContext(ctx, optionQuery,
 				optionId,
 				questionId,
@@ -114,6 +114,7 @@ func (r *Repository) GetQuizById(ctx context.Context, quizId uuid.UUID) (*quiz.G
             q.title,
             qq.question_no,
             qq.question_text,
+            qq.explanation,
             qo.option_label,
             qo.option_text,
             qo.is_correct
@@ -139,6 +140,7 @@ func (r *Repository) GetQuizById(ctx context.Context, quizId uuid.UUID) (*quiz.G
 			title        string
 			questionNo   int
 			questionText string
+			explanation  string // Yeni alan
 			optionLabel  string
 			optionText   string
 			isCorrect    bool
@@ -149,6 +151,7 @@ func (r *Repository) GetQuizById(ctx context.Context, quizId uuid.UUID) (*quiz.G
 			&title,
 			&questionNo,
 			&questionText,
+			&explanation, // Yeni scan
 			&optionLabel,
 			&optionText,
 			&isCorrect,
@@ -171,6 +174,7 @@ func (r *Repository) GetQuizById(ctx context.Context, quizId uuid.UUID) (*quiz.G
 			questionsMap[questionNo] = &quiz.Question{
 				No:            questionNo,
 				Text:          questionText,
+				Explanation:   explanation, // Yeni alan
 				Options:       []quiz.Option{},
 				CorrectOption: "",
 			}
@@ -210,7 +214,6 @@ func (r *Repository) GetQuizById(ctx context.Context, quizId uuid.UUID) (*quiz.G
 	return response, nil
 }
 
-// GetQuizAnswersById returns a map of question_no -> correct_option_label and total question count
 func (r *Repository) GetQuizAnswersById(ctx context.Context, quizID uuid.UUID) (map[int]string, int, error) {
 	query := `
 		SELECT 
@@ -256,7 +259,6 @@ func (r *Repository) GetQuizAnswersById(ctx context.Context, quizID uuid.UUID) (
 	return answers, totalQuestions, nil
 }
 
-// SaveQuizAttempt saves the quiz attempt to database
 func (r *Repository) SaveQuizAttempt(ctx context.Context, attempt *quiz.QuizAttempt) error {
 	query := `
 		INSERT INTO quiz_attempts (
@@ -281,21 +283,146 @@ func (r *Repository) SaveQuizAttempt(ctx context.Context, attempt *quiz.QuizAtte
 	return err
 }
 
+// ============ REPOSITORY METHODS ============
+
+// GetQuizDataForSolving quiz'i çözmek için gerekli tüm bilgiyi getirir
+func (r *Repository) GetQuizDataForSolving(ctx context.Context, quizID uuid.UUID) (*quiz.QuizSolvingData, error) {
+	query := `
+        SELECT 
+            qq.question_no,
+            qo.option_label,
+            qq.explanation,
+            COUNT(*) OVER() as total_questions
+        FROM quiz_questions qq
+        INNER JOIN quiz_question_options qo ON qq.id = qo.question_id
+        WHERE qq.quiz_id = $1 AND qo.is_correct = true
+        ORDER BY qq.question_no
+    `
+
+	rows, err := r.db.QueryContext(ctx, query, quizID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	data := &quiz.QuizSolvingData{
+		Questions: make(map[int]quiz.QuestionData),
+	}
+
+	for rows.Next() {
+		var questionNo int
+		var correctOption string
+		var explanation string
+		var total int
+
+		if err := rows.Scan(&questionNo, &correctOption, &explanation, &total); err != nil {
+			return nil, err
+		}
+
+		data.Questions[questionNo] = quiz.QuestionData{
+			CorrectOption: correctOption,
+			Explanation:   explanation,
+		}
+		data.TotalQuestions = total
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(data.Questions) == 0 {
+		return nil, errors.New("quiz not found")
+	}
+
+	return data, nil
+}
+
+// SaveQuizAttemptWithAnswers attempt'i ve kullanıcı cevaplarını transaction içinde kaydeder
+func (r *Repository) SaveQuizAttemptWithAnswers(ctx context.Context, attempt *quiz.QuizAttempt, answers []quiz.QuizAttemptAnswer) error {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	// Attempt'i kaydet
+	attemptQuery := `
+        INSERT INTO quiz_attempts (
+            id, 
+            quiz_id, 
+            user_id, 
+            score, 
+            total_questions,
+            completed_at
+        ) VALUES ($1, $2, $3, $4, $5, $6)
+    `
+	_, err = tx.ExecContext(
+		ctx,
+		attemptQuery,
+		attempt.ID,
+		attempt.QuizID,
+		attempt.UserID,
+		attempt.Score,
+		attempt.TotalQuestions,
+		attempt.CompletedAt,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to save attempt: %w", err)
+	}
+
+	// Cevapları kaydet
+	answerQuery := `
+        INSERT INTO quiz_attempt_answers (
+            id,
+            attempt_id,
+            question_no,
+            selected_option,
+            correct_option,
+            is_correct
+        ) VALUES ($1, $2, $3, $4, $5, $6)
+    `
+
+	for _, answer := range answers {
+		answer.AttemptID = attempt.ID // Set attempt ID
+		_, err = tx.ExecContext(
+			ctx,
+			answerQuery,
+			answer.ID,
+			answer.AttemptID,
+			answer.QuestionNo,
+			answer.SelectedOption,
+			answer.CorrectOption,
+			answer.IsCorrect,
+		)
+		if err != nil {
+			return fmt.Errorf("failed to save answer for question %d: %w", answer.QuestionNo, err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return nil
+}
+
 // GetQuizAttemptsByUserId returns all quiz attempts for a user with pagination
 func (r *Repository) GetQuizAttemptsByUserId(ctx context.Context, userID uuid.UUID, limit, offset int) ([]quiz.QuizAttemptDetail, int, error) {
 	query := `
-		SELECT 
-			qa.id,
-			qa.quiz_id,
-			q.title as quiz_title,
-			qa.score,
-			qa.total_questions,
-			COUNT(*) OVER() as total_count
-		FROM quiz_attempts qa
-		INNER JOIN quizzes q ON qa.quiz_id = q.id
-		WHERE qa.user_id = $1
-		LIMIT $2 OFFSET $3
-	`
+        SELECT 
+            qa.id,
+            qa.quiz_id,
+            q.title as quiz_title,
+            qa.score,
+            qa.total_questions,
+            qa.completed_at,
+            COUNT(*) OVER() as total_count
+        FROM quiz_attempts qa
+        INNER JOIN quizzes q ON qa.quiz_id = q.id
+        WHERE qa.user_id = $1
+        ORDER BY qa.completed_at DESC
+        LIMIT $2 OFFSET $3
+    `
 
 	rows, err := r.db.QueryContext(ctx, query, userID, limit, offset)
 	if err != nil {
@@ -316,6 +443,7 @@ func (r *Repository) GetQuizAttemptsByUserId(ctx context.Context, userID uuid.UU
 			&attempt.QuizTitle,
 			&attempt.Score,
 			&attempt.TotalQuestions,
+			&attempt.CompletedAt,
 			&total,
 		)
 		if err != nil {
@@ -339,4 +467,107 @@ func (r *Repository) GetQuizAttemptsByUserId(ctx context.Context, userID uuid.UU
 	}
 
 	return attempts, totalCount, nil
+}
+
+// GetAttemptDetails bir attempt'in detaylı bilgilerini getirir (cevaplar + açıklamalar dahil)
+func (r *Repository) GetAttemptDetails(ctx context.Context, attemptID uuid.UUID, userID uuid.UUID) (*quiz.AttemptDetailResponse, error) {
+	query := `
+        SELECT 
+            qa.id,
+            qa.quiz_id,
+            q.title as quiz_title,
+            qa.score,
+            qa.total_questions,
+            qa.completed_at,
+            qaa.question_no,
+            qq.question_text,
+            qaa.selected_option,
+            qaa.correct_option,
+            qaa.is_correct,
+            qq.explanation
+        FROM quiz_attempts qa
+        INNER JOIN quizzes q ON qa.quiz_id = q.id
+        INNER JOIN quiz_attempt_answers qaa ON qa.id = qaa.attempt_id
+        INNER JOIN quiz_questions qq ON q.id = qq.quiz_id AND qq.question_no = qaa.question_no
+        WHERE qa.id = $1 AND qa.user_id = $2
+        ORDER BY qaa.question_no
+    `
+
+	rows, err := r.db.QueryContext(ctx, query, attemptID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var response *quiz.AttemptDetailResponse
+	var answers []quiz.AttemptAnswerDetail
+
+	for rows.Next() {
+		var (
+			attemptID      uuid.UUID
+			quizID         uuid.UUID
+			quizTitle      string
+			score          int
+			totalQuestions int
+			completedAt    time.Time
+			questionNo     int
+			questionText   string
+			selectedOption string
+			correctOption  string
+			isCorrect      bool
+			explanation    string
+		)
+
+		err := rows.Scan(
+			&attemptID,
+			&quizID,
+			&quizTitle,
+			&score,
+			&totalQuestions,
+			&completedAt,
+			&questionNo,
+			&questionText,
+			&selectedOption,
+			&correctOption,
+			&isCorrect,
+			&explanation,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if response == nil {
+			response = &quiz.AttemptDetailResponse{
+				ID:             attemptID,
+				QuizID:         quizID,
+				QuizTitle:      quizTitle,
+				Score:          score,
+				TotalQuestions: totalQuestions,
+				CompletedAt:    completedAt,
+			}
+			if totalQuestions > 0 {
+				response.Percentage = (float64(score) / float64(totalQuestions)) * 100
+			}
+		}
+
+		answers = append(answers, quiz.AttemptAnswerDetail{
+			QuestionNo:     questionNo,
+			QuestionText:   questionText,
+			SelectedOption: selectedOption,
+			CorrectOption:  correctOption,
+			IsCorrect:      isCorrect,
+			Explanation:    explanation,
+		})
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if response == nil {
+		return nil, errors.New("attempt not found")
+	}
+
+	response.Answers = answers
+	return response, nil
 }

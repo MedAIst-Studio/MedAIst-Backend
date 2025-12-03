@@ -2,10 +2,8 @@ package quiz
 
 import (
 	"context"
-	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
-	"github.com/google/uuid"
 )
 
 type GetQuizAttemptsRequest struct {
@@ -17,17 +15,6 @@ type GetQuizAttemptsRequest struct {
 type GetQuizAttemptsResponse struct {
 	Attempts   []QuizAttemptDetail `json:"attempts"`
 	TotalCount int                 `json:"total_count"`
-}
-
-type QuizAttemptDetail struct {
-	ID             uuid.UUID `json:"id"`
-	QuizID         uuid.UUID `json:"quiz_id"`
-	QuizTitle      string    `json:"quiz_title"`
-	Score          int       `json:"score"`
-	TotalQuestions int       `json:"total_questions"`
-	Percentage     float64   `json:"percentage"`
-	TimeSpent      int       `json:"time_spent_seconds"`
-	CompletedAt    time.Time `json:"completed_at"`
 }
 
 type GetQuizAttemptsHandler struct {

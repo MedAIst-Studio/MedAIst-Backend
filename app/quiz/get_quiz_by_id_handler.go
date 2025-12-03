@@ -22,6 +22,7 @@ type Question struct {
 	Text          string   `json:"text"`
 	Options       []Option `json:"options"`
 	CorrectOption string   `json:"correct_option"`
+	Explanation   string   `json:"explanation,omitempty"`
 }
 
 type Option struct {

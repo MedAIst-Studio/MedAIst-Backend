@@ -11,6 +11,7 @@ type Repository interface {
 	SaveMessage(ctx context.Context, message *domain.Message) error
 	CreateChat(ctx context.Context, chat *domain.Chat) error
 	GetChatHistoryForAIContext(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error)
+	DeleteMessage(ctx context.Context, messageId uuid.UUID) error
 }
 
 type VectorRepository interface {

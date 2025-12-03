@@ -11,12 +11,13 @@ import (
 
 type GenerateQuizRequest struct {
 	FileId    uuid.UUID `json:"fileId" validate:"required,uuid"`
-	FileName  string    `json:"fileName" validate:"required"`
+	QuizName  string    `json:"quizName" validate:"required"`
 	StartPage int       `json:"startPage,omitempty"`
 	EndPage   int       `json:"endPage,omitempty"`
 }
 
 type GenerateQuizResponse struct {
+	QuizID uuid.UUID `json:"quizId"`
 }
 
 type GenerateQuizHandler struct {
@@ -51,14 +52,16 @@ type questionResult struct {
 // @Router			/quizzes [post]
 func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizRequest) (*GenerateQuizResponse, int, error) {
 	userId := domain.GetUserID(ctx)
-	quiz := domain.NewQuiz(userId, req.FileId, req.FileName)
-	fmt.Println(req)
+	quiz := domain.NewQuiz(userId, req.FileId, req.QuizName)
 	var chunks []string
 	var err error
 
-	pageRange := []int{
-		req.StartPage,
-		req.EndPage,
+	var pageRange []int
+	if req.StartPage != 0 || req.EndPage != 0 {
+		pageRange = []int{
+			req.StartPage,
+			req.EndPage,
+		}
 	}
 
 	if len(pageRange) > 0 {
@@ -74,8 +77,6 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 			return nil, 500, err
 		}
 	}
-
-	fmt.Println("Chunks:", chunks)
 
 	var wg sync.WaitGroup
 	resultChan := make(chan questionResult, len(chunks))
@@ -110,11 +111,16 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 		}
 		quiz.AddQuestion(result.question)
 	}
-	fmt.Println(quiz)
+
+	fmt.Println(quiz.Id)
+	fmt.Println(quiz.Title)
+	fmt.Println(quiz.Questions[1])
 	err = h.repository.SaveQuiz(ctx, quiz)
 	if err != nil {
 		return nil, 500, err
 	}
 
-	return nil, 204, nil
+	return &GenerateQuizResponse{
+		QuizID: quiz.Id,
+	}, 200, nil
 }

@@ -23,12 +23,44 @@ const (
 
 	pdfSearchQuerySystemMessage = "You are a helpful medical assistant. Answer the user's questions based on the provided medical document excerpts. If the information is not available in the excerpts, respond with 'I don't know.' Do not provide any medical advice beyond the scope of the document excerpts. Response in the same language as the question."
 
-	QueryClassificationSystemPrompt = `Classify the user's query into one of three types:
+	QueryClassificationSystemPrompt = `Classify the user's query into exactly one of the following categories.
+Return only one word: PDFSearch, Clarification, or General.
 
-	- PDFSearch: Questions requesting specific information from the document (e.g., dosages, side effects, procedures, study results)
-	- Clarification: Follow-up questions asking for explanation of previous responses (e.g., "explain more", "what does that mean", "can you clarify")
-	- General: Greetings, casual conversation, or questions unrelated to the document (e.g., "hello", "who are you")
+Follow these strict rules in order:
 
+1. PDFSearch
+   The query must be classified as PDFSearch if ANY of the following are true:
+     - The user asks for information that could be inside the document.
+       (Examples: "what is X", "explain Y", "tell me about Z", "summarize section about A")
+     - The query references content, topics, definitions, explanations, or facts.
+     - The query is medical, scientific, legal, historical, or technical in nature.
+     - You are uncertain which category it fits. (Default to PDFSearch)
+   Examples:
+     "Explain glycolysis"
+     "What is classical conditioning?"
+     "Find information about Osmanlı tarihi"
+
+2. Clarification
+   Classify as Clarification ONLY IF:
+     - The query explicitly refers to your previous answer or user's previous question.
+     - The user asks for elaboration, simplification, or more detail.
+   Examples:
+     "Explain more"
+     "What do you mean?"
+     "Can you clarify the last part?"
+     "Continue"
+
+3. General
+   Classify as General ONLY IF:
+     - The user is greeting, chatting, or asking unrelated personal/AI questions.
+   Examples:
+     "hello"
+     "who are you?"
+     "how are you?"
+     "tell me a joke"
+     "where do you live?"
+
+	 Instructions:
 	Respond with exactly one word: "PDFSearch", "Clarification", or "General". When uncertain, default to "PDFSearch" for any medical-related content.`
 
 	QueryExpansionSystemPrompt = `You are a search query expansion specialist. Your task is to generate exactly 5 diverse search queries that capture different aspects of the user's original intent.

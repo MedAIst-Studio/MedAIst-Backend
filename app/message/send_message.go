@@ -73,11 +73,10 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	queryType, err := h.ChatSvc.CheckUserQuery(ctx, req.Content)
 	if err != nil {
 		fmt.Printf("Error checking user query: %v\n", err)
-		// TODO delete user message
+		h.Repo.DeleteMessage(ctx, userMessage.Id)
 		return nil, 500, err
 	}
 	fmt.Printf("queryType: %v\n", queryType)
-	fmt.Printf("is new chat: %v\n", isNewChat)
 
 	crm := domain.NewChatRequestManager(queryType, req.Content)
 
@@ -91,7 +90,6 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		}
 		return nil, 500, err
 	}
-	fmt.Printf("crm.Req messages: %v\n", crm.Req.Messages)
 
 	crm.Req.Stream = h.Stream
 	aiResp, err := h.ChatSvc.SendChatRequest(ctx, crm.Req)
@@ -146,7 +144,6 @@ func (h *SendMessageHandler) processQuery(ctx context.Context, req *SendMessageR
 	}
 
 	if crm.IsPdfSearchQuery() {
-		fmt.Println("Worked as PDF Search Query")
 		return h.addPdfContext(ctx, req, crm)
 	}
 	return nil
@@ -167,7 +164,6 @@ func (h *SendMessageHandler) addPdfContext(ctx context.Context, req *SendMessage
 	var wg sync.WaitGroup
 
 	for _, query := range generatedQueries {
-		fmt.Printf("query: %v\n", query)
 		wg.Add(1)
 		go func(q string) {
 			defer wg.Done()

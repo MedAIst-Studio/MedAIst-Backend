@@ -141,25 +141,28 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     quiz_id UUID NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id),
     score INTEGER,
-    total_questions INTEGER
+    total_questions INTEGER,
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
--- USER ANSWERS
-CREATE TABLE IF NOT EXISTS user_quiz_answers (
-    id UUID PRIMARY KEY,
+
+CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     attempt_id UUID NOT NULL REFERENCES quiz_attempts(id) ON DELETE CASCADE,
-    question_id UUID NOT NULL REFERENCES quiz_questions(id),
-    selected_option_id UUID REFERENCES quiz_question_options(id),
+    question_no INT NOT NULL,
+    selected_option VARCHAR(1) NOT NULL CHECK (selected_option IN ('A', 'B', 'C', 'D', 'E')),
+    correct_option VARCHAR(1) NOT NULL CHECK (correct_option IN ('A', 'B', 'C', 'D', 'E')),
     is_correct BOOLEAN NOT NULL,
-    answered_at TIMESTAMP DEFAULT NOW(),
-    UNIQUE(attempt_id, question_id)  -- Aynı soruya iki kez cevap verilmesin
+    created_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE(attempt_id, question_no)
 );
 
-
--- INDEXES
-CREATE INDEX IF NOT EXISTS  idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
-CREATE INDEX IF NOT EXISTS  idx_quiz_attempts_quiz_user ON quiz_attempts(quiz_id, user_id);
-CREATE INDEX IF NOT EXISTS  idx_user_answers_attempt ON user_quiz_answers(attempt_id);
+    
+    
+    -- INDEXES
+    CREATE INDEX IF NOT EXISTS  idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
+    CREATE INDEX IF NOT EXISTS  idx_quiz_attempts_quiz_user ON quiz_attempts(quiz_id, user_id);
+    CREATE INDEX IF NOT EXISTS idx_quiz_attempt_answers_attempt_id ON quiz_attempt_answers(attempt_id);
 	`
 	_, err := db.Exec(createTableQuery)
 	if err != nil {
