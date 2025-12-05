@@ -242,6 +242,7 @@ Rules:
 - Only ONE option isCorrect: true
 - Correct answer position must be random
 - Respond ONLY with JSON
+- Distractors (wrong answers) must be plausible and tricky.
 `, chunk)
 
 	fmt.Println(s.GenerateQuestionModel)
