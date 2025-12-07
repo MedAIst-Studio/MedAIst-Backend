@@ -142,7 +142,8 @@ CREATE TABLE IF NOT EXISTS quiz_attempts (
     user_id UUID NOT NULL REFERENCES users(id),
     score INTEGER,
     total_questions INTEGER,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    completed_at TIMESTAMP DEFAULT NOW()
 );
 
 
