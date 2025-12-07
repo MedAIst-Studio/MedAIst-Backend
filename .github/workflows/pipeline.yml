@@ -63,3 +63,21 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      
+      - name: Deploy Application
+        if: success()
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            APPLICATION_ID="${{ secrets.PROD_APP_ID }}"
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            APPLICATION_ID="${{ secrets.DEV_APP_ID }}"
+          else
+            echo "Skipping deployment for non-main/dev branch"
+            exit 0
+          fi
+          
+          curl -X POST 'https://panel.medaist.com/api/trpc/application.deploy?batch=1' \
+            -H 'accept: */*' \
+            -H 'content-type: application/json' \
+            -H "x-api-key: ${{ secrets.DOKPLOY_API_KEY }}" \
+            --data-raw "{\"0\":{\"json\":{\"applicationId\":\"${APPLICATION_ID}\"}}}"
