@@ -54,8 +54,8 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		Endpoint:        "minio:9000",
 		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
 		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
-		UseSSL:          false,
-		BucketName:      "files",
+		UseSSL:          os.Getenv("MINIO_USE_SSL") == "true",
+		BucketName:      os.Getenv("MINIO_BUCKET_NAME"),
 		Location:        "us-east-1",
 	})
 	fmt.Println("Connected to MinIO at", "localhost:9000")
