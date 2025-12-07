@@ -42,7 +42,7 @@ func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
 
 	conn, err := grpc.NewClient(cfg.Addr, opts...)
 	if err != nil {
-		panic(fmt.Errorf("failed to connect to Qdrant: %w", err))
+		panic(fmt.Errorf("failed to connect to Qdrant DB: %w", err))
 	}
 
 	q := &QdrantVectorDB{
