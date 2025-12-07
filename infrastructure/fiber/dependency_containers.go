@@ -51,14 +51,14 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
 
 	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
-		Endpoint:        "minio:9000",
+		Endpoint:        os.Getenv("MINIO_ENDPOINT"),
 		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
 		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
 		UseSSL:          os.Getenv("MINIO_USE_SSL") == "true",
 		BucketName:      os.Getenv("MINIO_BUCKET_NAME"),
 		Location:        "us-east-1",
 	})
-	fmt.Println("Connected to MinIO at", "localhost:9000")
+	fmt.Println("Connected to MinIO at", os.Getenv("MINIO_ENDPOINT"))
 
 	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
 		MaxChunkSize:    1024,
