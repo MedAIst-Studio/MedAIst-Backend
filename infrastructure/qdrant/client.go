@@ -18,6 +18,7 @@ import (
 type Config struct {
 	Addr           string
 	CollectionName string
+	ApiKey         string
 	MinScore       float32
 	VectorSize     uint64
 	ChunkLimit     uint64
@@ -31,7 +32,15 @@ type QdrantVectorDB struct {
 }
 
 func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
-	conn, err := grpc.NewClient(cfg.Addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+
+	if cfg.ApiKey != "" {
+		opts = append(opts, grpc.WithPerRPCCredentials(apiKeyCredentials{apiKey: cfg.ApiKey}))
+	}
+
+	conn, err := grpc.NewClient(cfg.Addr, opts...)
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to Qdrant: %w", err))
 	}
@@ -45,10 +54,25 @@ func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
 
 	if err := q.ensureCollection(context.Background(), cfg.VectorSize); err != nil {
 		conn.Close()
+		fmt.Printf("Warning: failed to ensure collection: %v\n", err)
 		panic(err)
 	}
 
 	return q
+}
+
+type apiKeyCredentials struct {
+	apiKey string
+}
+
+func (c apiKeyCredentials) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
+	return map[string]string{
+		"api-key": c.apiKey,
+	}, nil
+}
+
+func (c apiKeyCredentials) RequireTransportSecurity() bool {
+	return false
 }
 
 func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64) error {

@@ -40,9 +40,9 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	fmt.Println("Connected to database")
 
 	jweTokenService := jwe.NewJWETokenService(&jwe.Config{
-		AccessTokenEncryptionKey:  "12345678901234567890123456789012",
-		RefreshTokenEncryptionKey: "12345678901234567890123456789012",
-		SecureEmailEncryptionKey:  "12345678901234567890123456789012",
+		AccessTokenEncryptionKey:  os.Getenv("ACCESS_TOKEN_ENCRYPTION_KEY"),
+		RefreshTokenEncryptionKey: os.Getenv("REFRESH_TOKEN_ENCRYPTION_KEY"),
+		SecureEmailEncryptionKey:  os.Getenv("SECURE_EMAIL_ENCRYPTION_KEY"),
 		AuthAccessTokenDuration:   time.Minute * 15,
 		AuthRefreshTokenDuration:  time.Hour * 24 * 30,
 		SecureEmailTokenDuration:  time.Minute * 11,
@@ -71,6 +71,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
 		Addr:           os.Getenv("QDRANT_URL"),
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
+		ApiKey:         os.Getenv("QDRANT_API_KEY"),
 		MinScore:       0.6,
 		VectorSize:     1024,
 		ChunkLimit:     10,
