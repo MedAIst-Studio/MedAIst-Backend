@@ -78,7 +78,11 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 		}
 	}
 
+	fmt.Println("chunk num:", len(chunks))
+	fmt.Println("chunks:", chunks)
+
 	var wg sync.WaitGroup
+
 	resultChan := make(chan questionResult, len(chunks))
 
 	for i, chunk := range chunks {

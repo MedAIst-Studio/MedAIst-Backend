@@ -45,7 +45,6 @@ type EmbeddingResponse struct {
 	Results   []Embedding `json:"results"`
 	Dimension int         `json:"dimension"`
 	Count     int         `json:"count"`
-	Model     string      `json:"model"`
 }
 
 type Embedding struct {

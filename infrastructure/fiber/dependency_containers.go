@@ -66,13 +66,13 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		PreserveContext: true,
 	})
 
-	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("EMBEDDING_API_KEY"), os.Getenv("EMBEDDING_API_DOMAIN"))
+	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("OPENAI_API_KEY"))
 
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
 		Addr:           os.Getenv("QDRANT_URL"),
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
 		MinScore:       0.3,
-		VectorSize:     1024,
+		VectorSize:     1536,
 		ChunkLimit:     10,
 	})
 

@@ -1,98 +1,96 @@
 package embeddingapi
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
+	"github.com/sashabaranov/go-openai"
 )
 
 type EmbeddingService struct {
-	APIKey     string
-	APIDomain  string
-	HTTPClient *http.Client
+	client *openai.Client
 }
 
-func NewEmbeddingService(apiKey, apiDomain string) *EmbeddingService {
+func NewEmbeddingService(apiKey string) *EmbeddingService {
+	client := openai.NewClient(apiKey)
+
 	return &EmbeddingService{
-		APIKey:     apiKey,
-		APIDomain:  apiDomain,
-		HTTPClient: &http.Client{Timeout: 30 * time.Second},
+		client: client,
 	}
 }
 
 func (c *EmbeddingService) GenerateEmbeddingBatch(ctx context.Context, req *file.EmbeddingBatchRequest) (*file.EmbeddingResponse, error) {
-	reqBody, err := json.Marshal(req)
+
+	// --- 1) []Text → []string dönüşümü ---
+	inputs := make([]string, len(req.Texts))
+	for i, t := range req.Texts {
+		inputs[i] = t.Text
+	}
+
+	embeddingReq := openai.EmbeddingRequestStrings{
+		Input: inputs,
+		Model: openai.SmallEmbedding3,
+	}
+
+	// --- 2) OpenAI çağrısı ---
+	resp, err := c.client.CreateEmbeddings(ctx, embeddingReq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal embedding request: %w", err)
+		return nil, fmt.Errorf("failed to create embeddings: %w", err)
 	}
 
-	url := c.APIDomain + "/embed/batch"
+	// --- 3) Response mapping ---
+	results := make([]file.Embedding, len(resp.Data))
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(reqBody))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+	for i, data := range resp.Data {
+
+		// float64 → float32 dönüştürülmeli
+		vector := make([]float32, len(data.Embedding))
+		for j, v := range data.Embedding {
+			vector[j] = float32(v)
+		}
+
+		results[i] = file.Embedding{
+			Id:          req.Texts[i].Id,
+			Text:        req.Texts[i].Text,
+			Vector:      vector,
+			PageNumbers: []int{}, // eğer page varsa burada doldurursun
+		}
 	}
 
-	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.HTTPClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to call embedding API: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("embedding API returned status %d: %s", resp.StatusCode, string(bodyBytes))
-	}
-
-	var embeddingResp file.EmbeddingResponse
-	if err := json.NewDecoder(resp.Body).Decode(&embeddingResp); err != nil {
-		return nil, fmt.Errorf("failed to decode embedding response: %w", err)
-	}
-
-	return &embeddingResp, nil
+	// --- 4) Son response ---
+	return &file.EmbeddingResponse{
+		Results:   results,
+		Dimension: len(results[0].Vector),
+		Count:     len(results),
+	}, nil
 }
 
 func (c *EmbeddingService) GenerateEmbedding(ctx context.Context, req *message.EmbeddingRequest) (*message.EmbeddingResponse, error) {
-	reqBody, err := json.Marshal(req)
+	embeddingReq := openai.EmbeddingRequest{
+		Input: req.Text,
+		Model: openai.SmallEmbedding3,
+	}
+
+	// Yeni client formatı:
+	resp, err := c.client.CreateEmbeddings(ctx, embeddingReq)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal embedding request: %w", err)
+		return nil, fmt.Errorf("failed to create embedding: %w", err)
 	}
 
-	url := c.APIDomain + "/embed"
-
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(reqBody))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+	if len(resp.Data) == 0 {
+		return nil, fmt.Errorf("no embedding data received")
 	}
 
-	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
-
-	resp, err := c.HTTPClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to call embedding API: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("embedding API returned status %d: %s", resp.StatusCode, string(bodyBytes))
+	// ---> float64[] → float32[]
+	src := resp.Data[0].Embedding
+	vector := make([]float32, len(src))
+	for i, v := range src {
+		vector[i] = float32(v)
 	}
 
-	var embeddingResp message.EmbeddingResponse
-	if err := json.NewDecoder(resp.Body).Decode(&embeddingResp); err != nil {
-		return nil, fmt.Errorf("failed to decode embedding response: %w", err)
-	}
-
-	return &embeddingResp, nil
+	return &message.EmbeddingResponse{
+		Vector: vector,
+	}, nil
 }
