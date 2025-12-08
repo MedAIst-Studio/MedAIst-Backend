@@ -40,9 +40,9 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	fmt.Println("Connected to database")
 
 	jweTokenService := jwe.NewJWETokenService(&jwe.Config{
-		AccessTokenEncryptionKey:  "12345678901234567890123456789012",
-		RefreshTokenEncryptionKey: "12345678901234567890123456789012",
-		SecureEmailEncryptionKey:  "12345678901234567890123456789012",
+		AccessTokenEncryptionKey:  os.Getenv("ACCESS_TOKEN_ENCRYPTION_KEY"),
+		RefreshTokenEncryptionKey: os.Getenv("REFRESH_TOKEN_ENCRYPTION_KEY"),
+		SecureEmailEncryptionKey:  os.Getenv("SECURE_EMAIL_ENCRYPTION_KEY"),
 		AuthAccessTokenDuration:   time.Minute * 15,
 		AuthRefreshTokenDuration:  time.Hour * 24 * 30,
 		SecureEmailTokenDuration:  time.Minute * 11,
@@ -51,14 +51,14 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
 
 	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
-		Endpoint:        "minio:9000",
+		Endpoint:        os.Getenv("MINIO_ENDPOINT"),
 		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
 		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
-		UseSSL:          false,
-		BucketName:      "files",
+		UseSSL:          os.Getenv("MINIO_USE_SSL") == "true",
+		BucketName:      os.Getenv("MINIO_BUCKET_NAME"),
 		Location:        "us-east-1",
 	})
-	fmt.Println("Connected to MinIO at", "localhost:9000")
+	fmt.Println("Connected to MinIO at", os.Getenv("MINIO_ENDPOINT"))
 
 	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
 		MaxChunkSize:    1024,

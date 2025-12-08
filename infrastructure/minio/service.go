@@ -35,37 +35,43 @@ func NewMinioService(config *MinioConfig) *MinioService {
 		endpoint = "localhost:9000"
 	}
 
-	accessKeyID := config.AccessKeyID
-	secretAccessKey := config.SecretAccessKey
-
-	useSSL := config.UseSSL
+	log.Printf("MinIO Connecting to: %s (SSL: %v)", endpoint, config.UseSSL)
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
+		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
+		Secure: config.UseSSL,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println("MinIO Client creation failed:", err)
 	}
 
 	bucketName := config.BucketName
-	location := config.Location
 
-	err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: location})
+	location := config.Location
+	if location == "" {
+		location = "us-east-1"
+	}
+
+	exists, err := minioClient.BucketExists(ctx, bucketName)
 	if err != nil {
-		exists, errBucketExists := minioClient.BucketExists(ctx, bucketName)
-		if errBucketExists == nil && exists {
-			log.Printf("We already own %s\n", bucketName)
-		} else {
-			log.Fatalln(err)
+		log.Println("Bucket control failed:", err)
+	}
+
+	if !exists {
+		log.Printf("Bucket '%s' not found, creating... (Region: %s)", bucketName, location)
+		err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{Region: location})
+		if err != nil {
+			log.Println("Bucket creation failed:", err)
 		}
+		log.Printf("Bucket '%s' successfully created.", bucketName)
 	} else {
-		log.Printf("Successfully created %s\n", bucketName)
+		log.Printf("Bucket '%s' already exists, moving on.", bucketName)
 	}
 
 	return &MinioService{
 		minioClient: minioClient,
-		BucketName:  bucketName}
+		BucketName:  bucketName,
+	}
 }
 
 func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data []byte) error {

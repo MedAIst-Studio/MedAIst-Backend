@@ -42,7 +42,7 @@ func (s *Service) RerankChunks(ctx context.Context, chunks []string, userQuestio
 	req := RerankRequest{
 		Model:           s.model,
 		Query:           userQuestion,
-		TopN:            10,
+		TopN:            3,
 		Documents:       chunks,
 		ReturnDocuments: false,
 	}
