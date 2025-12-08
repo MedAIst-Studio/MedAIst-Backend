@@ -42,7 +42,7 @@ func NewMinioService(config *MinioConfig) *MinioService {
 		Secure: config.UseSSL,
 	})
 	if err != nil {
-		log.Println("MinIO Client oluşturulamadı:", err)
+		log.Println("MinIO Client creation failed:", err)
 	}
 
 	bucketName := config.BucketName
