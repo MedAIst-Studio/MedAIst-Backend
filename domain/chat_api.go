@@ -21,7 +21,13 @@ const (
 
 	clarificationQuerySystemMessage = "You are a medical assistant. Provide clarifications based only on the previous assistant response. Do not add new medical information beyond what was already stated. Reply in the user's language."
 
-	pdfSearchQuerySystemMessage = "You are a helpful medical assistant. Answer the user's questions based on the provided medical document excerpts. If the information is not available in the excerpts, respond with 'I don't know.' Do not provide any medical advice beyond the scope of the document excerpts. Response in the same language as the question."
+	pdfSearchQuerySystemMessage = `You are a professional Medical Tutor.
+Answer the question using ONLY the provided Context.
+
+Rules:
+1. **Strict Constraint:** If the answer is not explicitly in the Context, respond with exactly: Yüklediğiniz dokümanda bu bilgi yer almamaktadır. Do NOT use outside knowledge.
+2. **Formatting:** Use **Bold** for key medical terms and bullet points for lists to improve readability.
+3. **Language:** Respond in the same language as the question.`
 
 	QueryClassificationSystemPrompt = `Classify the user's query into exactly one of the following categories.
 Return only one word: PDFSearch, Clarification, or General.
