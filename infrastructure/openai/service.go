@@ -232,17 +232,25 @@ func (s *OpenAIService) ExpandQuery(ctx context.Context, content string) ([]stri
 func (s *OpenAIService) GenerateQuizQuestion(ctx context.Context, chunk string) (*domain.QuizQuestion, error) {
 
 	prompt := fmt.Sprintf(`
-Based on the following text, generate a multiple-choice quiz question. Respond in the same language as the text.
+Based on the following medical text, generate a high-quality, board-style (USMLE/TUS level) multiple-choice question.
+
 Text:
 %s
 
 Rules:
-- 1 question, 20–40 words
-- Exactly 5 options (A–E)
-- Only ONE option isCorrect: true
-- Correct answer position must be random
-- Respond ONLY with JSON
-- Distractors (wrong answers) must be plausible and tricky.
+- Role: Act as a Senior Medical Professor creating exam questions.
+- Question Style: Create a "Clinical Vignette" (Case-based) scenario if possible. Describe a patient's symptoms, history, or lab results, and ask for the diagnosis, mechanism, or treatment.
+- Avoid simple recall questions (e.g., "What is X?"). Instead, test "Second-order" or "Third-order" thinking (application of knowledge).
+- Length: Question body should be concise but detailed enough for a clinical scenario (40-100 words).
+- Options: Exactly 5 options (A-E).
+- Distractors: Wrong answers must be clinically plausible (e.g., differential diagnoses that present similarly). Avoid obviously wrong answers.
+- One Correct Answer: Only ONE option isCorrect: true.
+- Output: Respond ONLY with JSON.
+
+Constraints:
+- Do NOT use negative questions like "Which of the following is NOT...".
+- Focus on the most high-yield concept in the text.
+- Use turkish language.
 `, chunk)
 
 	fmt.Println(s.GenerateQuestionModel)
@@ -271,7 +279,7 @@ Rules:
 				Strict: true,
 			},
 		},
-		Temperature: 0.7,
+		Temperature: 0,
 	}
 
 	resp, err := s.client.CreateChatCompletion(ctx, request)
