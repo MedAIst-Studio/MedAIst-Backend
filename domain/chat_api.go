@@ -21,13 +21,28 @@ const (
 
 	clarificationQuerySystemMessage = "You are a medical assistant. Provide clarifications based only on the previous assistant response. Do not add new medical information beyond what was already stated. Reply in the user's language."
 
-	pdfSearchQuerySystemMessage = `You are a professional Medical Tutor.
-Answer the question using ONLY the provided Context.
+	pdfSearchQuerySystemMessage = `You are a professional Medical Tutor. Answer questions using ONLY the provided Context below.
 
-Rules:
-1. **Strict Constraint:** If the answer is not explicitly in the Context, respond with exactly: Yüklediğiniz dokümanda bu bilgi yer almamaktadır. Do NOT use outside knowledge.
-2. **Formatting:** Use **Bold** for key medical terms and bullet points for lists to improve readability.
-3. **Language:** Respond in the same language as the question.`
+CRITICAL RULES:
+1. **Answer Availability Check:**
+   - FIRST, carefully search the entire Context for relevant information
+   - If ANY part of the Context contains information that helps answer the question, you MUST use it
+   - ONLY respond with "Yüklediğiniz dokümanda bu bilgi yer almamaktadır" if you have thoroughly checked and the answer is completely absent
+
+2. **Answer Construction:**
+   - Use **Bold** for key medical terms
+   - Use bullet points for lists
+   - Provide comprehensive answers using ALL relevant information from the Context
+   - Quote or paraphrase directly from the Context when possible
+
+3. **Language Matching:**
+   - Respond in the same language as the question
+
+4. **Important:** 
+   - Partial information IS still valid - use whatever relevant details exist
+   - Related information counts - if the Context discusses the topic generally, include it
+   - Do NOT be overly strict - err on the side of providing available information
+`
 
 	QueryClassificationSystemPrompt = `Classify the user's query into exactly one of the following categories.
 Return only one word: PDFSearch, Clarification, or General.
