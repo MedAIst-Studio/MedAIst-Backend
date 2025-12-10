@@ -325,30 +325,46 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 		},
 	}
 
-	scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
-		CollectionName: q.CollectionName,
-		Filter:         filter,
-		Limit:          pointerUint32(1000),
-		WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to scroll points: %w", err)
-	}
+	limit := int(q.Config.ChunkLimit)
+	allChunks := make([]string, 0, limit*2) // Capacity hint
+	var nextPageOffset *qdrant.PointId
 
-	allChunks := make([]string, 0)
-	for _, point := range scrollResp.Result {
-		if text, ok := point.Payload["text"]; ok {
-			if textVal, ok := text.GetKind().(*qdrant.Value_StringValue); ok {
-				allChunks = append(allChunks, textVal.StringValue)
+	// Pagination ile chunk'ları al
+	// Not: Random seçim için hepsini almamız gerekiyor
+	for {
+		scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
+			CollectionName: q.CollectionName,
+			Filter:         filter,
+			Limit:          pointerUint32(1000),
+			Offset:         nextPageOffset,
+			WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to scroll points: %w", err)
+		}
+
+		// Chunk'ları topla
+		for _, point := range scrollResp.Result {
+			if text, ok := point.Payload["text"]; ok {
+				if textVal, ok := text.GetKind().(*qdrant.Value_StringValue); ok {
+					allChunks = append(allChunks, textVal.StringValue)
+				}
 			}
 		}
+
+		// Eğer NextPageOffset nil ise, tüm sayfalar alındı
+		if scrollResp.NextPageOffset == nil {
+			break
+		}
+		nextPageOffset = scrollResp.NextPageOffset
 	}
 
-	limit := int(q.Config.ChunkLimit)
+	// Limit'ten az veya eşitse hepsini döndür
 	if len(allChunks) <= limit {
 		return allChunks, nil
 	}
 
+	// Random seçim yap
 	rand.Shuffle(len(allChunks), func(i, j int) {
 		allChunks[i], allChunks[j] = allChunks[j], allChunks[i]
 	})
@@ -364,7 +380,6 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 	fmt.Println("Pages length:", len(pageRange))
 	fmt.Println("Page numbers:", pageRange)
 
-	// file_id ile filtrele
 	filter := &qdrant.Filter{
 		Must: []*qdrant.Condition{
 			{
@@ -382,72 +397,78 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 		},
 	}
 
-	// Tüm file'a ait chunkları al
-	scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
-		CollectionName: q.CollectionName,
-		Filter:         filter,
-		Limit:          pointerUint32(1000),
-		WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to scroll points by pages: %w", err)
-	}
-
-	// pageRange'i set'e çevir (hızlı lookup için)
-	pageSet := make(map[int]bool)
+	// pageRange'i set'e çevir (O(1) lookup)
+	pageSet := make(map[int]bool, len(pageRange))
 	for _, page := range pageRange {
 		pageSet[page] = true
 	}
 
-	// Sadece istenen sayfalardaki chunkları filtrele
 	matchingChunks := make([]string, 0)
-	for _, point := range scrollResp.Result {
-		// page_numbers listesini kontrol et
-		if pageNumbers, ok := point.Payload["page_numbers"]; ok {
-			if listVal, ok := pageNumbers.GetKind().(*qdrant.Value_ListValue); ok {
-				// Bu chunk'ın hangi sayfalarda olduğunu kontrol et
-				hasMatchingPage := false
-				for _, pageVal := range listVal.ListValue.Values {
-					// Sayfa numarasını al (integer veya string olabilir)
-					var pageNum int
-					switch v := pageVal.GetKind().(type) {
-					case *qdrant.Value_IntegerValue:
-						pageNum = int(v.IntegerValue)
-					case *qdrant.Value_StringValue:
-						// String ise int'e çevir
-						if num, err := strconv.Atoi(v.StringValue); err == nil {
-							pageNum = num
+	var nextPageOffset *qdrant.PointId
+
+	// Pagination ile tüm chunk'ları al ve filtrele
+	for {
+		scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
+			CollectionName: q.CollectionName,
+			Filter:         filter,
+			Limit:          pointerUint32(1000),
+			Offset:         nextPageOffset,
+			WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to scroll points by pages: %w", err)
+		}
+
+		// Sadece istenen sayfalardaki chunk'ları filtrele
+		for _, point := range scrollResp.Result {
+			if pageNumbers, ok := point.Payload["page_numbers"]; ok {
+				if listVal, ok := pageNumbers.GetKind().(*qdrant.Value_ListValue); ok {
+					hasMatchingPage := false
+
+					for _, pageVal := range listVal.ListValue.Values {
+						var pageNum int
+						switch v := pageVal.GetKind().(type) {
+						case *qdrant.Value_IntegerValue:
+							pageNum = int(v.IntegerValue)
+						case *qdrant.Value_StringValue:
+							if num, err := strconv.Atoi(v.StringValue); err == nil {
+								pageNum = num
+							}
+						}
+
+						if pageSet[pageNum] {
+							hasMatchingPage = true
+							break
 						}
 					}
 
-					// Eğer bu sayfa istenen sayfalardan biriyse
-					if pageSet[pageNum] {
-						hasMatchingPage = true
-						break
-					}
-				}
-
-				// Eğer chunk istenen sayfalardan birindeyse text'i al
-				if hasMatchingPage {
-					if text, ok := point.Payload["text"]; ok {
-						if textVal, ok := text.GetKind().(*qdrant.Value_StringValue); ok {
-							matchingChunks = append(matchingChunks, textVal.StringValue)
+					if hasMatchingPage {
+						if text, ok := point.Payload["text"]; ok {
+							if textVal, ok := text.GetKind().(*qdrant.Value_StringValue); ok {
+								matchingChunks = append(matchingChunks, textVal.StringValue)
+							}
 						}
 					}
 				}
 			}
 		}
+
+		// Tüm sayfalar alındı mı?
+		if scrollResp.NextPageOffset == nil {
+			break
+		}
+		nextPageOffset = scrollResp.NextPageOffset
 	}
 
 	fmt.Println("Total chunks found:", len(matchingChunks))
 
 	limit := int(q.Config.ChunkLimit)
-	// Eğer limit'ten az varsa hepsini döndür
+
 	if len(matchingChunks) <= limit {
 		return matchingChunks, nil
 	}
 
-	// Random chunk seç
+	// Random seçim
 	rand.Shuffle(len(matchingChunks), func(i, j int) {
 		matchingChunks[i], matchingChunks[j] = matchingChunks[j], matchingChunks[i]
 	})
@@ -455,11 +476,6 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 	return matchingChunks[:limit], nil
 }
 
-// Helper functions
 func pointerUint32(v uint32) *uint32 {
-	return &v
-}
-
-func pointerUint64(v uint64) *uint64 {
 	return &v
 }

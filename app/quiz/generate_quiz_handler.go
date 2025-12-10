@@ -57,7 +57,7 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 	var err error
 
 	var pageRange []int
-	if req.StartPage != 0 || req.EndPage != 0 {
+	if req.StartPage != 0 && req.EndPage != 0 {
 		pageRange = []int{
 			req.StartPage,
 			req.EndPage,
@@ -78,7 +78,10 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 		}
 	}
 
-	fmt.Println("chunk num:", len(chunks))
+	if len(chunks) == 0 {
+		return nil, 400, domain.ErrNoContentToGenerateQuiz
+	}
+	fmt.Println("chunks count:", len(chunks))
 	fmt.Println("chunks:", chunks)
 
 	var wg sync.WaitGroup
@@ -118,7 +121,6 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 
 	fmt.Println(quiz.Id)
 	fmt.Println(quiz.Title)
-	fmt.Println(quiz.Questions[1])
 	err = h.repository.SaveQuiz(ctx, quiz)
 	if err != nil {
 		return nil, 500, err
