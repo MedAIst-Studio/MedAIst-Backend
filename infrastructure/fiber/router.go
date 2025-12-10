@@ -66,6 +66,7 @@ package fiber
 import (
 	"net/http"
 
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/admin"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
@@ -145,6 +146,8 @@ func SetupRoutes(app *fiber.App) {
 	getQuizAttemptsHandler := quiz.NewGetQuizAttemptsHandler(dc.Repo)
 	getQuizAttemptByIdHandler := quiz.NewGetAttemptByIdHandler(dc.Repo)
 
+	getAllUsersHandler := admin.NewGetUsersHandler(dc.Repo)
+
 	sl := dc.slogLogger
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
 	app.Use(contextMiddleware)
@@ -192,6 +195,9 @@ func SetupRoutes(app *fiber.App) {
 	quizApp.Get("/attempts/:id", Handle(getQuizAttemptByIdHandler, sl))
 	quizApp.Post("/:id/solve", Handle(solveQuizHandler, sl))
 	quizApp.Get("/:id", Handle(getQuizByIdHandler, sl))
+
+	adminApp := app.Group("/ebuhanife")
+	adminApp.Get("/users", Handle(getAllUsersHandler, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)
