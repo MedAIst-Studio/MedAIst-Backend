@@ -257,25 +257,25 @@ func (s *OpenAIService) ExpandQuery(ctx context.Context, content string) ([]stri
 func (s *OpenAIService) GenerateQuizQuestion(ctx context.Context, chunk string) (*domain.QuizQuestion, error) {
 
 	prompt := fmt.Sprintf(`
-Based on the following medical text, generate a high-quality, board-style (USMLE/TUS level) multiple-choice question.
+Verilen metne dayanarak YKS (TYT/AYT) formatında, kaliteli bir çoktan seçmeli soru oluştur.
 
-Text:
+Metin:
 %s
 
-Rules:
-- Role: Act as a Senior Medical Professor creating exam questions.
-- Question Style: Create a "Clinical Vignette" (Case-based) scenario if possible. Describe a patient's symptoms, history, or lab results, and ask for the diagnosis, mechanism, or treatment.
-- Avoid simple recall questions (e.g., "What is X?"). Instead, test "Second-order" or "Third-order" thinking (application of knowledge).
-- Length: Question body should be concise but detailed enough for a clinical scenario (40-100 words).
-- Options: Exactly 5 options (A-E).
-- Distractors: Wrong answers must be clinically plausible (e.g., differential diagnoses that present similarly). Avoid obviously wrong answers.
-- One Correct Answer: Only ONE option isCorrect: true.
-- Output: Respond ONLY with JSON.
+Kurallar:
+- Rol: Kıdemli YKS soru hazırlayıcısı.
+- Soru Tarzı: ÖSYM standartlarına uygun, muhakeme ve bilgi ölçen nitelikli bir soru olsun.
+- Zorluk: Orta veya zor seviye (Öğrenciyi düşündüren).
+- Uzunluk: Gereksiz uzun olmasın, net ve anlaşılır olsun.
+- Şıklar: Tam 5 şık (A-E).
+- Çeldiriciler: Mantıklı ve güçlü çeldiriciler kullan.
+- Tek Doğru: Sadece bir şık isCorrect: true olsun.
+- Çıktı: SADECE JSON formatında yanıt ver.
 
-Constraints:
-- Do NOT use negative questions like "Which of the following is NOT...".
-- Focus on the most high-yield concept in the text.
-- Use turkish language.
+Kısıtlamalar:
+- "Hangisi değildir" gibi olumsuz köklü sorulardan kaçınmaya çalış (zorunluysa kullanabilirsin ama pozitif köklü sorular öncelikli).
+- Metindeki en önemli kavramı odak noktası yap.
+- Türkçe kullan.
 `, chunk)
 
 	fmt.Println(s.GenerateQuestionModel)
@@ -289,7 +289,7 @@ Constraints:
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
-				Content: "You are a quiz question generator. Generate questions that test understanding of medical and educational content. Always respond with valid JSON matching the provided schema.",
+				Content: "Sen uzman bir YKS soru hazırlayıcısısın. TYT ve AYT müfredatına uygun, ölçücü ve öğretici sorular hazırlarsın. Sadece verilen şemaya uygun JSON formatında çıktı verirsin.",
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
@@ -356,7 +356,7 @@ func (s *OpenAIService) ExtractTextFromImage(ctx context.Context, imageUrl strin
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
-				Content: "You are an OCR specialist. Extract ALL text from the provided image accurately. Do not summarize. If the image contains a question, extract the full question text and all options (A, B, C, D, E). Return ONLY the extracted text.",
+				Content: "Sen bir OCR ve Soru Dijitalleştirme Uzmanısın. Görüntüdeki metni eksiksiz ve hatasız bir şekilde çıkar. Eğer görsel bir soruysa, soru metnini ve şıkların hepsini (A, B, C, D, E) tam olarak aktar. Sadece çıkarılan metni döndür, yorum yapma.",
 			},
 			{
 				Role: openai.ChatMessageRoleUser,
@@ -391,16 +391,18 @@ func (s *OpenAIService) SolveQuestionWithReasoning(ctx context.Context, question
 	// o1 models (beta) typically do not support "system" role or have restrictions.
 	// We put instructions in the user message.
 
-	prompt := fmt.Sprintf(`You are an expert medical professor. Solve the following question providing a detailed step-by-step reasoning.
-	
-Question:
+	prompt := fmt.Sprintf(`Sen uzman bir YKS öğretmenisin (Matematik, Fen, Türkçe, Sosyal). Öğrencinin sorduğu soruyu adım adım, anlaşılır ve açıklayıcı bir şekilde çöz.
+
+Soru:
 %s
 
-Instructions:
-1. Analyze the clinical vignette/question.
-2. Evaluate each option (A-E) explaining why it is correct or incorrect.
-3. Conclude with the final correct answer.
-4. Use Turkish language.
+Yönergeler:
+1. Soruyu dikkatlice analiz et ve hangi konudan olduğunu belirle.
+2. Çözüm adımlarını mantıksal bir sırayla yaz (işlem önceliği, formüller, mantık yürütme).
+3. Varsa şıkları (A-E) değerlendir, neden doğru veya yanlış olduklarını açıkla.
+4. Sonucu net bir şekilde belirt.
+5. Samimi, eğitici ve teşvik edici bir dil kullan (Öğrenciye hitap et).
+6. Türkçe yanıtla.
 `, questionText)
 
 	request := openai.ChatCompletionRequest{
