@@ -17,6 +17,7 @@ type Message struct {
 	Content   string
 	IsUser    bool
 	CreatedAt time.Time
+	ImageUrl  string // Add ImageUrl field
 }
 
 func NewMessage(chatId uuid.UUID, content string, isUser bool) *Message {

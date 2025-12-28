@@ -67,6 +67,8 @@ type OpenAIConfig struct {
 	ExpandQuestionModel    string
 	CheckUserQueryModel    string
 	GenerateChatTitleModel string
+	OcrModel               string
+	ReasoningModel         string
 }
 
 type OpenAIService struct {
@@ -92,10 +94,33 @@ func (s *OpenAIService) SendChatRequest(ctx context.Context, req *domain.ChatReq
 	messages := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
 
 	for _, msg := range req.Messages {
-		messages = append(messages, openai.ChatCompletionMessage{
-			Role:    string(msg.Role),
-			Content: msg.Content,
-		})
+		if len(msg.ImageUrl) > 0 {
+			// Handle Multimodal Message (Text + Image)
+			multiContent := []openai.ChatMessagePart{
+				{
+					Type: openai.ChatMessagePartTypeText,
+					Text: msg.Content,
+				},
+			}
+			for _, url := range msg.ImageUrl {
+				multiContent = append(multiContent, openai.ChatMessagePart{
+					Type: openai.ChatMessagePartTypeImageURL,
+					ImageURL: &openai.ChatMessageImageURL{
+						URL: url,
+					},
+				})
+			}
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:         string(msg.Role),
+				MultiContent: multiContent,
+			})
+		} else {
+			// Handle Text-only Message
+			messages = append(messages, openai.ChatCompletionMessage{
+				Role:    string(msg.Role),
+				Content: msg.Content,
+			})
+		}
 	}
 
 	request := openai.ChatCompletionRequest{
@@ -319,4 +344,82 @@ Constraints:
 	}
 
 	return &question, nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// 6) OCR (IMAGE TO TEXT)
+///////////////////////////////////////////////////////////////////////////////
+
+func (s *OpenAIService) ExtractTextFromImage(ctx context.Context, imageUrl string) (string, error) {
+	request := openai.ChatCompletionRequest{
+		Model: s.OcrModel,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: "You are an OCR specialist. Extract ALL text from the provided image accurately. Do not summarize. If the image contains a question, extract the full question text and all options (A, B, C, D, E). Return ONLY the extracted text.",
+			},
+			{
+				Role: openai.ChatMessageRoleUser,
+				MultiContent: []openai.ChatMessagePart{
+					{
+						Type: openai.ChatMessagePartTypeImageURL,
+						ImageURL: &openai.ChatMessageImageURL{
+							URL: imageUrl,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	resp, err := s.client.CreateChatCompletion(ctx, request)
+	if err != nil {
+		return "", fmt.Errorf("OCR failed: %w", err)
+	}
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("empty OCR response")
+	}
+
+	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// 7) REASONING (SOLVE QUESTION)
+///////////////////////////////////////////////////////////////////////////////
+
+func (s *OpenAIService) SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error) {
+	// o1 models (beta) typically do not support "system" role or have restrictions.
+	// We put instructions in the user message.
+
+	prompt := fmt.Sprintf(`You are an expert medical professor. Solve the following question providing a detailed step-by-step reasoning.
+	
+Question:
+%s
+
+Instructions:
+1. Analyze the clinical vignette/question.
+2. Evaluate each option (A-E) explaining why it is correct or incorrect.
+3. Conclude with the final correct answer.
+4. Use Turkish language.
+`, questionText)
+
+	request := openai.ChatCompletionRequest{
+		Model: s.ReasoningModel,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: prompt,
+			},
+		},
+	}
+
+	resp, err := s.client.CreateChatCompletion(ctx, request)
+	if err != nil {
+		return "", fmt.Errorf("reasoning/solving failed: %w", err)
+	}
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("empty reasoning response")
+	}
+
+	return resp.Choices[0].Message.Content, nil
 }

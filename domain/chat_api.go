@@ -14,12 +14,15 @@ const (
 	PdfSearchQuery     QueryType = "pdf_search_query"
 	ClarificationQuery QueryType = "clarification_query"
 	GeneralQuery       QueryType = "general_query"
+	ImageQuery         QueryType = "image_query"
 )
 
 const (
 	generalQuerySystemMessage = "You are just a general assistant. Answer the user's questions to the best of your ability. Response in the same language as the question."
 
 	clarificationQuerySystemMessage = "You are a medical assistant. Provide clarifications based only on the previous assistant response. Do not add new medical information beyond what was already stated. Reply in the user's language."
+
+	imageQuerySystemMessage = "You are a medical assistant capable of analyzing medical images. Analyze the provided image and answer the user's question. If the image is not medical related, politely refuse to answer."
 
 	pdfSearchQuerySystemMessage = `You are a professional Medical Tutor. Answer questions using ONLY the provided Context below.
 
@@ -28,16 +31,13 @@ CRITICAL RULES:
    - FIRST, carefully search the entire Context for relevant information
    - If ANY part of the Context contains information that helps answer the question, you MUST use it
    - ONLY respond with "Yüklediğiniz dokümanda bu bilgi yer almamaktadır" if you have thoroughly checked and the answer is completely absent
-
 2. **Answer Construction:**
    - Use **Bold** for key medical terms
    - Use bullet points for lists
    - Provide comprehensive answers using ALL relevant information from the Context
    - Quote or paraphrase directly from the Context when possible
-
 3. **Language Matching:**
    - Respond in the same language as the question
-
 4. **Important:** 
    - Partial information IS still valid - use whatever relevant details exist
    - Related information counts - if the Context discusses the topic generally, include it
@@ -113,8 +113,9 @@ type QueryExpansionResponse struct {
 }
 
 type ChatMessage struct {
-	Role    Role   `json:"role"`
-	Content string `json:"content"`
+	Role     Role     `json:"role"`
+	Content  string   `json:"content"`
+	ImageUrl []string `json:"image_url,omitempty"`
 }
 
 type ChatRequestManager struct {
@@ -157,6 +158,8 @@ func getSystemMessageForQueryType(queryType QueryType) string {
 		return clarificationQuerySystemMessage
 	case PdfSearchQuery:
 		return pdfSearchQuerySystemMessage
+	case ImageQuery:
+		return imageQuerySystemMessage
 	default:
 		return generalQuerySystemMessage
 	}

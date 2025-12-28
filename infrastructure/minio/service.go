@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"mime"
+	"path/filepath"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
@@ -76,12 +77,19 @@ func NewMinioService(config *MinioConfig) *MinioService {
 
 func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data []byte) error {
 
-	contentType := "application/octet-stream"
-	if mimeType := mime.TypeByExtension("pdf"); mimeType != "" {
-		contentType = mimeType
+	var objectName string
+	// Backward compatibility: domain.NewFile sets Path without extension for PDFs.
+	// If Path contains a dot, assume it's a full path with extension.
+	if file.Path != "" && hasExtension(file.Path) {
+		objectName = file.Path
+	} else {
+		objectName = fmt.Sprintf("uploads/%s%s", file.Id.String(), ".pdf")
 	}
 
-	objectName := fmt.Sprintf("uploads/%s%s", file.Id.String(), ".pdf")
+	contentType := mime.TypeByExtension(filepath.Ext(objectName))
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
 
 	_, err := s.minioClient.PutObject(ctx,
 		s.BucketName,
@@ -95,6 +103,10 @@ func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data [
 		return fmt.Errorf("upload to minio failed: %w", err)
 	}
 	return nil
+}
+
+func hasExtension(path string) bool {
+	return filepath.Ext(path) != ""
 }
 
 func (s *MinioService) DeleteFile(ctx context.Context, filePath string) error {

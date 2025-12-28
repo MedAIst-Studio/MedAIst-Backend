@@ -36,4 +36,6 @@ type AIService interface {
 	CheckUserQuery(ctx context.Context, userContent string) (domain.QueryType, error)
 	ExpandQuery(ctx context.Context, content string) ([]string, error)
 	RerankChunks(ctx context.Context, chunks []string, userQuestion string) ([]string, error)
+	ExtractTextFromImage(ctx context.Context, imageUrl string) (string, error)
+	SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error)
 }

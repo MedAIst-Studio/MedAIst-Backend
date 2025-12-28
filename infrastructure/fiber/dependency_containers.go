@@ -84,6 +84,8 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		ExpandQuestionModel:    "gpt-4o-mini",
 		CheckUserQueryModel:    "gpt-4o-mini",
 		GenerateChatTitleModel: "gpt-4o-mini",
+		OcrModel:               getEnv("OPENAI_OCR_MODEL", "gpt-4o-mini"),
+		ReasoningModel:         getEnv("OPENAI_REASONING_MODEL", "o1-mini"),
 	})
 
 	jina := jina.NewService(os.Getenv("JINA_API_KEY"))
@@ -119,4 +121,11 @@ func NewAuthDependencyContainer() *DependencyContainer {
 type MultiModelService struct {
 	*openaiInfra.OpenAIService
 	*jina.Service
+}
+
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }
