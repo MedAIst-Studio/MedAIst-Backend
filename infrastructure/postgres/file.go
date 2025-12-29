@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
@@ -57,4 +58,17 @@ func (r *Repository) DoesUserHaveFile(ctx context.Context, userId uuid.UUID, fil
 		return false, err
 	}
 	return exists, nil
+}
+
+func (r *Repository) GetFileMetadata(ctx context.Context, fileId uuid.UUID) (*domain.File, error) {
+	query := `SELECT id, user_id, title, size, path, created_at FROM files WHERE id = $1`
+	var f domain.File
+	err := r.db.QueryRowContext(ctx, query, fileId).Scan(&f.Id, &f.UserId, &f.Name, &f.Size, &f.Path, &f.CreatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, domain.ErrFileNotFound
+		}
+		return nil, domain.ErrInternalServer
+	}
+	return &f, nil
 }

@@ -24,8 +24,8 @@ type FileRequires struct {
 
 func NewFile(fr *FileRequires) (*File, error) {
 
-	if !isPDF(fr.Extension) {
-		return nil, ErrNotPDFFile
+	if !isSupportedFile(fr.Extension) {
+		return nil, ErrNotPDFFile // Note: We might want to rename this error later globally, but keeping for now to minimize ripple or assuming generic name.
 	}
 
 	if !isSizeValid(fr.Size) {
@@ -42,8 +42,21 @@ func NewFile(fr *FileRequires) (*File, error) {
 	}, nil
 }
 
-func isPDF(extension string) bool {
-	return extension == ".pdf" || extension == "pdf"
+func isSupportedFile(extension string) bool {
+	ext := cleanExtension(extension)
+	switch ext {
+	case ".pdf", ".jpg", ".jpeg", ".png", ".webp":
+		return true
+	default:
+		return false
+	}
+}
+
+func cleanExtension(extension string) string {
+	if len(extension) > 0 && extension[0] != '.' {
+		return "." + extension
+	}
+	return extension
 }
 
 func isSizeValid(size int64) bool {

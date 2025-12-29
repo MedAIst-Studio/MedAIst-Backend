@@ -58,3 +58,27 @@ type ChunkOptions struct {
 	OverlapSize     int
 	PreserveContext bool
 }
+
+type EmbeddingBatchRequest struct {
+	Texts     []Text `json:"texts"`
+	Normalize bool   `json:"normalize"`
+	BatchSize int    `json:"batch_size"`
+}
+
+type Text struct {
+	Id   uuid.UUID `json:"id"`
+	Text string    `json:"text"`
+}
+
+type EmbeddingResponse struct {
+	Results   []Embedding `json:"results"`
+	Dimension int         `json:"dimension"`
+	Count     int         `json:"count"`
+}
+
+type Embedding struct {
+	Id          uuid.UUID `json:"id"`
+	Text        string    `json:"text"`
+	Vector      []float32 `json:"vector"`
+	PageNumbers []int     `json:"page_numbers"`
+}

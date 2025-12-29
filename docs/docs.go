@@ -15,6 +15,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/users": {
+            "post": {
+                "description": "Retrieve a list of all users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get Users",
+                "parameters": [
+                    {
+                        "description": "Get Users request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.GetUsersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/admin.UserInfo"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/auth/exchange": {
             "post": {
                 "consumes": [
@@ -517,7 +560,7 @@ const docTemplate = `{
                 ],
                 "description": "Sends a message in a chat and gets a response from the AI",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -528,13 +571,29 @@ const docTemplate = `{
                 "summary": "Send a message in a chat",
                 "parameters": [
                     {
-                        "description": "Send Message Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/message.SendMessageRequest"
-                        }
+                        "type": "string",
+                        "description": "PDF ID",
+                        "name": "pdf_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "chat_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Content",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Image URL",
+                        "name": "image_url",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1066,6 +1125,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "admin.GetUsersRequest": {
+            "type": "object"
+        },
+        "admin.UserInfo": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.ExchangeRequest": {
             "type": "object",
             "properties": {
@@ -1155,9 +1231,6 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
-                "file_id": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -1202,25 +1275,6 @@ const docTemplate = `{
         },
         "file.UploadFileResponse": {
             "type": "object"
-        },
-        "message.SendMessageRequest": {
-            "type": "object",
-            "required": [
-                "content",
-                "pdf_id"
-            ],
-            "properties": {
-                "chat_id": {
-                    "type": "string"
-                },
-                "content": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "pdf_id": {
-                    "type": "string"
-                }
-            }
         },
         "message.SendMessageResponse": {
             "type": "object",

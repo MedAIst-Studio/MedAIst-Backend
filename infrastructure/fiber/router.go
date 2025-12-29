@@ -124,7 +124,11 @@ func SetupRoutes(app *fiber.App) {
 	getChatByIDHandler := chat.NewGetChatByIDHandler(dc.Repo)
 	deleteChatHandler := chat.NewDeleteChatHandler(dc.Repo)
 
-	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, dc.Embedding, dc.Chunker, 48, true)
+	pdfProcessor := file.NewPdfProcessor(dc.Repo, dc.FileStorage, dc.VectorDB, dc.Embedding, dc.Chunker, 48, true)
+	imageProcessor := file.NewImageProcessor()
+	fileProcessorFactory := file.NewFileProcessorFactory(pdfProcessor, imageProcessor)
+
+	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, fileProcessorFactory)
 	getFilesHandler := file.NewGetFilesHandler(dc.Repo)
 	deleteFileByIdHandler := file.NewDeleteFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB)
 	getFileHandler := file.NewGetFileHandler(dc.Repo, dc.FileStorage)

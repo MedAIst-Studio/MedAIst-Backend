@@ -3,7 +3,6 @@ package file
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"mime/multipart"
 	"path/filepath"
@@ -21,48 +20,18 @@ type UploadFileResponse struct {
 }
 
 type UploadFileHandler struct {
-	BatchSize int
-	Normalize bool
-	repo      Repository
-	fl        FileService
-	vb        VectorDB
-	ems       EmbeddingService
-	chunker   Chunker
+	Factory *FileProcessorFactory
+	repo    Repository
+	fl      FileService
+	vb      VectorDB // Still needed for recover? Or move recover to a service? Let's check.
 }
 
-type EmbeddingBatchRequest struct {
-	Texts     []Text `json:"texts"`
-	Normalize bool   `json:"normalize"`
-	BatchSize int    `json:"batch_size"`
-}
-
-type Text struct {
-	Id   uuid.UUID `json:"id"`
-	Text string    `json:"text"`
-}
-
-type EmbeddingResponse struct {
-	Results   []Embedding `json:"results"`
-	Dimension int         `json:"dimension"`
-	Count     int         `json:"count"`
-}
-
-type Embedding struct {
-	Id          uuid.UUID `json:"id"`
-	Text        string    `json:"text"`
-	Vector      []float32 `json:"vector"`
-	PageNumbers []int     `json:"page_numbers"`
-}
-
-func NewUploadFileHandler(repo Repository, fl FileService, vb VectorDB, ems EmbeddingService, chunker Chunker, batchSize int, normalize bool) *UploadFileHandler {
+func NewUploadFileHandler(repo Repository, fl FileService, vb VectorDB, factory *FileProcessorFactory) *UploadFileHandler {
 	return &UploadFileHandler{
-		repo:      repo,
-		fl:        fl,
-		vb:        vb,
-		ems:       ems,
-		chunker:   chunker,
-		BatchSize: batchSize,
-		Normalize: normalize,
+		repo:    repo,
+		fl:      fl,
+		vb:      vb,
+		Factory: factory,
 	}
 }
 
@@ -106,6 +75,11 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		return nil, 500, err
 	}
 
+	processor, err := h.Factory.GetProcessor(newFile.Name)
+	if err != nil {
+		return nil, 400, err
+	}
+
 	if err := h.fl.UploadFile(ctx, newFile, fileBytes); err != nil {
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, 400, err
@@ -114,93 +88,17 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 	}
 
 	if err := h.repo.SaveFileInformation(ctx, newFile); err != nil {
-		h.fl.DeleteFile(ctx, formatFilePath(newFile.Id))
+		h.fl.DeleteFile(ctx, "uploads/"+newFile.Id.String())
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, 400, err
 		}
 		return nil, 500, err
 	}
 
-	chunks, err := h.chunker.ChunkPDF(ctx, fileBytes, newFile.Id.String())
-	if err != nil {
+	if err := processor.Process(ctx, newFile, fileBytes); err != nil {
+		// If processing fails, we should probably rollback the file upload/save
 		h.recover(ctx, newFile.Id)
-		if !errors.Is(err, domain.ErrInternalServer) {
-			return nil, 400, err
-		}
 		return nil, 500, err
-	}
-
-	for start := 0; start < len(chunks); start += h.BatchSize {
-		end := min(start+h.BatchSize, len(chunks))
-
-		batch := chunks[start:end]
-
-		var embeddings []Embedding
-		for _, chunk := range batch {
-			var embedding Embedding
-			embedding.Id = uuid.New()
-			embedding.PageNumbers = chunk.Metadata.PageNumbers
-			embedding.Text = chunk.Text
-			embeddings = append(embeddings, embedding)
-		}
-
-		var texts []Text
-		for _, emb := range embeddings {
-			texts = append(texts, Text{
-				Id:   emb.Id,
-				Text: emb.Text,
-			})
-		}
-
-		embeddingReq := &EmbeddingBatchRequest{
-			Texts:     texts,
-			Normalize: h.Normalize,
-			BatchSize: h.BatchSize,
-		}
-
-		embeddingRes, err := h.ems.GenerateEmbeddingBatch(ctx, embeddingReq)
-		if err != nil {
-			h.recover(ctx, newFile.Id)
-			return nil, 500, err
-		}
-
-		embeddingMap := make(map[uuid.UUID]*Embedding)
-		for i := range embeddings {
-			embeddingMap[embeddings[i].Id] = &embeddings[i]
-		}
-
-		for _, resultEmb := range embeddingRes.Results {
-			if emb, exists := embeddingMap[resultEmb.Id]; exists {
-				emb.Vector = resultEmb.Vector
-			} else {
-				h.recover(ctx, newFile.Id)
-				return nil, 500, fmt.Errorf("embedding ID %s not found in batch", resultEmb.Id)
-			}
-		}
-
-		for _, emb := range embeddings {
-			if len(emb.Vector) == 0 {
-				h.recover(ctx, newFile.Id)
-				return nil, 500, fmt.Errorf("embedding %s has no vector", emb.Id)
-			}
-		}
-
-		var fileMetadatas []*FileMetadata
-		for _, emb := range embeddings {
-			fm := &FileMetadata{
-				Id:          uuid.New(),
-				Text:        emb.Text,
-				PageNumbers: emb.PageNumbers,
-				Vector:      emb.Vector,
-			}
-			fileMetadatas = append(fileMetadatas, fm)
-		}
-
-		if err := h.vb.InsertEmbeddings(ctx, newFile.Id, fileMetadatas); err != nil {
-			h.recover(ctx, newFile.Id)
-			return nil, 500, err
-		}
-
 	}
 
 	return nil, 200, nil
@@ -208,6 +106,6 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 
 func (h *UploadFileHandler) recover(ctx context.Context, fileId uuid.UUID) {
 	h.repo.DeleteFileById(ctx, fileId)
-	h.fl.DeleteFile(ctx, formatFilePath(fileId))
+	h.fl.DeleteFile(ctx, "uploads/"+fileId.String())
 	h.vb.DeleteEmbeddingsByFileId(ctx, fileId)
 }

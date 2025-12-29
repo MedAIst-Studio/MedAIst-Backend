@@ -12,6 +12,7 @@ type Repository interface {
 	CreateChat(ctx context.Context, chat *domain.Chat) error
 	GetChatHistoryForAIContext(ctx context.Context, chatId uuid.UUID, limit int) ([]domain.ChatMessage, error)
 	DeleteMessage(ctx context.Context, messageId uuid.UUID) error
+	GetFileMetadata(ctx context.Context, fileId uuid.UUID) (*domain.File, error)
 }
 
 type VectorRepository interface {
