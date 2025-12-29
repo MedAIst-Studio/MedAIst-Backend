@@ -54,10 +54,10 @@ func NewSendMessageHandler(config Config) *SendMessageHandler {
 // @Tags			Message
 // @Accept			multipart/form-data
 // @Produce		json
-// @Param			pdf_id		formData	string	false	"PDF ID"
-// @Param			chat_id		formData	string	false	"Chat ID"
-// @Param			content		formData	string	true	"Content"
-// @Param			image		formData	file	false	"Image file"
+// @Param			pdf_id	formData	string	false	"PDF ID"
+// @Param			chat_id	formData	string	false	"Chat ID"
+// @Param			content	formData	string	true	"Content"
+// @Param			image	formData	file	false	"Image file"
 // @Success		200		{object}	SendMessageResponse
 // @Failure		400
 // @Failure		500
@@ -323,7 +323,7 @@ func (h *SendMessageHandler) handleNewChatIfNeeded(ctx context.Context, req *Sen
 		return "", err
 	}
 
-	chat := domain.NewChat(userId, req.PdfId, trimTitle(aiResp.Text))
+	chat := domain.NewChat(userId, trimTitle(aiResp.Text))
 	if err := h.Repo.CreateChat(ctx, chat); err != nil {
 		return "", err
 	}

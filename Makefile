@@ -1,7 +1,7 @@
 swagger: 
 	swag fmt
 	swag init -g ./infrastructure/fiber/router.go
-dev:
+dev: swagger
 	docker-compose up 
 
 build:

@@ -23,16 +23,16 @@ func NewGetUsersHandler(repository Repository) *GetUsersHandler {
 	}
 }
 
-// @Summary     Get Users
-// @Description Retrieve a list of all users
-// @Tags        Admin
-// @Accept      json
-// @Produce     json
-// @Param       request body GetUsersRequest true "Get Users request"
-// @Success     200 {object} GetUsersResponse
-// @Failure     400
-// @Failure     500
-// @Router      /admin/users [post]
+// @Summary		Get Users
+// @Description	Retrieve a list of all users
+// @Tags			Admin
+// @Accept			json
+// @Produce		json
+// @Param			request	body		GetUsersRequest	true	"Get Users request"
+// @Success		200		{object}	GetUsersResponse
+// @Failure		400
+// @Failure		500
+// @Router			/admin/users [post]
 func (h *GetUsersHandler) Handle(ctx context.Context, req *GetUsersRequest) (*GetUsersResponse, int, error) {
 	users, err := h.repository.GetAllUsers(ctx)
 	if err != nil {
