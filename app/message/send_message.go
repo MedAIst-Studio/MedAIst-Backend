@@ -2,8 +2,10 @@ package message
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"sync"
 
@@ -16,7 +18,7 @@ type SendMessageRequest struct {
 	PdfId    uuid.UUID `json:"pdf_id" form:"pdf_id"`
 	ChatId   uuid.UUID `json:"chat_id,omitempty" form:"chat_id"`
 	Content  string    `json:"content" validate:"required,min=1" form:"content"`
-	ImageUrl string    `json:"image" form:"image_url"`
+	ImageUrl string    `json:"image_url" form:"image_url"`
 }
 
 type SendMessageResponse struct {
@@ -50,12 +52,12 @@ func NewSendMessageHandler(config Config) *SendMessageHandler {
 // @Summary		Send a message in a chat
 // @Description	Sends a message in a chat and gets a response from the AI
 // @Tags			Message
-// @Accept			multipart/form-data
+// @Accept			json
 // @Produce		json
-// @Param			pdf_id		formData	string	false	"PDF ID"
-// @Param			chat_id		formData	string	false	"Chat ID"
-// @Param			content		formData	string	true	"Content"
-// @Param			image_url	formData	string	false	"Image URL"
+// @Param			pdf_id		json	uuid	false	"PDF ID"
+// @Param			chat_id		json	uuid	false	"Chat ID"
+// @Param			content		json	string	true	"Content"
+// @Param			image_url	json	string	false	"Image URL"
 // @Success		200			{object}	SendMessageResponse
 // @Failure		400
 // @Failure		500
@@ -86,35 +88,23 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	if req.PdfId != uuid.Nil && req.ImageUrl == "" {
 		fileMeta, err := h.Repo.GetFileMetadata(ctx, req.PdfId)
 		if err == nil && isImageFile(fileMeta.Name) {
-			// Construct Image URL (assuming accessible via some public/internal path or just passing identifier for now)
-			// For local dev with MinIO, we might need a presigned URL or just the path if the service handles it.
-			// Let's assume the service can handle the relative path or we construct a public URL.
-			// Since I don't have URL generation logic here, I'll use a placeholder or the path.
-			// Actually, ExtractTextFromImage probably takes a URL.
-			// Let's try setting it to the path for now and logging.
-			req.ImageUrl = "uploads/" + req.PdfId.String() // Internal path pattern
-			fmt.Printf("DEBUG: PdfId %s points to image file %s. Auto-switching to ImageQuery.\n", req.PdfId, fileMeta.Name)
+			req.ImageUrl = "uploads/" + req.PdfId.String()
 		}
 	}
 
 	if req.ImageUrl != "" {
-		fmt.Printf("DEBUG: ImageUrl provided: %s. Setting QueryType to ImageQuery.\n", req.ImageUrl)
 		queryType = domain.ImageQuery
 	} else {
-		// Only check user query with LLM if it's text-only
 		var err error
 		queryType, err = h.ChatSvc.CheckUserQuery(ctx, req.Content)
 		if err != nil {
-			fmt.Printf("Error checking user query: %v\n", err)
 			h.Repo.DeleteMessage(ctx, userMessage.Id)
 			return nil, 500, err
 		}
-		fmt.Printf("DEBUG: Checked user query. LLM determined QueryType: %s\n", queryType)
 	}
 
 	crm := domain.NewChatRequestManager(queryType, req.Content)
 
-	// If ImageQuery, we need to attach the image to the Request
 	if queryType == domain.ImageQuery && userMessage.ImageUrl != "" {
 		if len(crm.Req.Messages) > 0 {
 			lastMsgIdx := len(crm.Req.Messages) - 1
@@ -124,7 +114,9 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		}
 	}
 
-	if isNewChat && crm.IsClarificationQuery() {
+	isClarification := crm.IsClarificationQuery()
+
+	if isNewChat && isClarification {
 		return h.handleUnallowedClarification(ctx, userMessage, chatTitle, isNewChat)
 	}
 
@@ -135,12 +127,36 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	// If ImageQuery, instead of sending image to ChatRequest directly (or parallel),
-	// we now implement the OCR -> Reasoning flow as requested.
 	if queryType == domain.ImageQuery && userMessage.ImageUrl != "" {
-		fmt.Println("DEBUG: Entering OCR -> Reasoning flow for ImageQuery.")
-		// 1. OCR Step
-		extractedText, err := h.ChatSvc.ExtractTextFromImage(ctx, userMessage.ImageUrl)
+		var fileBytes []byte
+		var err error
+
+		if req.PdfId != uuid.Nil {
+			fileMeta, err := h.Repo.GetFileMetadata(ctx, req.PdfId)
+			if err != nil {
+				return nil, 500, fmt.Errorf("failed to get file metadata for OCR: %w", err)
+			}
+			fileBytes, err = h.FileService.GetFile(ctx, fileMeta.Path)
+			if err != nil {
+				return nil, 500, fmt.Errorf("failed to get file bytes for OCR: %w", err)
+			}
+		} else {
+			if strings.Contains(userMessage.ImageUrl, "uploads/") {
+				idx := strings.Index(userMessage.ImageUrl, "uploads/")
+				objectPath := userMessage.ImageUrl[idx:]
+
+				fileBytes, err = h.FileService.GetFile(ctx, objectPath)
+				if err != nil {
+					return nil, 500, fmt.Errorf("failed to get file bytes from path %s: %w", objectPath, err)
+				}
+			} else {
+				return nil, 400, fmt.Errorf("cannot process image: no file ID provided and URL does not contain 'uploads/' path pattern. URL: %s", userMessage.ImageUrl)
+			}
+		}
+
+		base64Image := convertImageToBase64(fileBytes)
+
+		extractedText, err := h.ChatSvc.ExtractTextFromImage(ctx, base64Image)
 		if err != nil {
 			return nil, 500, fmt.Errorf("OCR failed: %w", err)
 		}
@@ -345,4 +361,10 @@ func isImageFile(filename string) bool {
 	default:
 		return false
 	}
+}
+
+func convertImageToBase64(data []byte) string {
+	mimeType := http.DetectContentType(data)
+	base64Str := base64.StdEncoding.EncodeToString(data)
+	return fmt.Sprintf("data:%s;base64,%s", mimeType, base64Str)
 }

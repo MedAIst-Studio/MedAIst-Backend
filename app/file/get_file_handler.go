@@ -2,6 +2,7 @@ package file
 
 import (
 	"context"
+	"errors"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
@@ -52,7 +53,15 @@ func (h *GetFileHandler) Handle(ctx context.Context, req *GetFileRequest) (*GetF
 		return nil, 403, domain.ErrForbidden
 	}
 
-	fileBytes, err := h.fl.GetFile(ctx, req.Id)
+	fileMeta, err := h.repo.GetFileMetadata(ctx, req.Id)
+	if err != nil {
+		if errors.Is(err, domain.ErrFileNotFound) {
+			return nil, 404, err
+		}
+		return nil, 500, err
+	}
+
+	fileBytes, err := h.fl.GetFile(ctx, fileMeta.Path)
 	if err != nil {
 		return nil, 500, err
 	}

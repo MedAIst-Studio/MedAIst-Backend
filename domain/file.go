@@ -37,7 +37,7 @@ func NewFile(fr *FileRequires) (*File, error) {
 		UserId:    fr.UserId,
 		Name:      fr.Name,
 		Size:      fr.Size,
-		Path:      "uploads/" + id.String(),
+		Path:      "uploads/" + id.String() + cleanExtension(fr.Extension),
 		CreatedAt: time.Now(),
 	}, nil
 }

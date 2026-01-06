@@ -123,6 +123,7 @@ func SetupRoutes(app *fiber.App) {
 	getChatsHandler := chat.NewGetChatsHandler(dc.Repo)
 	getChatByIDHandler := chat.NewGetChatByIDHandler(dc.Repo)
 	deleteChatHandler := chat.NewDeleteChatHandler(dc.Repo)
+	updateChatHandler := chat.NewUpdateChatHandler(dc.Repo)
 
 	pdfProcessor := file.NewPdfProcessor(dc.Repo, dc.FileStorage, dc.VectorDB, dc.Embedding, dc.Chunker, 48, true)
 	imageProcessor := file.NewImageProcessor()
@@ -180,6 +181,7 @@ func SetupRoutes(app *fiber.App) {
 	chatsApp.Get("/", Handle(getChatsHandler, sl))
 	chatsApp.Get("/:id", Handle(getChatByIDHandler, sl))
 	chatsApp.Delete("/:id", Handle(deleteChatHandler, sl))
+	chatsApp.Patch("/:id", Handle(updateChatHandler, sl))
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
 	filesApp.Post("/upload", Handle(uploadFileHandler, sl))

@@ -10,7 +10,8 @@ import (
 type Repository interface {
 	GetUserById(ctx context.Context, id uuid.UUID) (*GetCurrentUserResponse, error)
 	CheckEmail(ctx context.Context, email string) error
-	DeleteAccount(ctx context.Context, id uuid.UUID) ([]uuid.UUID, error)
+	// DeleteAccount deletes a user account and returns the files associated with the user (for cleanup)
+	DeleteAccount(ctx context.Context, id uuid.UUID) ([]*domain.File, error)
 	GetUserOnlyHavingPasswordById(ctx context.Context, id uuid.UUID) (*domain.User, error)
 	EmailExists(ctx context.Context, email string) (bool, error)
 	ResetPasswordByEmail(ctx context.Context, email, newPassword string) error

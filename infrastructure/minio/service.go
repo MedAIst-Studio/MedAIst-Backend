@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
-	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -75,7 +74,7 @@ func NewMinioService(config *MinioConfig) *MinioService {
 	}
 }
 
-func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data []byte) error {
+func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data []byte) (string, error) {
 
 	var objectName string
 	// Backward compatibility: domain.NewFile sets Path without extension for PDFs.
@@ -100,9 +99,18 @@ func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data [
 	)
 
 	if err != nil {
-		return fmt.Errorf("upload to minio failed: %w", err)
+		return "", fmt.Errorf("upload to minio failed: %w", err)
 	}
-	return nil
+
+	endpoint := s.minioClient.EndpointURL().String()
+	fileUrl := fmt.Sprintf("%s/%s/%s", endpoint, s.BucketName, objectName)
+
+	log.Printf("[DEBUG] UploadFile - Endpoint: %s", endpoint)
+	log.Printf("[DEBUG] UploadFile - BucketName: %s", s.BucketName)
+	log.Printf("[DEBUG] UploadFile - ObjectName: %s", objectName)
+	log.Printf("[DEBUG] UploadFile - Generated URL: %s", fileUrl)
+
+	return fileUrl, nil
 }
 
 func hasExtension(path string) bool {
@@ -117,10 +125,9 @@ func (s *MinioService) DeleteFile(ctx context.Context, filePath string) error {
 	return nil
 }
 
-func (s *MinioService) GetFile(ctx context.Context, fileId uuid.UUID) ([]byte, error) {
-	objectName := fmt.Sprintf("uploads/%s%s", fileId.String(), ".pdf")
-
-	object, err := s.minioClient.GetObject(ctx, s.BucketName, objectName, minio.GetObjectOptions{})
+func (s *MinioService) GetFile(ctx context.Context, filePath string) ([]byte, error) {
+	// filePath is now expected to be the full object name/path in the bucket
+	object, err := s.minioClient.GetObject(ctx, s.BucketName, filePath, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file from minio: %w", err)
 	}
@@ -135,17 +142,16 @@ func (s *MinioService) GetFile(ctx context.Context, fileId uuid.UUID) ([]byte, e
 	return buf.Bytes(), nil
 }
 
-func (s *MinioService) DeleteFiles(ctx context.Context, fileIds []string) error {
-	if len(fileIds) == 0 {
+func (s *MinioService) DeleteFiles(ctx context.Context, filePaths []string) error {
+	if len(filePaths) == 0 {
 		return nil
 	}
 
 	var errors []error
-	for _, fileId := range fileIds {
-		objectName := formatFilePath(fileId)
-		err := s.minioClient.RemoveObject(ctx, s.BucketName, objectName, minio.RemoveObjectOptions{})
+	for _, filePath := range filePaths {
+		err := s.minioClient.RemoveObject(ctx, s.BucketName, filePath, minio.RemoveObjectOptions{})
 		if err != nil {
-			errors = append(errors, fmt.Errorf("failed to delete file %s: %w", objectName, err))
+			errors = append(errors, fmt.Errorf("failed to delete file %s: %w", filePath, err))
 		}
 	}
 

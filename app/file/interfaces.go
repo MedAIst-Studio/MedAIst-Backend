@@ -12,6 +12,7 @@ type Repository interface {
 	GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]File, error)
 	DeleteFileById(ctx context.Context, id uuid.UUID) error
 	DoesUserHaveFile(ctx context.Context, userId uuid.UUID, fileId uuid.UUID) (bool, error)
+	GetFileMetadata(ctx context.Context, fileId uuid.UUID) (*domain.File, error)
 }
 
 type FileMetadata struct {
@@ -31,9 +32,10 @@ type EmbeddingService interface {
 }
 
 type FileService interface {
-	UploadFile(ctx context.Context, file *domain.File, data []byte) error
+	UploadFile(ctx context.Context, file *domain.File, data []byte) (string, error)
 	DeleteFile(ctx context.Context, filePath string) error
-	GetFile(ctx context.Context, fileId uuid.UUID) ([]byte, error)
+	GetFile(ctx context.Context, filePath string) ([]byte, error)
+	DeleteFiles(ctx context.Context, filePaths []string) error
 }
 
 type Chunker interface {

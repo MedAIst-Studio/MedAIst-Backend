@@ -32,26 +32,26 @@ func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCu
 	return &user, nil
 }
 
-func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) ([]uuid.UUID, error) {
+func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) ([]*domain.File, error) {
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.Rollback()
 
-	var fileIds []uuid.UUID
-	rows, err := tx.QueryContext(ctx, "SELECT id FROM files WHERE user_id = $1", id)
+	var files []*domain.File
+	rows, err := tx.QueryContext(ctx, "SELECT id, path FROM files WHERE user_id = $1", id)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var fileId uuid.UUID
-		if err := rows.Scan(&fileId); err != nil {
+		var f domain.File
+		if err := rows.Scan(&f.Id, &f.Path); err != nil {
 			return nil, err
 		}
-		fileIds = append(fileIds, fileId)
+		files = append(files, &f)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -66,7 +66,7 @@ func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) ([]uuid.UU
 		return nil, err
 	}
 
-	return fileIds, nil
+	return files, nil
 }
 
 func (r *Repository) UpdateUsername(ctx context.Context, id uuid.UUID, username string) error {

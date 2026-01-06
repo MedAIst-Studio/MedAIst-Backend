@@ -65,3 +65,14 @@ func (r *Repository) DeleteChat(ctx context.Context, chatId uuid.UUID) error {
 	}
 	return nil
 }
+
+func (r *Repository) UpdateChat(ctx context.Context, chatId uuid.UUID, title string) error {
+	result, err := r.db.ExecContext(ctx, "UPDATE chats SET title = $1 WHERE id = $2", title, chatId)
+	if err != nil {
+		return err
+	}
+	if rowsAffected, _ := result.RowsAffected(); rowsAffected == 0 {
+		return domain.ErrChatNotFound
+	}
+	return nil
+}

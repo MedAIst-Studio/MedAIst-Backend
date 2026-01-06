@@ -22,7 +22,7 @@ const (
 
 	clarificationQuerySystemMessage = "Sen bir öğrenci koçu ve eğitmensin. Önceki verdiğin cevabı daha basitleştirerek veya detaylandırarak açıkla. Yeni konu açma, mevcut konuyu pekiştirerek anlat."
 
-	imageQuerySystemMessage = "Sen bir soru çözüm asistanısın. Gönderilen görseldeki soruyu analiz et ve çöz. Eğer görsel dersle/sınavla ilgili değilse, nazikçe cevap veremeyeceğini belirt."
+	imageQuerySystemMessage = "Sen bir soru çözüm asistanısın. Gönderilen görseldeki soruyu analiz et ve çözümünü ver. Eğer görsel dersle/sınavla ilgili değilse, nazikçe cevap veremeyeceğini belirt."
 
 	pdfSearchQuerySystemMessage = `Sen Uzman bir YKS Eğitmenisin. Soruları SADECE aşağıda verilen Bağlam (Context) içeriğini kullanarak cevapla.
 
@@ -107,6 +107,13 @@ type ChatResponse struct {
 
 type QueryExpansionResponse struct {
 	Queries []string `json:"queries"`
+}
+
+type UpdateChatRequest struct {
+	Title string `json:"title"`
+}
+
+type UpdateChatResponse struct {
 }
 
 type ChatMessage struct {
@@ -204,7 +211,7 @@ func buildTitleGenerationMessage(firstUserMessage string) []ChatMessage {
 	return []ChatMessage{
 		NewChatMessage(
 			RoleSystem,
-			"Generate a 3-7 word title for this medical document chat: "+firstUserMessage,
+			"Generate a 3-7 word title for this chat: "+firstUserMessage,
 		),
 	}
 }

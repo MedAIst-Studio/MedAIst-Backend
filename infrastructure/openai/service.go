@@ -90,7 +90,6 @@ func NewOpenAIService(config OpenAIConfig) *OpenAIService {
 ///////////////////////////////////////////////////////////////////////////////
 
 func (s *OpenAIService) SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
-	fmt.Println("requestimiz", req)
 	messages := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
 
 	for _, msg := range req.Messages {
@@ -355,8 +354,16 @@ func (s *OpenAIService) ExtractTextFromImage(ctx context.Context, imageUrl strin
 		Model: s.OcrModel,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: "Sen bir OCR ve Soru Dijitalleştirme Uzmanısın. Görüntüdeki metni eksiksiz ve hatasız bir şekilde çıkar. Eğer görsel bir soruysa, soru metnini ve şıkların hepsini (A, B, C, D, E) tam olarak aktar. Sadece çıkarılan metni döndür, yorum yapma.",
+				Role: openai.ChatMessageRoleSystem,
+				Content: `Sen bir OCR ve Soru Dijitalleştirme Uzmanısın. Görevin: Resimdeki metni BİREBİR, KELİMESİ KELİMESİNE dışarı aktarmaktır.
+Kurallar:
+1. Asla özetleme yapma. Resimdeki en ufak detayı bile atlama.
+2. Matematiksel ifadeleri LaTeX formatında yaz (örn: $\frac{a}{b}$).
+3. Satır sonlarını rastgele kesme, cümlenin bittiği yere kadar oku.
+4. "..." gibi kısaltmalar kullanma, metinde ne yazıyorsa aynısını yaz.
+5. Soru numarası, öncüller (I, II, III) ve şıkların (A, B, C, D, E) TAMAMINI eksiksiz çıkar.
+6. Sadece çıkarılan metni döndür. Yorum veya giriş cümlesi yazma.
+7. Resim içerisindeki resimleri de eksiksiz çıkar.`,
 			},
 			{
 				Role: openai.ChatMessageRoleUser,
@@ -370,15 +377,16 @@ func (s *OpenAIService) ExtractTextFromImage(ctx context.Context, imageUrl strin
 				},
 			},
 		},
+		MaxTokens: 1100,
 	}
 
 	resp, err := s.client.CreateChatCompletion(ctx, request)
 	if err != nil {
 		return "", fmt.Errorf("OCR failed: %w", err)
 	}
-	if len(resp.Choices) == 0 {
-		return "", fmt.Errorf("empty OCR response")
-	}
+
+	fmt.Printf("DEBUG: OCR FinishReason: %s\n", resp.Choices[0].FinishReason)
+	fmt.Printf("DEBUG: OCR Token Usage: Prompt: %d, Completion: %d, Total: %d\n", resp.Usage.PromptTokens, resp.Usage.CompletionTokens, resp.Usage.TotalTokens)
 
 	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
 }

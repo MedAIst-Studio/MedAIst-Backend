@@ -17,13 +17,14 @@ type UploadFileRequest struct {
 }
 
 type UploadFileResponse struct {
+	Url string `json:"url"`
 }
 
 type UploadFileHandler struct {
 	Factory *FileProcessorFactory
 	repo    Repository
 	fl      FileService
-	vb      VectorDB // Still needed for recover? Or move recover to a service? Let's check.
+	vb      VectorDB
 }
 
 func NewUploadFileHandler(repo Repository, fl FileService, vb VectorDB, factory *FileProcessorFactory) *UploadFileHandler {
@@ -80,7 +81,8 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 		return nil, 400, err
 	}
 
-	if err := h.fl.UploadFile(ctx, newFile, fileBytes); err != nil {
+	fileUrl, err := h.fl.UploadFile(ctx, newFile, fileBytes)
+	if err != nil {
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, 400, err
 		}
@@ -88,7 +90,7 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 	}
 
 	if err := h.repo.SaveFileInformation(ctx, newFile); err != nil {
-		h.fl.DeleteFile(ctx, "uploads/"+newFile.Id.String())
+		h.fl.DeleteFile(ctx, newFile.Path)
 		if !errors.Is(err, domain.ErrInternalServer) {
 			return nil, 400, err
 		}
@@ -97,15 +99,15 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 
 	if err := processor.Process(ctx, newFile, fileBytes); err != nil {
 		// If processing fails, we should probably rollback the file upload/save
-		h.recover(ctx, newFile.Id)
+		h.recover(ctx, newFile.Id, newFile.Path)
 		return nil, 500, err
 	}
 
-	return nil, 200, nil
+	return &UploadFileResponse{Url: fileUrl}, 200, nil
 }
 
-func (h *UploadFileHandler) recover(ctx context.Context, fileId uuid.UUID) {
+func (h *UploadFileHandler) recover(ctx context.Context, fileId uuid.UUID, filePath string) {
 	h.repo.DeleteFileById(ctx, fileId)
-	h.fl.DeleteFile(ctx, "uploads/"+fileId.String())
+	h.fl.DeleteFile(ctx, filePath)
 	h.vb.DeleteEmbeddingsByFileId(ctx, fileId)
 }

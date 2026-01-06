@@ -16,12 +16,12 @@ import (
 
 func SetupServer() *fiber.App {
 	app := fiber.New(fiber.Config{
-		IdleTimeout:  5 * time.Second,
-		ReadTimeout:  3 * time.Second,
-		WriteTimeout: 3 * time.Second,
+		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  60 * time.Second,
+		WriteTimeout: 60 * time.Second,
 		Concurrency:  256 * 1024,
 		BodyLimit:    15 * 1024 * 1024,
-		AppName:      "MedAIist-Backend API",
+		AppName:      "YKSAI-Backend API",
 	})
 
 	registerMiddlewares(app)
