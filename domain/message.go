@@ -12,12 +12,24 @@ const (
 )
 
 type Message struct {
-	Id        uuid.UUID
-	ChatId    uuid.UUID
-	Content   string
-	IsUser    bool
-	CreatedAt time.Time
-	ImageUrl  string // Add ImageUrl field
+	Id              uuid.UUID
+	ChatId          uuid.UUID
+	Content         string
+	IsUser          bool
+	CreatedAt       time.Time
+	ContextSnapshot *ContextSnapshot
+	Attachments     []Attachment
+}
+
+type ContextSnapshot struct {
+	Type        string `json:"type"` // "pdf", "book", etc.
+	DocumentId  string `json:"document_id"`
+	CachedTitle string `json:"cached_title"`
+}
+
+type Attachment struct {
+	Type string `json:"type"` // "image"
+	Url  string `json:"url"`
 }
 
 func NewMessage(chatId uuid.UUID, content string, isUser bool) *Message {

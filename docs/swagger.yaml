@@ -1,4 +1,15 @@
 definitions:
+  admin.GetUsersRequest:
+    type: object
+  admin.UserInfo:
+    properties:
+      email:
+        type: string
+      provider:
+        type: string
+      username:
+        type: string
+    type: object
   auth.ExchangeRequest:
     properties:
       session:
@@ -57,8 +68,6 @@ definitions:
     properties:
       created_at:
         type: string
-      file_id:
-        type: string
       id:
         type: string
       title:
@@ -66,11 +75,40 @@ definitions:
     type: object
   chat.Message:
     properties:
+      attachments:
+        items:
+          $ref: '#/definitions/domain.Attachment'
+        type: array
       content:
         type: string
+      context_snapshot:
+        $ref: '#/definitions/domain.ContextSnapshot'
       is_user:
         type: boolean
       timestamp:
+        type: string
+    type: object
+  domain.Attachment:
+    properties:
+      type:
+        description: '"image"'
+        type: string
+      url:
+        type: string
+    type: object
+  domain.ContextSnapshot:
+    properties:
+      cached_title:
+        type: string
+      document_id:
+        type: string
+      type:
+        description: '"pdf", "book", etc.'
+        type: string
+    type: object
+  domain.UpdateChatRequest:
+    properties:
+      title:
         type: string
     type: object
   file.File:
@@ -85,8 +123,16 @@ definitions:
         type: string
     type: object
   file.UploadFileRequest:
+    properties:
+      file_data:
+        $ref: '#/definitions/multipart.FileHeader'
+      file_title:
+        type: string
     type: object
   file.UploadFileResponse:
+    properties:
+      url:
+        type: string
     type: object
   message.SendMessageRequest:
     properties:
@@ -95,11 +141,12 @@ definitions:
       content:
         minLength: 1
         type: string
+      image_url:
+        type: string
       pdf_id:
         type: string
     required:
     - content
-    - pdf_id
     type: object
   message.SendMessageResponse:
     properties:
@@ -113,6 +160,16 @@ definitions:
         type: string
       user_message_id:
         type: string
+    type: object
+  multipart.FileHeader:
+    properties:
+      filename:
+        type: string
+      header:
+        $ref: '#/definitions/textproto.MIMEHeader'
+      size:
+        format: int64
+        type: integer
     type: object
   quiz.Answer:
     properties:
@@ -296,6 +353,12 @@ definitions:
       total_questions:
         type: integer
     type: object
+  textproto.MIMEHeader:
+    additionalProperties:
+      items:
+        type: string
+      type: array
+    type: object
   user.ChangePasswordRequest:
     properties:
       new_password:
@@ -413,6 +476,34 @@ info:
   title: MedAIist-Backend API
   version: "1.0"
 paths:
+  /admin/users:
+    post:
+      consumes:
+      - application/json
+      description: Retrieve a list of all users
+      parameters:
+      - description: Get Users request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/admin.GetUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/admin.UserInfo'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get Users
+      tags:
+      - Admin
   /api/auth/exchange:
     post:
       consumes:
@@ -609,6 +700,38 @@ paths:
       security:
       - BearerAuth: []
       summary: Retrieve messages for a specific chat
+      tags:
+      - Chats
+    patch:
+      consumes:
+      - application/json
+      description: Updates the title of a chat by its ID.
+      parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New Title
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateChatRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update Chat Title
       tags:
       - Chats
   /files:

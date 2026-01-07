@@ -28,7 +28,7 @@ func NewUpdateChatHandler(repo Repository) *UpdateChatHandler {
 //	@Tags			Chats
 //	@Accept			json
 //	@Produce		json
-//	@Param			id		path	string					true	"Chat ID"
+//	@Param			id		path	string						true	"Chat ID"
 //	@Param			body	body	domain.UpdateChatRequest	true	"New Title"
 //	@Success		204		"No Content"
 //	@Failure		400

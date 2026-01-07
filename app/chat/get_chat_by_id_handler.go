@@ -16,9 +16,11 @@ type GetChatByIDRequest struct {
 type GetChatByIDResponse []Message
 
 type Message struct {
-	IsUser    bool      `json:"is_user"`
-	Content   string    `json:"content"`
-	Timestamp time.Time `json:"timestamp"`
+	IsUser          bool                    `json:"is_user"`
+	Content         string                  `json:"content"`
+	Timestamp       time.Time               `json:"timestamp"`
+	ContextSnapshot *domain.ContextSnapshot `json:"context_snapshot,omitempty"`
+	Attachments     []domain.Attachment     `json:"attachments,omitempty"`
 }
 
 type GetChatByIDHandler struct {
@@ -44,7 +46,6 @@ func NewGetChatByIDHandler(repo Repository) *GetChatByIDHandler {
 //	@Security		BearerAuth
 //	@Router			/chats/{id} [get]
 func (h *GetChatByIDHandler) Handle(ctx context.Context, req *GetChatByIDRequest) (*GetChatByIDResponse, int, error) {
-	// TODO check if the user owns the chat before retrieving
 	chat, err := h.repo.GetChatByID(ctx, req.ChatID)
 	if err != nil {
 		if errors.Is(err, domain.ErrChatNotFound) {

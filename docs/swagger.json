@@ -7,6 +7,49 @@
         "version": "1.0"
     },
     "paths": {
+        "/admin/users": {
+            "post": {
+                "description": "Retrieve a list of all users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get Users",
+                "parameters": [
+                    {
+                        "description": "Get Users request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/admin.GetUsersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/admin.UserInfo"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/api/auth/exchange": {
             "post": {
                 "consumes": [
@@ -303,6 +346,56 @@
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates the title of a chat by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats"
+                ],
+                "summary": "Update Chat Title",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Title",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
@@ -1058,6 +1151,23 @@
         }
     },
     "definitions": {
+        "admin.GetUsersRequest": {
+            "type": "object"
+        },
+        "admin.UserInfo": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "auth.ExchangeRequest": {
             "type": "object",
             "properties": {
@@ -1147,9 +1257,6 @@
                 "created_at": {
                     "type": "string"
                 },
-                "file_id": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "string"
                 },
@@ -1161,13 +1268,57 @@
         "chat.Message": {
             "type": "object",
             "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Attachment"
+                    }
+                },
                 "content": {
                     "type": "string"
+                },
+                "context_snapshot": {
+                    "$ref": "#/definitions/domain.ContextSnapshot"
                 },
                 "is_user": {
                     "type": "boolean"
                 },
                 "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Attachment": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"image\"",
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ContextSnapshot": {
+            "type": "object",
+            "properties": {
+                "cached_title": {
+                    "type": "string"
+                },
+                "document_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"pdf\", \"book\", etc.",
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UpdateChatRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
                     "type": "string"
                 }
             }
@@ -1190,16 +1341,28 @@
             }
         },
         "file.UploadFileRequest": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "file_data": {
+                    "$ref": "#/definitions/multipart.FileHeader"
+                },
+                "file_title": {
+                    "type": "string"
+                }
+            }
         },
         "file.UploadFileResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
         },
         "message.SendMessageRequest": {
             "type": "object",
             "required": [
-                "content",
-                "pdf_id"
+                "content"
             ],
             "properties": {
                 "chat_id": {
@@ -1208,6 +1371,9 @@
                 "content": {
                     "type": "string",
                     "minLength": 1
+                },
+                "image_url": {
+                    "type": "string"
                 },
                 "pdf_id": {
                     "type": "string"
@@ -1231,6 +1397,21 @@
                 },
                 "user_message_id": {
                     "type": "string"
+                }
+            }
+        },
+        "multipart.FileHeader": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "header": {
+                    "$ref": "#/definitions/textproto.MIMEHeader"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -1506,6 +1687,15 @@
                 },
                 "total_questions": {
                     "type": "integer"
+                }
+            }
+        },
+        "textproto.MIMEHeader": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "string"
                 }
             }
         },

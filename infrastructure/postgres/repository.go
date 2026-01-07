@@ -96,7 +96,9 @@ CREATE TABLE IF NOT EXISTS  messages (
     chat_id UUID NOT NULL REFERENCES chats(id) ON DELETE CASCADE ON UPDATE NO ACTION,
     is_user BOOLEAN NOT NULL,
     content TEXT NOT NULL, 
-    created_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL,
+    context_snapshot JSONB,
+    attachments JSONB
 );
 
 -- QUIZZES
@@ -167,5 +169,15 @@ CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
 	_, err := db.Exec(createTableQuery)
 	if err != nil {
 		panic("Failed to create tables: " + err.Error())
+	}
+
+	// Migrations for existing tables
+	migrationQuery := `
+	ALTER TABLE messages ADD COLUMN IF NOT EXISTS context_snapshot JSONB;
+	ALTER TABLE messages ADD COLUMN IF NOT EXISTS attachments JSONB;
+	`
+	_, err = db.Exec(migrationQuery)
+	if err != nil {
+		panic("Failed to run migrations: " + err.Error())
 	}
 }

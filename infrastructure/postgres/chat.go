@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
@@ -33,7 +34,7 @@ func (r *Repository) GetChatsByUserID(ctx context.Context, userId uuid.UUID) ([]
 }
 
 func (r *Repository) GetChatByID(ctx context.Context, chatId uuid.UUID) (*chat.GetChatByIDResponse, error) {
-	rows, err := r.db.QueryContext(ctx, "SELECT is_user, content, created_at FROM messages WHERE chat_id = $1 ORDER BY created_at ASC", chatId)
+	rows, err := r.db.QueryContext(ctx, "SELECT is_user, content, created_at, context_snapshot, attachments FROM messages WHERE chat_id = $1 ORDER BY created_at ASC", chatId)
 	if err != nil {
 		return nil, err
 	}
@@ -42,9 +43,24 @@ func (r *Repository) GetChatByID(ctx context.Context, chatId uuid.UUID) (*chat.G
 	var messages chat.GetChatByIDResponse
 	for rows.Next() {
 		var msg chat.Message
-		if err := rows.Scan(&msg.IsUser, &msg.Content, &msg.Timestamp); err != nil {
+		var contextBytes, attachmentsBytes []byte
+
+		if err := rows.Scan(&msg.IsUser, &msg.Content, &msg.Timestamp, &contextBytes, &attachmentsBytes); err != nil {
 			return nil, err
 		}
+
+		if len(contextBytes) > 0 {
+			if err := json.Unmarshal(contextBytes, &msg.ContextSnapshot); err != nil {
+				return nil, err
+			}
+		}
+
+		if len(attachmentsBytes) > 0 {
+			if err := json.Unmarshal(attachmentsBytes, &msg.Attachments); err != nil {
+				return nil, err
+			}
+		}
+
 		messages = append(messages, msg)
 	}
 

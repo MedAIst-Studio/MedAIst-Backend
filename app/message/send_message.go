@@ -54,11 +54,8 @@ func NewSendMessageHandler(config Config) *SendMessageHandler {
 // @Tags			Message
 // @Accept			json
 // @Produce		json
-// @Param			pdf_id		json	uuid	false	"PDF ID"
-// @Param			chat_id		json	uuid	false	"Chat ID"
-// @Param			content		json	string	true	"Content"
-// @Param			image_url	json	string	false	"Image URL"
-// @Success		200			{object}	SendMessageResponse
+// @Param			request	body		SendMessageRequest	true	"Send Message Request"
+// @Success		200		{object}	SendMessageResponse
 // @Failure		400
 // @Failure		500
 // @Security		BearerAuth
@@ -67,9 +64,19 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 	userId := domain.GetUserID(ctx)
 
 	userMessage := domain.NewMessage(req.ChatId, req.Content, true)
-	if req.ImageUrl != "" {
-		userMessage.ImageUrl = req.ImageUrl
+
+	processImage := func(url string) error {
+		userMessage.Attachments = append(userMessage.Attachments, domain.Attachment{
+			Type: "image",
+			Url:  url,
+		})
+		return nil
 	}
+
+	if req.ImageUrl != "" {
+		processImage(req.ImageUrl)
+	}
+
 	isNewChat := req.ChatId == uuid.Nil
 
 	chatTitle, err := h.handleNewChatIfNeeded(ctx, req, userId, userMessage, isNewChat)
@@ -77,18 +84,22 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	if err := h.Repo.SaveMessage(ctx, userMessage); err != nil {
-		return nil, 500, err
-	}
-
-	// Determine QueryType
 	var queryType domain.QueryType
 
-	// Check if PdfId refers to an image
 	if req.PdfId != uuid.Nil && req.ImageUrl == "" {
 		fileMeta, err := h.Repo.GetFileMetadata(ctx, req.PdfId)
-		if err == nil && isImageFile(fileMeta.Name) {
-			req.ImageUrl = "uploads/" + req.PdfId.String()
+		if err == nil {
+			if isImageFile(fileMeta.Name) {
+				url := "uploads/" + req.PdfId.String()
+				req.ImageUrl = url
+				processImage(url)
+			} else {
+				userMessage.ContextSnapshot = &domain.ContextSnapshot{
+					Type:        "pdf",
+					DocumentId:  req.PdfId.String(),
+					CachedTitle: fileMeta.Name,
+				}
+			}
 		}
 	}
 
@@ -98,18 +109,23 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		var err error
 		queryType, err = h.ChatSvc.CheckUserQuery(ctx, req.Content)
 		if err != nil {
-			h.Repo.DeleteMessage(ctx, userMessage.Id)
 			return nil, 500, err
 		}
 	}
 
+	if err := h.Repo.SaveMessage(ctx, userMessage); err != nil {
+		return nil, 500, err
+	}
+
 	crm := domain.NewChatRequestManager(queryType, req.Content)
 
-	if queryType == domain.ImageQuery && userMessage.ImageUrl != "" {
+	if queryType == domain.ImageQuery && len(userMessage.Attachments) > 0 {
 		if len(crm.Req.Messages) > 0 {
 			lastMsgIdx := len(crm.Req.Messages) - 1
 			if crm.Req.Messages[lastMsgIdx].Role == domain.RoleUser {
-				crm.Req.Messages[lastMsgIdx].ImageUrl = []string{userMessage.ImageUrl}
+				if len(userMessage.Attachments) > 0 {
+					crm.Req.Messages[lastMsgIdx].ImageUrl = []string{userMessage.Attachments[0].Url}
+				}
 			}
 		}
 	}
@@ -127,51 +143,48 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
-	if queryType == domain.ImageQuery && userMessage.ImageUrl != "" {
-		var fileBytes []byte
-		var err error
-
-		if req.PdfId != uuid.Nil {
-			fileMeta, err := h.Repo.GetFileMetadata(ctx, req.PdfId)
-			if err != nil {
-				return nil, 500, fmt.Errorf("failed to get file metadata for OCR: %w", err)
+	if queryType == domain.ImageQuery {
+		var attachment *domain.Attachment
+		for i := range userMessage.Attachments {
+			if strings.Contains(userMessage.Attachments[i].Url, "uploads/") {
+				attachment = &userMessage.Attachments[i]
+				break
 			}
-			fileBytes, err = h.FileService.GetFile(ctx, fileMeta.Path)
-			if err != nil {
-				return nil, 500, fmt.Errorf("failed to get file bytes for OCR: %w", err)
-			}
-		} else {
-			if strings.Contains(userMessage.ImageUrl, "uploads/") {
-				idx := strings.Index(userMessage.ImageUrl, "uploads/")
-				objectPath := userMessage.ImageUrl[idx:]
+		}
 
+		if attachment != nil {
+			var fileBytes []byte
+			var err error
+
+			// Parse path
+			idx := strings.Index(attachment.Url, "uploads/")
+			if idx != -1 {
+				objectPath := attachment.Url[idx:]
 				fileBytes, err = h.FileService.GetFile(ctx, objectPath)
 				if err != nil {
 					return nil, 500, fmt.Errorf("failed to get file bytes from path %s: %w", objectPath, err)
 				}
-			} else {
-				return nil, 400, fmt.Errorf("cannot process image: no file ID provided and URL does not contain 'uploads/' path pattern. URL: %s", userMessage.ImageUrl)
 			}
+
+			base64Image := convertImageToBase64(fileBytes)
+
+			extractedText, err := h.ChatSvc.ExtractTextFromImage(ctx, base64Image)
+			if err != nil {
+				return nil, 500, fmt.Errorf("OCR failed: %w", err)
+			}
+
+			reasoningAns, err := h.ChatSvc.SolveQuestionWithReasoning(ctx, extractedText)
+			if err != nil {
+				return nil, 500, fmt.Errorf("reasoning failed: %w", err)
+			}
+
+			aiMessage := domain.NewMessage(userMessage.ChatId, reasoningAns, false)
+			if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
+				return nil, 500, err
+			}
+
+			return h.buildResponse(userMessage, aiMessage, chatTitle, isNewChat), 200, nil
 		}
-
-		base64Image := convertImageToBase64(fileBytes)
-
-		extractedText, err := h.ChatSvc.ExtractTextFromImage(ctx, base64Image)
-		if err != nil {
-			return nil, 500, fmt.Errorf("OCR failed: %w", err)
-		}
-
-		reasoningAns, err := h.ChatSvc.SolveQuestionWithReasoning(ctx, extractedText)
-		if err != nil {
-			return nil, 500, fmt.Errorf("reasoning failed: %w", err)
-		}
-
-		aiMessage := domain.NewMessage(userMessage.ChatId, reasoningAns, false)
-		if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
-			return nil, 500, err
-		}
-
-		return h.buildResponse(userMessage, aiMessage, chatTitle, isNewChat), 200, nil
 	}
 
 	crm.Req.Stream = h.Stream

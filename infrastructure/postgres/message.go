@@ -2,14 +2,32 @@ package postgres
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 )
 
 func (r *Repository) SaveMessage(ctx context.Context, message *domain.Message) error {
-	_, err := r.db.ExecContext(ctx, "INSERT INTO messages (id, chat_id, content, is_user, created_at) VALUES ($1, $2, $3, $4, $5)",
-		message.Id, message.ChatId, message.Content, message.IsUser, message.CreatedAt)
+	var contextVal, attachmentsVal interface{}
+	var err error
+
+	if message.ContextSnapshot != nil {
+		contextVal, err = json.Marshal(message.ContextSnapshot)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(message.Attachments) > 0 {
+		attachmentsVal, err = json.Marshal(message.Attachments)
+		if err != nil {
+			return err
+		}
+	}
+
+	_, err = r.db.ExecContext(ctx, "INSERT INTO messages (id, chat_id, content, is_user, created_at, context_snapshot, attachments) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+		message.Id, message.ChatId, message.Content, message.IsUser, message.CreatedAt, contextVal, attachmentsVal)
 	return err
 }
 

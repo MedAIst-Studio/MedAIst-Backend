@@ -362,6 +362,56 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates the title of a chat by its ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats"
+                ],
+                "summary": "Update Chat Title",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Title",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
             }
         },
         "/files": {
@@ -560,7 +610,7 @@ const docTemplate = `{
                 ],
                 "description": "Sends a message in a chat and gets a response from the AI",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -571,29 +621,13 @@ const docTemplate = `{
                 "summary": "Send a message in a chat",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "PDF ID",
-                        "name": "pdf_id",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Chat ID",
-                        "name": "chat_id",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Content",
-                        "name": "content",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Image URL",
-                        "name": "image_url",
-                        "in": "formData"
+                        "description": "Send Message Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/message.SendMessageRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -1242,13 +1276,57 @@ const docTemplate = `{
         "chat.Message": {
             "type": "object",
             "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Attachment"
+                    }
+                },
                 "content": {
                     "type": "string"
+                },
+                "context_snapshot": {
+                    "$ref": "#/definitions/domain.ContextSnapshot"
                 },
                 "is_user": {
                     "type": "boolean"
                 },
                 "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Attachment": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"image\"",
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ContextSnapshot": {
+            "type": "object",
+            "properties": {
+                "cached_title": {
+                    "type": "string"
+                },
+                "document_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"pdf\", \"book\", etc.",
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UpdateChatRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
                     "type": "string"
                 }
             }
@@ -1271,10 +1349,44 @@ const docTemplate = `{
             }
         },
         "file.UploadFileRequest": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "file_data": {
+                    "$ref": "#/definitions/multipart.FileHeader"
+                },
+                "file_title": {
+                    "type": "string"
+                }
+            }
         },
         "file.UploadFileResponse": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "message.SendMessageRequest": {
+            "type": "object",
+            "required": [
+                "content"
+            ],
+            "properties": {
+                "chat_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "pdf_id": {
+                    "type": "string"
+                }
+            }
         },
         "message.SendMessageResponse": {
             "type": "object",
@@ -1293,6 +1405,21 @@ const docTemplate = `{
                 },
                 "user_message_id": {
                     "type": "string"
+                }
+            }
+        },
+        "multipart.FileHeader": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "header": {
+                    "$ref": "#/definitions/textproto.MIMEHeader"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -1568,6 +1695,15 @@ const docTemplate = `{
                 },
                 "total_questions": {
                     "type": "integer"
+                }
+            }
+        },
+        "textproto.MIMEHeader": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
+                    "type": "string"
                 }
             }
         },
