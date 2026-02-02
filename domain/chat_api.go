@@ -211,7 +211,7 @@ func buildTitleGenerationMessage(firstUserMessage string) []ChatMessage {
 	return []ChatMessage{
 		NewChatMessage(
 			RoleSystem,
-			"Generate a 3-7 word title for this chat: "+firstUserMessage,
+			"Generate a 3-7 word title for this chat in turkish: "+firstUserMessage,
 		),
 	}
 }

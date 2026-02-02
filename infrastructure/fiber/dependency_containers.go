@@ -1,20 +1,22 @@
 package fiber
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
+
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
-	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
+	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openrouter"
 
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
 	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
-	openaiInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openai"
+
 	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
 	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
@@ -24,7 +26,7 @@ import (
 type DependencyContainer struct {
 	Repo            *postgresInfra.Repository
 	Chunker         *chunkerInfra.PdfChunkingService
-	Embedding       *embeddingInfra.EmbeddingService
+	Embedding       *openrouter.OpenRouterService
 	VectorDB        *qdrantInfra.QdrantVectorDB
 	FileStorage     *minioInfra.MinioService
 	jweTokenService *jwe.Service
@@ -66,8 +68,6 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		PreserveContext: true,
 	})
 
-	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("OPENAI_API_KEY"))
-
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
 		Addr:           os.Getenv("QDRANT_URL"),
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
@@ -77,22 +77,23 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		ChunkLimit:     10,
 	})
 
-	openai := openaiInfra.NewOpenAIService(openaiInfra.OpenAIConfig{
-		ApiKey:                 os.Getenv("OPENAI_API_KEY"),
-		ChatModel:              "gpt-4o",
-		GenerateQuestionModel:  "gpt-4o-mini",
-		ExpandQuestionModel:    "gpt-4o-mini",
-		CheckUserQueryModel:    "gpt-4o-mini",
-		GenerateChatTitleModel: "gpt-4o-mini",
-		OcrModel:               getEnv("OPENAI_OCR_MODEL", "gpt-4o-mini"),
-		ReasoningModel:         getEnv("OPENAI_REASONING_MODEL", "o4-mini"),
+	openRouter := openrouter.NewOpenRouterService(openrouter.Config{
+		ApiKey:                 getEnv("OPENROUTER_API_KEY", ""),
+		ChatModel:              getEnv("OPENROUTER_CHAT_MODEL", "openai/gpt-4o-mini"),
+		GenerateQuestionModel:  getEnv("OPENROUTER_QUESTION_MODEL", "openai/gpt-4o-mini"),
+		ExpandQuestionModel:    getEnv("OPENROUTER_EXPAND_MODEL", "openai/gpt-4o-mini"),
+		CheckUserQueryModel:    getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
+		GenerateChatTitleModel: getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
+		ReasoningModel:         getEnv("OPENROUTER_REASONING_MODEL", "google/gemini-3-flash-preview"),
+		VisionModel:            getEnv("OPENROUTER_VISION_MODEL", "google/gemini-3-flash-preview"),
+		EmbeddingModel:         getEnv("OPENROUTER_EMBEDDING_MODEL", "openai/text-embedding-3-small"),
 	})
 
 	jina := jina.NewService(os.Getenv("JINA_API_KEY"))
 
 	aiService := &MultiModelService{
-		openai,
-		jina,
+		OpenRouterService: openRouter,
+		Service:           jina,
 	}
 
 	slogLogger := slogInfra.NewLogger()
@@ -106,7 +107,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	return &DependencyContainer{
 		Repo:            postgresRepo,
 		Chunker:         chunker,
-		Embedding:       embeddingService,
+		Embedding:       openRouter, // Using OpenRouter for embeddings
 		VectorDB:        vectorDB,
 		FileStorage:     minioInfraService,
 		jweTokenService: jweTokenService,
@@ -119,8 +120,12 @@ func NewAuthDependencyContainer() *DependencyContainer {
 }
 
 type MultiModelService struct {
-	*openaiInfra.OpenAIService
+	*openrouter.OpenRouterService
 	*jina.Service
+}
+
+func (s *MultiModelService) ExtractTextFromImage(ctx context.Context, imageUrl string) (string, error) {
+	return s.OpenRouterService.ExtractTextFromImage(ctx, imageUrl)
 }
 
 func getEnv(key, fallback string) string {

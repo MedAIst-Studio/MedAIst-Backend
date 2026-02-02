@@ -12,16 +12,17 @@ require (
 	github.com/mailersend/mailersend-go v1.6.1
 	github.com/minio/minio-go/v7 v7.0.95
 	github.com/qdrant/go-client v1.15.2
+	github.com/sashabaranov/go-openai v1.41.2
 	github.com/swaggo/fiber-swagger v1.3.0
 	github.com/swaggo/swag v1.16.4
-	golang.org/x/crypto v0.42.0
-	golang.org/x/oauth2 v0.32.0
-	google.golang.org/grpc v1.66.0
+	golang.org/x/crypto v0.46.0
+	golang.org/x/oauth2 v0.34.0
+	google.golang.org/grpc v1.78.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
 
 require (
-	cloud.google.com/go/compute/metadata v0.3.0 // indirect
+	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
@@ -49,18 +50,20 @@ require (
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
-	github.com/sashabaranov/go-openai v1.41.2 // indirect
+	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	github.com/tinylib/msgp v1.3.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
-	golang.org/x/tools v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240827150818-7e3bb234dfed // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/tools v0.39.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251222181119-0a764e51fe1b // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
+	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

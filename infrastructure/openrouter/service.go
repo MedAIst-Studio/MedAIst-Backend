@@ -1,4 +1,4 @@
-package service
+package openrouter
 
 import (
 	"context"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -60,41 +62,44 @@ var (
 	}
 )
 
-type OpenAIConfig struct {
+type Config struct {
 	ApiKey                 string
 	ChatModel              string
 	GenerateQuestionModel  string
 	ExpandQuestionModel    string
 	CheckUserQueryModel    string
 	GenerateChatTitleModel string
-	OcrModel               string
 	ReasoningModel         string
+	VisionModel            string
+	EmbeddingModel         string
 }
 
-type OpenAIService struct {
+type OpenRouterService struct {
 	client *openai.Client
-	OpenAIConfig
+	Config
 }
 
-func NewOpenAIService(config OpenAIConfig) *OpenAIService {
-	client := openai.NewClient(config.ApiKey)
+func NewOpenRouterService(config Config) *OpenRouterService {
+	openaiConfig := openai.DefaultConfig(config.ApiKey)
+	openaiConfig.BaseURL = "https://openrouter.ai/api/v1"
 
-	return &OpenAIService{
-		client:       client,
-		OpenAIConfig: config,
+	client := openai.NewClientWithConfig(openaiConfig)
+
+	return &OpenRouterService{
+		client: client,
+		Config: config,
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 1) NORMAL CHAT
-///////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------
+// CHAT
+// ----------------------------------------------------------------------
 
-func (s *OpenAIService) SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
+func (s *OpenRouterService) SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
 	messages := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
 
 	for _, msg := range req.Messages {
 		if len(msg.ImageUrl) > 0 {
-			// Handle Multimodal Message (Text + Image)
 			multiContent := []openai.ChatMessagePart{
 				{
 					Type: openai.ChatMessagePartTypeText,
@@ -114,7 +119,6 @@ func (s *OpenAIService) SendChatRequest(ctx context.Context, req *domain.ChatReq
 				MultiContent: multiContent,
 			})
 		} else {
-			// Handle Text-only Message
 			messages = append(messages, openai.ChatCompletionMessage{
 				Role:    string(msg.Role),
 				Content: msg.Content,
@@ -141,11 +145,7 @@ func (s *OpenAIService) SendChatRequest(ctx context.Context, req *domain.ChatReq
 	}, nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 2) CHAT TITLE GENERATION
-///////////////////////////////////////////////////////////////////////////////
-
-func (s *OpenAIService) GenerateChatTitle(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
+func (s *OpenRouterService) GenerateChatTitle(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
 	messages := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
 
 	for _, msg := range req.Messages {
@@ -173,11 +173,11 @@ func (s *OpenAIService) GenerateChatTitle(ctx context.Context, req *domain.ChatR
 	}, nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 3) USER QUERY CLASSIFICATION
-///////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------
+// CLASSIFICATION & EXPANSION
+// ----------------------------------------------------------------------
 
-func (s *OpenAIService) CheckUserQuery(ctx context.Context, userContent string) (domain.QueryType, error) {
+func (s *OpenRouterService) CheckUserQuery(ctx context.Context, userContent string) (domain.QueryType, error) {
 	request := openai.ChatCompletionRequest{
 		Model: s.CheckUserQueryModel,
 		Messages: []openai.ChatCompletionMessage{
@@ -210,15 +210,11 @@ func (s *OpenAIService) CheckUserQuery(ctx context.Context, userContent string) 
 	case "PDFSearch":
 		return domain.PdfSearchQuery, nil
 	default:
-		return domain.GeneralQuery, fmt.Errorf("unexpected classification: %s", text)
+		return domain.GeneralQuery, nil // Default fallback
 	}
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 4) QUERY EXPANSION (JSON PARSE)
-///////////////////////////////////////////////////////////////////////////////
-
-func (s *OpenAIService) ExpandQuery(ctx context.Context, content string) ([]string, error) {
+func (s *OpenRouterService) ExpandQuery(ctx context.Context, content string) ([]string, error) {
 	request := openai.ChatCompletionRequest{
 		Model: s.ExpandQuestionModel,
 		Messages: []openai.ChatCompletionMessage{
@@ -230,6 +226,9 @@ func (s *OpenAIService) ExpandQuery(ctx context.Context, content string) ([]stri
 				Role:    openai.ChatMessageRoleUser,
 				Content: content,
 			},
+		},
+		ResponseFormat: &openai.ChatCompletionResponseFormat{
+			Type: openai.ChatCompletionResponseFormatTypeJSONObject,
 		},
 	}
 
@@ -243,18 +242,18 @@ func (s *OpenAIService) ExpandQuery(ctx context.Context, content string) ([]stri
 
 	var parsed domain.QueryExpansionResponse
 	if err := json.Unmarshal([]byte(resp.Choices[0].Message.Content), &parsed); err != nil {
-		return nil, fmt.Errorf("failed to parse JSON: %w", err)
+		// Fallback if not valid JSON
+		return []string{content}, nil
 	}
 
 	return parsed.Queries, nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 5) QUIZ QUESTION GENERATOR (JSON MODE)
-///////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------
+// QUIZ
+// ----------------------------------------------------------------------
 
-func (s *OpenAIService) GenerateQuizQuestion(ctx context.Context, chunk string) (*domain.QuizQuestion, error) {
-
+func (s *OpenRouterService) GenerateQuizQuestion(ctx context.Context, chunk string) (*domain.QuizQuestion, error) {
 	prompt := fmt.Sprintf(`
 Verilen metne dayanarak YKS (TYT/AYT) formatında, kaliteli bir çoktan seçmeli soru oluştur.
 
@@ -277,7 +276,6 @@ Kısıtlamalar:
 - Türkçe kullan.
 `, chunk)
 
-	fmt.Println(s.GenerateQuestionModel)
 	schemaJSON, err := json.Marshal(quizQuestionSchema)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal schema: %w", err)
@@ -345,60 +343,48 @@ Kısıtlamalar:
 	return &question, nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 6) OCR (IMAGE TO TEXT)
-///////////////////////////////////////////////////////////////////////////////
+// ----------------------------------------------------------------------
+// VISION & REASONING (Formerly Gemini & OpenAI reasoning)
+// ----------------------------------------------------------------------
 
-func (s *OpenAIService) ExtractTextFromImage(ctx context.Context, imageUrl string) (string, error) {
+func (s *OpenRouterService) ExtractTextFromImage(ctx context.Context, imageBase64 string) (string, error) {
+	if !strings.HasPrefix(imageBase64, "data:image") {
+		imageBase64 = "data:image/jpeg;base64," + imageBase64
+	}
+
 	request := openai.ChatCompletionRequest{
-		Model: s.OcrModel,
+		Model: s.VisionModel,
 		Messages: []openai.ChatCompletionMessage{
-			{
-				Role: openai.ChatMessageRoleSystem,
-				Content: `Sen bir OCR ve Soru Dijitalleştirme Uzmanısın. Görevin: Resimdeki metni BİREBİR, KELİMESİ KELİMESİNE dışarı aktarmaktır.
-Kurallar:
-1. Asla özetleme yapma. Resimdeki en ufak detayı bile atlama.
-2. Matematiksel ifadeleri LaTeX formatında yaz (örn: $\frac{a}{b}$).
-3. Satır sonlarını rastgele kesme, cümlenin bittiği yere kadar oku.
-4. "..." gibi kısaltmalar kullanma, metinde ne yazıyorsa aynısını yaz.
-5. Soru numarası, öncüller (I, II, III) ve şıkların (A, B, C, D, E) TAMAMINI eksiksiz çıkar.
-6. Sadece çıkarılan metni döndür. Yorum veya giriş cümlesi yazma.
-7. Resim içerisindeki resimleri de eksiksiz çıkar.`,
-			},
 			{
 				Role: openai.ChatMessageRoleUser,
 				MultiContent: []openai.ChatMessagePart{
 					{
+						Type: openai.ChatMessagePartTypeText,
+						Text: "Sen bir OCR motorusun. Resimdeki sorudaki metinleri ve çizimleri çıkar. Sakın soruyu çözme. Sadece text çıktısı ver.",
+					},
+					{
 						Type: openai.ChatMessagePartTypeImageURL,
 						ImageURL: &openai.ChatMessageImageURL{
-							URL: imageUrl,
+							URL: imageBase64,
 						},
 					},
 				},
 			},
 		},
-		MaxTokens: 1100,
 	}
 
 	resp, err := s.client.CreateChatCompletion(ctx, request)
 	if err != nil {
-		return "", fmt.Errorf("OCR failed: %w", err)
+		return "", fmt.Errorf("ocr/vision request failed: %w", err)
+	}
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("empty ocr response")
 	}
 
-	fmt.Printf("DEBUG: OCR FinishReason: %s\n", resp.Choices[0].FinishReason)
-	fmt.Printf("DEBUG: OCR Token Usage: Prompt: %d, Completion: %d, Total: %d\n", resp.Usage.PromptTokens, resp.Usage.CompletionTokens, resp.Usage.TotalTokens)
-
-	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
+	return resp.Choices[0].Message.Content, nil
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// 7) REASONING (SOLVE QUESTION)
-///////////////////////////////////////////////////////////////////////////////
-
-func (s *OpenAIService) SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error) {
-	// o1 models (beta) typically do not support "system" role or have restrictions.
-	// We put instructions in the user message.
-
+func (s *OpenRouterService) SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error) {
 	prompt := fmt.Sprintf(`Sen uzman bir YKS öğretmenisin (Matematik, Fen, Türkçe, Sosyal). Öğrencinin sorduğu soruyu adım adım, anlaşılır ve açıklayıcı bir şekilde çöz.
 
 Soru:
@@ -432,4 +418,93 @@ Yönergeler:
 	}
 
 	return resp.Choices[0].Message.Content, nil
+}
+
+// ----------------------------------------------------------------------
+// EMBEDDING (Implementing EmbeddingService interface directly here)
+// ----------------------------------------------------------------------
+
+func (s *OpenRouterService) GenerateEmbedding(ctx context.Context, req *message.EmbeddingRequest) (*message.EmbeddingResponse, error) {
+	embeddingReq := openai.EmbeddingRequest{
+		Input: req.Text,
+		Model: openai.EmbeddingModel(s.EmbeddingModel),
+	}
+
+	resp, err := s.client.CreateEmbeddings(ctx, embeddingReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create embedding: %w", err)
+	}
+
+	if len(resp.Data) == 0 {
+		return nil, fmt.Errorf("no embedding data received")
+	}
+
+	src := resp.Data[0].Embedding
+	vector := make([]float32, len(src))
+	for i, v := range src {
+		vector[i] = float32(v)
+	}
+
+	return &message.EmbeddingResponse{
+		Vector: vector,
+	}, nil
+}
+
+// RerankChunks - This is NOT implemented by OpenRouter (Provider agnostic).
+// User should still use Jina or similar for reranking.
+// Since AIService interface requires it, we might need to compose this service with Jina
+// or implement a dummy pass-through if we wanted to move EVERYTHING here, but strict SOLID
+// suggests keeping specialized services separate.
+// However, the previous MultiModelService implemented AIService by composition.
+// OpenRouterService will implement `AIService` methods *except* RerankChunks
+// if we use composition in `dependency_containers.go`.
+// BUT, if we want OpenRouterService to be the standalone AIService, we can't unless it handles rerank.
+// So, we will likely keep the Composition pattern in `dependency_containers.go`.
+// For the sake of the interface satisfaction in `openrouter` package, we don't strictly need RerankChunks
+// if we don't claim `OpenRouterService` implements the FULL `AIService` by itself,
+
+func (s *OpenRouterService) GenerateEmbeddingBatch(ctx context.Context, req *file.EmbeddingBatchRequest) (*file.EmbeddingResponse, error) {
+
+	// --- 1) []Text → []string conversion ---
+	inputs := make([]string, len(req.Texts))
+	for i, t := range req.Texts {
+		inputs[i] = t.Text
+	}
+
+	embeddingReq := openai.EmbeddingRequestStrings{
+		Input: inputs,
+		Model: openai.EmbeddingModel(s.EmbeddingModel),
+	}
+
+	// --- 2) OpenAI call ---
+	resp, err := s.client.CreateEmbeddings(ctx, embeddingReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create embeddings: %w", err)
+	}
+
+	// --- 3) Response mapping ---
+	results := make([]file.Embedding, len(resp.Data))
+
+	for i, data := range resp.Data {
+
+		// float64 → float32 conversion
+		vector := make([]float32, len(data.Embedding))
+		for j, v := range data.Embedding {
+			vector[j] = float32(v)
+		}
+
+		results[i] = file.Embedding{
+			Id:          req.Texts[i].Id,
+			Text:        req.Texts[i].Text,
+			Vector:      vector,
+			PageNumbers: []int{}, // if page exists, fill here
+		}
+	}
+
+	// --- 4) Final response ---
+	return &file.EmbeddingResponse{
+		Results:   results,
+		Dimension: len(results[0].Vector),
+		Count:     len(results),
+	}, nil
 }
