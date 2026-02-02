@@ -14,8 +14,9 @@ import (
 )
 
 type MinioService struct {
-	minioClient *minio.Client
-	BucketName  string
+	minioClient  *minio.Client
+	BucketName   string
+	PublicDomain string
 }
 
 type MinioConfig struct {
@@ -25,6 +26,7 @@ type MinioConfig struct {
 	UseSSL          bool
 	BucketName      string
 	Location        string
+	PublicDomain    string
 }
 
 func NewMinioService(config *MinioConfig) *MinioService {
@@ -35,14 +37,14 @@ func NewMinioService(config *MinioConfig) *MinioService {
 		endpoint = "localhost:9000"
 	}
 
-	log.Printf("MinIO Connecting to: %s (SSL: %v)", endpoint, config.UseSSL)
+	log.Printf("S3 Storage Connecting to: %s (SSL: %v)", endpoint, config.UseSSL)
 
 	minioClient, err := minio.New(endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(config.AccessKeyID, config.SecretAccessKey, ""),
 		Secure: config.UseSSL,
 	})
 	if err != nil {
-		log.Println("MinIO Client creation failed:", err)
+		log.Println("S3 Client creation failed:", err)
 	}
 
 	bucketName := config.BucketName
@@ -69,8 +71,9 @@ func NewMinioService(config *MinioConfig) *MinioService {
 	}
 
 	return &MinioService{
-		minioClient: minioClient,
-		BucketName:  bucketName,
+		minioClient:  minioClient,
+		BucketName:   bucketName,
+		PublicDomain: config.PublicDomain,
 	}
 }
 
@@ -99,16 +102,16 @@ func (s *MinioService) UploadFile(ctx context.Context, file *domain.File, data [
 	)
 
 	if err != nil {
-		return "", fmt.Errorf("upload to minio failed: %w", err)
+		return "", fmt.Errorf("upload to s3 failed: %w", err)
 	}
 
-	endpoint := s.minioClient.EndpointURL().String()
-	fileUrl := fmt.Sprintf("%s/%s/%s", endpoint, s.BucketName, objectName)
-
-	log.Printf("[DEBUG] UploadFile - Endpoint: %s", endpoint)
-	log.Printf("[DEBUG] UploadFile - BucketName: %s", s.BucketName)
-	log.Printf("[DEBUG] UploadFile - ObjectName: %s", objectName)
-	log.Printf("[DEBUG] UploadFile - Generated URL: %s", fileUrl)
+	var fileUrl string
+	if s.PublicDomain != "" {
+		fileUrl = fmt.Sprintf("%s/%s/%s", s.PublicDomain, s.BucketName, objectName)
+	} else {
+		endpoint := s.minioClient.EndpointURL().String()
+		fileUrl = fmt.Sprintf("%s/%s/%s", endpoint, s.BucketName, objectName)
+	}
 
 	return fileUrl, nil
 }
@@ -155,14 +158,9 @@ func (s *MinioService) DeleteFiles(ctx context.Context, filePaths []string) erro
 		}
 	}
 
-	// Return combined errors if any occurred
 	if len(errors) > 0 {
 		return fmt.Errorf("failed to delete %d file(s): %v", len(errors), errors)
 	}
 
 	return nil
-}
-
-func formatFilePath(fileId string) string {
-	return "/uploads/" + fileId + ".pdf"
 }

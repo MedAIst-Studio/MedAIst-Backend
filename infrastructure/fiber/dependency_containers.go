@@ -53,14 +53,15 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
 
 	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
-		Endpoint:        os.Getenv("MINIO_ENDPOINT"),
-		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
-		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
-		UseSSL:          os.Getenv("MINIO_USE_SSL") == "true",
-		BucketName:      os.Getenv("MINIO_BUCKET_NAME"),
-		Location:        "us-east-1",
+		Endpoint:        os.Getenv("S3_ENDPOINT"),
+		AccessKeyID:     os.Getenv("S3_ACCESS_KEY"),
+		SecretAccessKey: os.Getenv("S3_SECRET_KEY"),
+		UseSSL:          os.Getenv("S3_USE_SSL") == "true",
+		BucketName:      os.Getenv("S3_BUCKET_NAME"),
+		Location:        os.Getenv("S3_REGION"),
+		PublicDomain:    os.Getenv("S3_PUBLIC_URL"),
 	})
-	fmt.Println("Connected to MinIO at", os.Getenv("MINIO_ENDPOINT"))
+	fmt.Println("Connected to S3 Storage at", os.Getenv("S3_ENDPOINT"))
 
 	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
 		MaxChunkSize:    1024,
