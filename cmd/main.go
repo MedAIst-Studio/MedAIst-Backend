@@ -48,5 +48,5 @@ func startServer(app *fiber.App) {
 		panic(fmt.Sprintf("Failed to start server: %v\n", err))
 	}
 
-	fmt.Println("Server is running at http://localhost:", PORT)
+	fmt.Println("Server is running at PORT: ", PORT)
 }

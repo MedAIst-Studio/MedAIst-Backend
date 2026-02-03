@@ -70,7 +70,8 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	})
 
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
-		Addr:           os.Getenv("QDRANT_URL"),
+		Host:           os.Getenv("QDRANT_HOST"),
+		Port:           6334,
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
 		ApiKey:         os.Getenv("QDRANT_API_KEY"),
 		MinScore:       0.3,

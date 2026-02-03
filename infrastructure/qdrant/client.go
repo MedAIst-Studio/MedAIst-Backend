@@ -10,13 +10,11 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 	"github.com/qdrant/go-client/qdrant"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Config struct {
-	Addr           string
+	Host           string
+	Port           int
 	CollectionName string
 	ApiKey         string
 	MinScore       float32
@@ -26,34 +24,27 @@ type Config struct {
 
 type QdrantVectorDB struct {
 	Config
-	client            qdrant.PointsClient
-	collectionsClient qdrant.CollectionsClient
-	conn              *grpc.ClientConn
+	client *qdrant.Client
 }
 
 func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	}
-
-	if cfg.ApiKey != "" {
-		opts = append(opts, grpc.WithPerRPCCredentials(apiKeyCredentials{apiKey: cfg.ApiKey}))
-	}
-
-	conn, err := grpc.NewClient(cfg.Addr, opts...)
+	client, err := qdrant.NewClient(&qdrant.Config{
+		Host:   cfg.Host,
+		Port:   cfg.Port,
+		APIKey: cfg.ApiKey,
+		UseTLS: true,
+	})
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to Qdrant DB: %w", err))
 	}
 
 	q := &QdrantVectorDB{
-		client:            qdrant.NewPointsClient(conn),
-		collectionsClient: qdrant.NewCollectionsClient(conn),
-		conn:              conn,
-		Config:            cfg,
+		client: client,
+		Config: cfg,
 	}
 
 	if err := q.ensureCollection(context.Background(), cfg.VectorSize); err != nil {
-		conn.Close()
+		client.Close()
 		fmt.Printf("Warning: failed to ensure collection: %v\n", err)
 		panic(err)
 	}
@@ -61,30 +52,17 @@ func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
 	return q
 }
 
-type apiKeyCredentials struct {
-	apiKey string
-}
-
-func (c apiKeyCredentials) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
-	return map[string]string{
-		"api-key": c.apiKey,
-	}, nil
-}
-
-func (c apiKeyCredentials) RequireTransportSecurity() bool {
-	return false
-}
-
 func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64) error {
-	_, err := q.collectionsClient.Get(ctx, &qdrant.GetCollectionInfoRequest{
-		CollectionName: q.Config.CollectionName,
-	})
+	exists, err := q.client.CollectionExists(ctx, q.Config.CollectionName)
+	if err != nil {
+		return fmt.Errorf("failed to check collection existence: %w", err)
+	}
 
-	if err == nil {
+	if exists {
 		return nil
 	}
 
-	_, err = q.collectionsClient.Create(ctx, &qdrant.CreateCollection{
+	err = q.client.CreateCollection(ctx, &qdrant.CreateCollection{
 		CollectionName: q.Config.CollectionName,
 		VectorsConfig: &qdrant.VectorsConfig{
 			Config: &qdrant.VectorsConfig_Params{
@@ -105,7 +83,7 @@ func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64
 
 // Graceful shutdown için
 func (q *QdrantVectorDB) Close() error {
-	return q.conn.Close()
+	return q.client.Close()
 }
 
 func (q *QdrantVectorDB) InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*file.FileMetadata) error {
