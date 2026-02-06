@@ -58,24 +58,36 @@ func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64
 		return fmt.Errorf("failed to check collection existence: %w", err)
 	}
 
-	if exists {
-		return nil
-	}
-
-	err = q.client.CreateCollection(ctx, &qdrant.CreateCollection{
-		CollectionName: q.Config.CollectionName,
-		VectorsConfig: &qdrant.VectorsConfig{
-			Config: &qdrant.VectorsConfig_Params{
-				Params: &qdrant.VectorParams{
-					Size:     vectorSize,
-					Distance: qdrant.Distance_Cosine,
+	// Ensure collection exists (or create if not)
+	if !exists {
+		err = q.client.CreateCollection(ctx, &qdrant.CreateCollection{
+			CollectionName: q.Config.CollectionName,
+			VectorsConfig: &qdrant.VectorsConfig{
+				Config: &qdrant.VectorsConfig_Params{
+					Params: &qdrant.VectorParams{
+						Size:     vectorSize,
+						Distance: qdrant.Distance_Cosine,
+					},
 				},
 			},
-		},
-	})
+		})
 
+		if err != nil {
+			return fmt.Errorf("failed to create collection: %w", err)
+		}
+	}
+
+	// Always ensure index for file_id exists
+	fieldType := qdrant.FieldType(0)
+	_, err = q.client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+		CollectionName: q.Config.CollectionName,
+		FieldName:      "file_id",
+		FieldType:      &fieldType,
+	})
 	if err != nil {
-		return fmt.Errorf("failed to create collection: %w", err)
+		// Log warning but don't fail, maybe it already exists or concurrent creation
+		// In production, we might want to check if error is "already exists" specifically
+		fmt.Printf("Warning: ensure file_id index attempt: %v\n", err)
 	}
 
 	return nil

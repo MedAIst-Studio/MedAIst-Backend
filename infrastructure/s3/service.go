@@ -45,8 +45,6 @@ func NewS3Service(config *S3Config) *S3Service {
 		}
 	}
 
-	log.Printf("S3 Storage Connecting to: %s (SSL: %v)", endpoint, config.UseSSL)
-
 	cfg := aws.Config{
 		Region:      config.Location,
 		Credentials: credentials.NewStaticCredentialsProvider(config.AccessKeyID, config.SecretAccessKey, ""),
@@ -79,8 +77,6 @@ func (s *S3Service) UploadFile(ctx context.Context, file *domain.File, data []by
 		contentType = "application/octet-stream"
 	}
 
-	log.Printf("[DEBUG] UploadFile - Starting Upload. Bucket: '%s', Object: '%s', Size: %d", s.BucketName, objectName, len(data))
-
 	_, err := s.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(s.BucketName),
 		Key:         aws.String(objectName),
@@ -93,26 +89,18 @@ func (s *S3Service) UploadFile(ctx context.Context, file *domain.File, data []by
 		return "", fmt.Errorf("upload to s3 failed: %w", err)
 	}
 
-	log.Printf("[DEBUG] UploadFile - PutObject Success")
-
 	var fileUrl string
 	if s.PublicDomain != "" {
 		baseUrl := strings.TrimRight(s.PublicDomain, "/")
-		// Handle Supabase specifically if needed, or generic public URL construction
 		if !strings.Contains(baseUrl, "storage/v1/object/public") {
-			// Try to guess if we need to append standard Supabase path
-			// But if PublicDomain is just the base URL:
 			fileUrl = fmt.Sprintf("%s/storage/v1/object/public/%s/%s", baseUrl, s.BucketName, objectName)
 		} else {
 			fileUrl = fmt.Sprintf("%s/%s/%s", baseUrl, s.BucketName, objectName)
 		}
 	} else {
-		// Fallback not ideal for custom endpoints with paths, but best effort
-		// We can't easily get the final resolved URL from the client options privately
 		fileUrl = fmt.Sprintf("%s/%s", s.BucketName, objectName)
 	}
 
-	log.Printf("[DEBUG] UploadFile Success - URL: %s", fileUrl)
 	return fileUrl, nil
 }
 
