@@ -39,7 +39,6 @@ func (h *DeleteAccountHandler) Handle(ctx context.Context, req *DeleteAccountReq
 
 	userId := domain.GetUserID(ctx)
 
-	// fileUUIDs is now actually files []*domain.File
 	files, err := h.repo.DeleteAccount(ctx, userId)
 	if err != nil {
 		return nil, http.StatusInternalServerError, domain.ErrInternalServer

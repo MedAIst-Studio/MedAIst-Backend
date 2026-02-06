@@ -15,7 +15,7 @@ import (
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
-	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
+	s3Infra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/s3"
 
 	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
 	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
@@ -28,7 +28,7 @@ type DependencyContainer struct {
 	Chunker         *chunkerInfra.PdfChunkingService
 	Embedding       *openrouter.OpenRouterService
 	VectorDB        *qdrantInfra.QdrantVectorDB
-	FileStorage     *minioInfra.MinioService
+	FileStorage     *s3Infra.S3Service
 	jweTokenService *jwe.Service
 	inMemoryClient  *inMemoryInfra.InMemoryClient
 	slogLogger      *slogInfra.SlogLogger
@@ -52,7 +52,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 
 	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
 
-	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
+	s3Service := s3Infra.NewS3Service(&s3Infra.S3Config{
 		Endpoint:        os.Getenv("S3_ENDPOINT"),
 		AccessKeyID:     os.Getenv("S3_ACCESS_KEY"),
 		SecretAccessKey: os.Getenv("S3_SECRET_KEY"),
@@ -111,7 +111,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		Chunker:         chunker,
 		Embedding:       openRouter, // Using OpenRouter for embeddings
 		VectorDB:        vectorDB,
-		FileStorage:     minioInfraService,
+		FileStorage:     s3Service,
 		jweTokenService: jweTokenService,
 		inMemoryClient:  inMemoryClient,
 		Validator:       validator,

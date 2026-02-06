@@ -1,16 +1,101 @@
 package openrouter
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
-	openai "github.com/sashabaranov/go-openai"
 )
+
+// Consts
+const (
+	openRouterBaseURL = "https://openrouter.ai/api/v1"
+)
+
+// ----------------------------------------------------------------------
+// STRUCTS (Native implementation to replace go-openai)
+// ----------------------------------------------------------------------
+
+type ChatMessagePartType string
+
+const (
+	ChatMessagePartTypeText     ChatMessagePartType = "text"
+	ChatMessagePartTypeImageURL ChatMessagePartType = "image_url"
+)
+
+type ChatMessageImageURL struct {
+	URL string `json:"url,omitempty"`
+}
+
+type ChatMessagePart struct {
+	Type     ChatMessagePartType  `json:"type,omitempty"`
+	Text     string               `json:"text,omitempty"`
+	ImageURL *ChatMessageImageURL `json:"image_url,omitempty"`
+}
+
+type ChatCompletionMessage struct {
+	Role         string            `json:"role"`
+	Content      interface{}       `json:"content"` // string or []ChatMessagePart
+	MultiContent []ChatMessagePart `json:"-"`       // Helper to build content (not used in JSON marshaling directly, handled by logic)
+}
+
+type ResponseFormat struct {
+	Type       string                `json:"type,omitempty"` // "json_object" or "json_schema"
+	JSONSchema *ResponseFormatSchema `json:"json_schema,omitempty"`
+}
+
+type ResponseFormatSchema struct {
+	Name   string          `json:"name"`
+	Schema json.RawMessage `json:"schema"`
+	Strict bool            `json:"strict,omitempty"`
+}
+
+type ChatCompletionRequest struct {
+	Model          string                  `json:"model"`
+	Messages       []ChatCompletionMessage `json:"messages"`
+	Temperature    float32                 `json:"temperature,omitempty"`
+	Stream         bool                    `json:"stream,omitempty"`
+	ResponseFormat *ResponseFormat         `json:"response_format,omitempty"`
+}
+
+type ChatCompletionChoice struct {
+	Index        int                   `json:"index"`
+	Message      ChatCompletionMessage `json:"message"`
+	FinishReason string                `json:"finish_reason"`
+}
+
+type ChatCompletionResponse struct {
+	ID      string                 `json:"id"`
+	Object  string                 `json:"object"`
+	Created int64                  `json:"created"`
+	Model   string                 `json:"model"`
+	Choices []ChatCompletionChoice `json:"choices"`
+}
+
+type EmbeddingRequest struct {
+	Input interface{} `json:"input"` // string or []string
+	Model string      `json:"model"`
+}
+
+type EmbeddingData struct {
+	Object    string    `json:"object"`
+	Embedding []float64 `json:"embedding"` // OpenRouter usually returns float64
+	Index     int       `json:"index"`
+}
+
+type EmbeddingResponse struct {
+	Object string          `json:"object"`
+	Data   []EmbeddingData `json:"data"`
+	Model  string          `json:"model"`
+	Usage  interface{}     `json:"usage"`
+}
 
 var (
 	quizQuestionSchema = map[string]interface{}{
@@ -75,20 +160,61 @@ type Config struct {
 }
 
 type OpenRouterService struct {
-	client *openai.Client
+	httpClient *http.Client
 	Config
 }
 
 func NewOpenRouterService(config Config) *OpenRouterService {
-	openaiConfig := openai.DefaultConfig(config.ApiKey)
-	openaiConfig.BaseURL = "https://openrouter.ai/api/v1"
-
-	client := openai.NewClientWithConfig(openaiConfig)
-
 	return &OpenRouterService{
-		client: client,
-		Config: config,
+		httpClient: &http.Client{},
+		Config:     config,
 	}
+}
+
+// ----------------------------------------------------------------------
+// HELPER METHODS
+// ----------------------------------------------------------------------
+
+func (s *OpenRouterService) makeRequest(ctx context.Context, method, endpoint string, body interface{}, respDest interface{}) error {
+	var bodyReader io.Reader
+	if body != nil {
+		jsonData, err := json.Marshal(body)
+		if err != nil {
+			return fmt.Errorf("failed to marshal request body: %w", err)
+		}
+		bodyReader = bytes.NewBuffer(jsonData)
+	}
+
+	url := fmt.Sprintf("%s%s", openRouterBaseURL, endpoint)
+	req, err := http.NewRequestWithContext(ctx, method, url, bodyReader)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+s.ApiKey)
+	// OpenRouter specific headers (optional but good practice)
+	req.Header.Set("HTTP-Referer", "https://medaiist.com") // Replace with actual site if strictly needed
+	req.Header.Set("X-Title", "MedAIist Backend")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("http request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 400 {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("api error (status %d): %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	if respDest != nil {
+		if err := json.NewDecoder(resp.Body).Decode(respDest); err != nil {
+			return fmt.Errorf("failed to decode response: %w", err)
+		}
+	}
+
+	return nil
 }
 
 // ----------------------------------------------------------------------
@@ -96,80 +222,89 @@ func NewOpenRouterService(config Config) *OpenRouterService {
 // ----------------------------------------------------------------------
 
 func (s *OpenRouterService) SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
-	messages := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
+	apiMessages := make([]ChatCompletionMessage, 0, len(req.Messages))
 
 	for _, msg := range req.Messages {
 		if len(msg.ImageUrl) > 0 {
-			multiContent := []openai.ChatMessagePart{
-				{
-					Type: openai.ChatMessagePartTypeText,
-					Text: msg.Content,
-				},
+			parts := []ChatMessagePart{
+				{Type: ChatMessagePartTypeText, Text: msg.Content},
 			}
 			for _, url := range msg.ImageUrl {
-				multiContent = append(multiContent, openai.ChatMessagePart{
-					Type: openai.ChatMessagePartTypeImageURL,
-					ImageURL: &openai.ChatMessageImageURL{
-						URL: url,
-					},
+				parts = append(parts, ChatMessagePart{
+					Type:     ChatMessagePartTypeImageURL,
+					ImageURL: &ChatMessageImageURL{URL: url},
 				})
 			}
-			messages = append(messages, openai.ChatCompletionMessage{
-				Role:         string(msg.Role),
-				MultiContent: multiContent,
+			apiMessages = append(apiMessages, ChatCompletionMessage{
+				Role:    string(msg.Role),
+				Content: parts,
 			})
 		} else {
-			messages = append(messages, openai.ChatCompletionMessage{
+			apiMessages = append(apiMessages, ChatCompletionMessage{
 				Role:    string(msg.Role),
 				Content: msg.Content,
 			})
 		}
 	}
 
-	request := openai.ChatCompletionRequest{
+	apiReq := ChatCompletionRequest{
 		Model:    s.ChatModel,
-		Messages: messages,
+		Messages: apiMessages,
 		Stream:   req.Stream,
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
-		return nil, fmt.Errorf("chat request failed: %w", err)
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
+		return nil, err
 	}
-	if len(resp.Choices) == 0 {
+
+	if len(apiResp.Choices) == 0 {
 		return nil, fmt.Errorf("empty response")
 	}
 
+	content := ""
+	if str, ok := apiResp.Choices[0].Message.Content.(string); ok {
+		content = str
+	} else if parts, ok := apiResp.Choices[0].Message.Content.([]interface{}); ok {
+		for _, p := range parts {
+			if m, ok := p.(map[string]interface{}); ok {
+				if t, ok := m["text"].(string); ok {
+					content += t
+				}
+			}
+		}
+	}
+
 	return &domain.ChatResponse{
-		Text: resp.Choices[0].Message.Content,
+		Text: content,
 	}, nil
 }
 
 func (s *OpenRouterService) GenerateChatTitle(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error) {
-	messages := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
-
+	apiMessages := make([]ChatCompletionMessage, 0, len(req.Messages))
 	for _, msg := range req.Messages {
-		messages = append(messages, openai.ChatCompletionMessage{
+		apiMessages = append(apiMessages, ChatCompletionMessage{
 			Role:    string(msg.Role),
 			Content: msg.Content,
 		})
 	}
 
-	request := openai.ChatCompletionRequest{
+	apiReq := ChatCompletionRequest{
 		Model:    s.GenerateChatTitleModel,
-		Messages: messages,
+		Messages: apiMessages,
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return nil, fmt.Errorf("failed to generate title: %w", err)
 	}
-	if len(resp.Choices) == 0 {
+	if len(apiResp.Choices) == 0 {
 		return nil, fmt.Errorf("empty response")
 	}
 
+	content, _ := apiResp.Choices[0].Message.Content.(string)
 	return &domain.ChatResponse{
-		Text: resp.Choices[0].Message.Content,
+		Text: content,
 	}, nil
 }
 
@@ -178,29 +313,24 @@ func (s *OpenRouterService) GenerateChatTitle(ctx context.Context, req *domain.C
 // ----------------------------------------------------------------------
 
 func (s *OpenRouterService) CheckUserQuery(ctx context.Context, userContent string) (domain.QueryType, error) {
-	request := openai.ChatCompletionRequest{
+	apiReq := ChatCompletionRequest{
 		Model: s.CheckUserQueryModel,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: domain.QueryClassificationSystemPrompt,
-			},
-			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: userContent,
-			},
+		Messages: []ChatCompletionMessage{
+			{Role: "system", Content: domain.QueryClassificationSystemPrompt},
+			{Role: "user", Content: userContent},
 		},
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return domain.GeneralQuery, fmt.Errorf("classification failed: %w", err)
 	}
-	if len(resp.Choices) == 0 {
+	if len(apiResp.Choices) == 0 {
 		return domain.GeneralQuery, fmt.Errorf("empty response")
 	}
 
-	text := strings.TrimSpace(resp.Choices[0].Message.Content)
+	content, _ := apiResp.Choices[0].Message.Content.(string)
+	text := strings.TrimSpace(content)
 
 	switch text {
 	case "General":
@@ -210,39 +340,32 @@ func (s *OpenRouterService) CheckUserQuery(ctx context.Context, userContent stri
 	case "PDFSearch":
 		return domain.PdfSearchQuery, nil
 	default:
-		return domain.GeneralQuery, nil // Default fallback
+		return domain.GeneralQuery, nil
 	}
 }
 
 func (s *OpenRouterService) ExpandQuery(ctx context.Context, content string) ([]string, error) {
-	request := openai.ChatCompletionRequest{
+	apiReq := ChatCompletionRequest{
 		Model: s.ExpandQuestionModel,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: domain.QueryExpansionSystemPrompt,
-			},
-			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: content,
-			},
+		Messages: []ChatCompletionMessage{
+			{Role: "system", Content: domain.QueryExpansionSystemPrompt},
+			{Role: "user", Content: content},
 		},
-		ResponseFormat: &openai.ChatCompletionResponseFormat{
-			Type: openai.ChatCompletionResponseFormatTypeJSONObject,
-		},
+		ResponseFormat: &ResponseFormat{Type: "json_object"},
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return nil, fmt.Errorf("expand query failed: %w", err)
 	}
-	if len(resp.Choices) == 0 {
+	if len(apiResp.Choices) == 0 {
 		return nil, fmt.Errorf("empty response")
 	}
 
+	respContent, _ := apiResp.Choices[0].Message.Content.(string)
+
 	var parsed domain.QueryExpansionResponse
-	if err := json.Unmarshal([]byte(resp.Choices[0].Message.Content), &parsed); err != nil {
-		// Fallback if not valid JSON
+	if err := json.Unmarshal([]byte(respContent), &parsed); err != nil {
 		return []string{content}, nil
 	}
 
@@ -281,21 +404,21 @@ Kısıtlamalar:
 		return nil, fmt.Errorf("failed to marshal schema: %w", err)
 	}
 
-	request := openai.ChatCompletionRequest{
+	apiReq := ChatCompletionRequest{
 		Model: s.GenerateQuestionModel,
-		Messages: []openai.ChatCompletionMessage{
+		Messages: []ChatCompletionMessage{
 			{
-				Role:    openai.ChatMessageRoleSystem,
+				Role:    "system",
 				Content: "Sen uzman bir YKS soru hazırlayıcısısın. TYT ve AYT müfredatına uygun, ölçücü ve öğretici sorular hazırlarsın. Sadece verilen şemaya uygun JSON formatında çıktı verirsin.",
 			},
 			{
-				Role:    openai.ChatMessageRoleUser,
+				Role:    "user",
 				Content: prompt,
 			},
 		},
-		ResponseFormat: &openai.ChatCompletionResponseFormat{
-			Type: openai.ChatCompletionResponseFormatTypeJSONSchema,
-			JSONSchema: &openai.ChatCompletionResponseFormatJSONSchema{
+		ResponseFormat: &ResponseFormat{
+			Type: "json_schema",
+			JSONSchema: &ResponseFormatSchema{
 				Name:   "quiz_question",
 				Schema: json.RawMessage(schemaJSON),
 				Strict: true,
@@ -304,15 +427,16 @@ Kısıtlamalar:
 		Temperature: 0,
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return nil, fmt.Errorf("quiz generation failed: %w", err)
 	}
-	if len(resp.Choices) == 0 {
+	if len(apiResp.Choices) == 0 {
 		return nil, fmt.Errorf("empty quiz response")
 	}
 
-	content := strings.TrimSpace(resp.Choices[0].Message.Content)
+	respContent, _ := apiResp.Choices[0].Message.Content.(string)
+	content := strings.TrimSpace(respContent)
 
 	var question domain.QuizQuestion
 	if err := json.Unmarshal([]byte(content), &question); err != nil {
@@ -323,11 +447,9 @@ Kısıtlamalar:
 	if question.QuestionText == "" {
 		return nil, fmt.Errorf("question text is empty")
 	}
-
 	if len(question.Options) != 5 {
 		return nil, fmt.Errorf("options count incorrect: %d", len(question.Options))
 	}
-
 	correctCount := 0
 	for _, o := range question.Options {
 		if o.IsCorrect {
@@ -335,7 +457,6 @@ Kısıtlamalar:
 			correctCount++
 		}
 	}
-
 	if correctCount != 1 {
 		return nil, fmt.Errorf("expected exactly 1 correct option, got %d", correctCount)
 	}
@@ -344,7 +465,7 @@ Kısıtlamalar:
 }
 
 // ----------------------------------------------------------------------
-// VISION & REASONING (Formerly Gemini & OpenAI reasoning)
+// VISION & REASONING
 // ----------------------------------------------------------------------
 
 func (s *OpenRouterService) ExtractTextFromImage(ctx context.Context, imageBase64 string) (string, error) {
@@ -352,36 +473,28 @@ func (s *OpenRouterService) ExtractTextFromImage(ctx context.Context, imageBase6
 		imageBase64 = "data:image/jpeg;base64," + imageBase64
 	}
 
-	request := openai.ChatCompletionRequest{
+	parts := []ChatMessagePart{
+		{Type: ChatMessagePartTypeText, Text: "Sen bir OCR motorusun. Resimdeki sorudaki metinleri ve çizimleri çıkar. Sakın soruyu çözme. Sadece text çıktısı ver."},
+		{Type: ChatMessagePartTypeImageURL, ImageURL: &ChatMessageImageURL{URL: imageBase64}},
+	}
+
+	apiReq := ChatCompletionRequest{
 		Model: s.VisionModel,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role: openai.ChatMessageRoleUser,
-				MultiContent: []openai.ChatMessagePart{
-					{
-						Type: openai.ChatMessagePartTypeText,
-						Text: "Sen bir OCR motorusun. Resimdeki sorudaki metinleri ve çizimleri çıkar. Sakın soruyu çözme. Sadece text çıktısı ver.",
-					},
-					{
-						Type: openai.ChatMessagePartTypeImageURL,
-						ImageURL: &openai.ChatMessageImageURL{
-							URL: imageBase64,
-						},
-					},
-				},
-			},
+		Messages: []ChatCompletionMessage{
+			{Role: "user", Content: parts},
 		},
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return "", fmt.Errorf("ocr/vision request failed: %w", err)
 	}
-	if len(resp.Choices) == 0 {
+	if len(apiResp.Choices) == 0 {
 		return "", fmt.Errorf("empty ocr response")
 	}
 
-	return resp.Choices[0].Message.Content, nil
+	content, _ := apiResp.Choices[0].Message.Content.(string)
+	return content, nil
 }
 
 func (s *OpenRouterService) SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error) {
@@ -399,47 +512,46 @@ Yönergeler:
 6. Türkçe yanıtla.
 `, questionText)
 
-	request := openai.ChatCompletionRequest{
+	apiReq := ChatCompletionRequest{
 		Model: s.ReasoningModel,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: prompt,
-			},
+		Messages: []ChatCompletionMessage{
+			{Role: "user", Content: prompt},
 		},
 	}
 
-	resp, err := s.client.CreateChatCompletion(ctx, request)
-	if err != nil {
+	var apiResp ChatCompletionResponse
+	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return "", fmt.Errorf("reasoning/solving failed: %w", err)
 	}
-	if len(resp.Choices) == 0 {
+	if len(apiResp.Choices) == 0 {
 		return "", fmt.Errorf("empty reasoning response")
 	}
 
-	return resp.Choices[0].Message.Content, nil
+	content, _ := apiResp.Choices[0].Message.Content.(string)
+	return content, nil
 }
 
 // ----------------------------------------------------------------------
-// EMBEDDING (Implementing EmbeddingService interface directly here)
+// EMBEDDING
 // ----------------------------------------------------------------------
 
 func (s *OpenRouterService) GenerateEmbedding(ctx context.Context, req *message.EmbeddingRequest) (*message.EmbeddingResponse, error) {
-	embeddingReq := openai.EmbeddingRequest{
+	apiReq := EmbeddingRequest{
 		Input: req.Text,
-		Model: openai.EmbeddingModel(s.EmbeddingModel),
+		Model: s.EmbeddingModel,
 	}
 
-	resp, err := s.client.CreateEmbeddings(ctx, embeddingReq)
-	if err != nil {
+	var apiResp EmbeddingResponse
+	if err := s.makeRequest(ctx, "POST", "/embeddings", apiReq, &apiResp); err != nil {
 		return nil, fmt.Errorf("failed to create embedding: %w", err)
 	}
 
-	if len(resp.Data) == 0 {
+	if len(apiResp.Data) == 0 {
 		return nil, fmt.Errorf("no embedding data received")
 	}
 
-	src := resp.Data[0].Embedding
+	// Assuming float64 -> float32 conversion needed
+	src := apiResp.Data[0].Embedding
 	vector := make([]float32, len(src))
 	for i, v := range src {
 		vector[i] = float32(v)
@@ -450,44 +562,25 @@ func (s *OpenRouterService) GenerateEmbedding(ctx context.Context, req *message.
 	}, nil
 }
 
-// RerankChunks - This is NOT implemented by OpenRouter (Provider agnostic).
-// User should still use Jina or similar for reranking.
-// Since AIService interface requires it, we might need to compose this service with Jina
-// or implement a dummy pass-through if we wanted to move EVERYTHING here, but strict SOLID
-// suggests keeping specialized services separate.
-// However, the previous MultiModelService implemented AIService by composition.
-// OpenRouterService will implement `AIService` methods *except* RerankChunks
-// if we use composition in `dependency_containers.go`.
-// BUT, if we want OpenRouterService to be the standalone AIService, we can't unless it handles rerank.
-// So, we will likely keep the Composition pattern in `dependency_containers.go`.
-// For the sake of the interface satisfaction in `openrouter` package, we don't strictly need RerankChunks
-// if we don't claim `OpenRouterService` implements the FULL `AIService` by itself,
-
 func (s *OpenRouterService) GenerateEmbeddingBatch(ctx context.Context, req *file.EmbeddingBatchRequest) (*file.EmbeddingResponse, error) {
-
-	// --- 1) []Text → []string conversion ---
+	// []Text -> []string
 	inputs := make([]string, len(req.Texts))
 	for i, t := range req.Texts {
 		inputs[i] = t.Text
 	}
 
-	embeddingReq := openai.EmbeddingRequestStrings{
+	apiReq := EmbeddingRequest{
 		Input: inputs,
-		Model: openai.EmbeddingModel(s.EmbeddingModel),
+		Model: s.EmbeddingModel,
 	}
 
-	// --- 2) OpenAI call ---
-	resp, err := s.client.CreateEmbeddings(ctx, embeddingReq)
-	if err != nil {
+	var apiResp EmbeddingResponse
+	if err := s.makeRequest(ctx, "POST", "/embeddings", apiReq, &apiResp); err != nil {
 		return nil, fmt.Errorf("failed to create embeddings: %w", err)
 	}
 
-	// --- 3) Response mapping ---
-	results := make([]file.Embedding, len(resp.Data))
-
-	for i, data := range resp.Data {
-
-		// float64 → float32 conversion
+	results := make([]file.Embedding, len(apiResp.Data))
+	for i, data := range apiResp.Data {
 		vector := make([]float32, len(data.Embedding))
 		for j, v := range data.Embedding {
 			vector[j] = float32(v)
@@ -497,11 +590,14 @@ func (s *OpenRouterService) GenerateEmbeddingBatch(ctx context.Context, req *fil
 			Id:          req.Texts[i].Id,
 			Text:        req.Texts[i].Text,
 			Vector:      vector,
-			PageNumbers: []int{}, // if page exists, fill here
+			PageNumbers: []int{},
 		}
 	}
 
-	// --- 4) Final response ---
+	if len(results) == 0 {
+		return nil, fmt.Errorf("empty embedding results")
+	}
+
 	return &file.EmbeddingResponse{
 		Results:   results,
 		Dimension: len(results[0].Vector),

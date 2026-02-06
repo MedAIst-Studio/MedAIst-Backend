@@ -156,14 +156,15 @@ func (q *QdrantVectorDB) SearchByEmbedding(
 	fileId uuid.UUID,
 	embedding []float32,
 ) ([]string, error) {
-	searchRequest := &qdrant.SearchPoints{
+	limit := uint64(q.Config.ChunkLimit)
+	queryRequest := &qdrant.QueryPoints{
 		CollectionName: q.Config.CollectionName,
-		Vector:         embedding,
-		Limit:          q.Config.ChunkLimit,
-		ScoreThreshold: &q.Config.MinScore,
+		Query:          qdrant.NewQuery(embedding...),
+		Limit:          &limit,
 		WithPayload: &qdrant.WithPayloadSelector{
 			SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true},
 		},
+		ScoreThreshold: &q.Config.MinScore,
 		Filter: &qdrant.Filter{
 			Must: []*qdrant.Condition{
 				{
@@ -183,17 +184,17 @@ func (q *QdrantVectorDB) SearchByEmbedding(
 	}
 
 	// Qdrant sorgusunu çalıştır
-	searchResult, err := q.client.Search(ctx, searchRequest)
+	points, err := q.client.Query(ctx, queryRequest)
 	if err != nil {
 		return nil, fmt.Errorf("vector search failed: %w", err)
 	}
 
-	if len(searchResult.Result) == 0 {
+	if len(points) == 0 {
 		return nil, domain.ErrInfoNotFoundInPDF
 	}
 
 	var texts []string
-	for _, point := range searchResult.Result {
+	for _, point := range points {
 		if point.Payload == nil {
 			continue
 		}
@@ -203,12 +204,12 @@ func (q *QdrantVectorDB) SearchByEmbedding(
 			continue
 		}
 
-		text := val.GetStringValue()
-		if text == "" {
-			continue
+		if textVal, ok := val.GetKind().(*qdrant.Value_StringValue); ok {
+			text := textVal.StringValue
+			if text != "" {
+				texts = append(texts, text)
+			}
 		}
-
-		texts = append(texts, text)
 	}
 
 	if len(texts) == 0 {
@@ -307,13 +308,12 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 	allChunks := make([]string, 0, limit*2) // Capacity hint
 	var nextPageOffset *qdrant.PointId
 
-	// Pagination ile chunk'ları al
-	// Not: Random seçim için hepsini almamız gerekiyor
+	// Pagination loop
 	for {
-		scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
+		points, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
 			CollectionName: q.CollectionName,
 			Filter:         filter,
-			Limit:          pointerUint32(1000),
+			Limit:          pointerUint32(100), // Fetch 100 at a time
 			Offset:         nextPageOffset,
 			WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
 		})
@@ -321,8 +321,11 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 			return nil, fmt.Errorf("failed to scroll points: %w", err)
 		}
 
-		// Chunk'ları topla
-		for _, point := range scrollResp.Result {
+		if len(points) == 0 {
+			break
+		}
+
+		for _, point := range points {
 			if text, ok := point.Payload["text"]; ok {
 				if textVal, ok := text.GetKind().(*qdrant.Value_StringValue); ok {
 					allChunks = append(allChunks, textVal.StringValue)
@@ -330,11 +333,8 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 			}
 		}
 
-		// Eğer NextPageOffset nil ise, tüm sayfalar alındı
-		if scrollResp.NextPageOffset == nil {
-			break
-		}
-		nextPageOffset = scrollResp.NextPageOffset
+		// Use last point's ID as offset for next page
+		nextPageOffset = points[len(points)-1].Id
 	}
 
 	// Limit'ten az veya eşitse hepsini döndür
@@ -384,12 +384,12 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 	matchingChunks := make([]string, 0)
 	var nextPageOffset *qdrant.PointId
 
-	// Pagination ile tüm chunk'ları al ve filtrele
+	// Pagination loop
 	for {
-		scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
+		points, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
 			CollectionName: q.CollectionName,
 			Filter:         filter,
-			Limit:          pointerUint32(1000),
+			Limit:          pointerUint32(100),
 			Offset:         nextPageOffset,
 			WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
 		})
@@ -397,8 +397,11 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 			return nil, fmt.Errorf("failed to scroll points by pages: %w", err)
 		}
 
-		// Sadece istenen sayfalardaki chunk'ları filtrele
-		for _, point := range scrollResp.Result {
+		if len(points) == 0 {
+			break
+		}
+
+		for _, point := range points {
 			if pageNumbers, ok := point.Payload["page_numbers"]; ok {
 				if listVal, ok := pageNumbers.GetKind().(*qdrant.Value_ListValue); ok {
 					hasMatchingPage := false
@@ -431,11 +434,8 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 			}
 		}
 
-		// Tüm sayfalar alındı mı?
-		if scrollResp.NextPageOffset == nil {
-			break
-		}
-		nextPageOffset = scrollResp.NextPageOffset
+		// Use last point's ID as offset for next page
+		nextPageOffset = points[len(points)-1].Id
 	}
 
 	fmt.Println("Total chunks found:", len(matchingChunks))
