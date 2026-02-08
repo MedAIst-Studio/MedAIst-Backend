@@ -28,7 +28,6 @@ const (
 
 KRİTİK KURALLAR:
 1. **Cevap Kontrolü:**
-   - ÖNCE verilen Bağlamı dikkatlice ara.
    - Eğer Bağlam içinde soruyla ilgili HERHANGİ bir bilgi varsa, mutlaka kullan.
    - SADECE ve SADECE bağlamda HİÇBİR bilgi yoksa "Yüklediğiniz dokümanda bu bilgi yer almamaktadır" de.
 2. **Cevap Oluşturma:**
@@ -39,9 +38,7 @@ KRİTİK KURALLAR:
 3. **Dil:**
    - Türkçe cevapla.
 4. **Önemli:**
-   - Kısmi bilgi varsa bile kullan.
    - Konuyla dolaylı ilgili bilgi varsa ekle.
-   - Çok katı olma, öğrenciye yardımcı olmaya çalış (dokümandan sapmadan).
 `
 
 	QueryClassificationSystemPrompt = `Kullanıcının sorgusunu tam olarak aşağıdaki kategorilerden birine sınıflandır.
@@ -49,19 +46,7 @@ Sadece tek bir kelime döndür: PDFSearch, Clarification veya General.
 
 Kuralları sırasıyla uygula:
 
-1. PDFSearch
-   Eğer aşağıdakilerden HERHANGİ biri geçerliyse PDFSearch olarak sınıflandır:
-     - Kullanıcı doküman/kitap içinde olabilecek bir bilgi soruyorsa.
-       (Örnekler: "X nedir", "Y'yi açıkla", "Z hakkında bilgi ver", "A bölümünü özetle")
-     - Sorgu bir konu, tanım, açıklama veya bilgi içeriyorsa.
-     - Sorgu dersle ilgiliyse (Matematik, Fizik, Türkçe, Tarih vb.).
-     - Emin değilsen (Varsayılan olarak PDFSearch seç).
-   Örnekler:
-     "Türev alma kuralları nelerdir?"
-     "Paragraf taktikleri ver"
-     "Osmanlı duraklama dönemi nedenleri"
-
-2. Clarification
+1. Clarification
    SADECE şu durumlarda Clarification seç:
      - Sorgu açıkça önceki cevabına veya kullanıcının önceki sorusuna atıfta bulunuyorsa.
      - Kullanıcı daha fazla detay, basitleştirme veya açıklama istiyorsa.
@@ -71,7 +56,7 @@ Kuralları sırasıyla uygula:
      "Son kısmı açar mısın?"
      "Devam et"
 
-3. General
+2. General
    SADECE şu durumlarda General seç:
      - Kullanıcı selamlaşma, sohbet veya ders dışı kişisel sorular soruyorsa.
    Örnekler:

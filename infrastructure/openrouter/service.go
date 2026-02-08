@@ -389,7 +389,8 @@ Kurallar:
 - Zorluk: Orta veya zor seviye (Öğrenciyi düşündüren).
 - Uzunluk: Gereksiz uzun olmasın, net ve anlaşılır olsun.
 - Şıklar: Tam 5 şık (A-E).
-- Çeldiriciler: Mantıklı ve güçlü çeldiriciler kullan.
+- Tutarlılık: Şıkların HEPSİ soru köküyle ve metinle doğrudan ilgili olmalı. Alakasız veya saçma şıklar yazma.
+- Çeldiriciler: Güçlü ve mantıklı çeldiriciler kullan. Soru bağlamından kopuk olmamalılar.
 - Tek Doğru: Sadece bir şık isCorrect: true olsun.
 - Çıktı: SADECE JSON formatında yanıt ver.
 
@@ -498,7 +499,7 @@ func (s *OpenRouterService) ExtractTextFromImage(ctx context.Context, imageBase6
 }
 
 func (s *OpenRouterService) SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error) {
-	prompt := fmt.Sprintf(`Sen uzman bir YKS öğretmenisin (Matematik, Fen, Türkçe, Sosyal). Öğrencinin sorduğu soruyu adım adım, anlaşılır ve açıklayıcı bir şekilde çöz.
+	prompt := fmt.Sprintf(`Sen uzman bir YKS öğretmenisin. Öğrencinin sorduğu soruyu adım adım, anlaşılır ve açıklayıcı bir şekilde çöz.
 
 Soru:
 %s
@@ -506,10 +507,8 @@ Soru:
 Yönergeler:
 1. Soruyu dikkatlice analiz et ve hangi konudan olduğunu belirle.
 2. Çözüm adımlarını mantıksal bir sırayla yaz (işlem önceliği, formüller, mantık yürütme).
-3. Varsa şıkları (A-E) değerlendir, neden doğru veya yanlış olduklarını açıkla.
-4. Sonucu net bir şekilde belirt.
-5. Samimi, eğitici ve teşvik edici bir dil kullan (Öğrenciye hitap et).
-6. Türkçe yanıtla.
+3. Sonucu net bir şekilde belirt.
+4. Türkçe yanıtla.
 `, questionText)
 
 	apiReq := ChatCompletionRequest{
@@ -550,7 +549,6 @@ func (s *OpenRouterService) GenerateEmbedding(ctx context.Context, req *message.
 		return nil, fmt.Errorf("no embedding data received")
 	}
 
-	// Assuming float64 -> float32 conversion needed
 	src := apiResp.Data[0].Embedding
 	vector := make([]float32, len(src))
 	for i, v := range src {

@@ -367,9 +367,6 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 		return []string{}, nil
 	}
 
-	fmt.Println("Pages length:", len(pageRange))
-	fmt.Println("Page numbers:", pageRange)
-
 	filter := &qdrant.Filter{
 		Must: []*qdrant.Condition{
 			{
@@ -398,6 +395,7 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 
 	// Pagination loop
 	for {
+		fmt.Printf("Scrolling... Offset: %v\n", nextPageOffset)
 		points, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
 			CollectionName: q.CollectionName,
 			Filter:         filter,
@@ -408,6 +406,8 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 		if err != nil {
 			return nil, fmt.Errorf("failed to scroll points by pages: %w", err)
 		}
+
+		fmt.Printf("Scroll returned %d points\n", len(points))
 
 		if len(points) == 0 {
 			break
@@ -447,7 +447,12 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 		}
 
 		// Use last point's ID as offset for next page
-		nextPageOffset = points[len(points)-1].Id
+		lastPoint := points[len(points)-1]
+		if nextPageOffset != nil && lastPoint.Id.String() == nextPageOffset.String() {
+			fmt.Println("Warning: Next page offset is same as current, breaking loop to prevent infinite loop")
+			break
+		}
+		nextPageOffset = lastPoint.Id
 	}
 
 	fmt.Println("Total chunks found:", len(matchingChunks))

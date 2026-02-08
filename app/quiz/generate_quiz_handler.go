@@ -2,7 +2,6 @@ package quiz
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
@@ -65,7 +64,6 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 	}
 
 	if len(pageRange) > 0 {
-		fmt.Println("has page range")
 		if len(pageRange) != 2 {
 			return nil, 400, domain.ErrInvalidRequest
 		}
@@ -81,8 +79,6 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 	if len(chunks) == 0 {
 		return nil, 400, domain.ErrNoContentToGenerateQuiz
 	}
-	fmt.Println("chunks count:", len(chunks))
-	fmt.Println("chunks:", chunks)
 
 	var wg sync.WaitGroup
 
@@ -119,8 +115,6 @@ func (h *GenerateQuizHandler) Handle(ctx context.Context, req *GenerateQuizReque
 		quiz.AddQuestion(result.question)
 	}
 
-	fmt.Println(quiz.Id)
-	fmt.Println(quiz.Title)
 	err = h.repository.SaveQuiz(ctx, quiz)
 	if err != nil {
 		return nil, 500, err
