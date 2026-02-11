@@ -66,6 +66,8 @@ package fiber
 import (
 	"net/http"
 
+	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/oauth"
+
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
@@ -110,6 +112,13 @@ func SetupRoutes(app *fiber.App) {
 
 	googleOAuthService := NewGoogleOAuthService(dc)
 	facebookOAuthService := NewFacebookOAuthService(dc)
+
+	oauthService := oauth.NewOAuthService(dc.Repo, dc.jweTokenService)
+	verifiers := map[string]oauth.TokenVerifier{
+		"google":   oauth.NewGoogleVerifier(),
+		"facebook": oauth.NewFacebookVerifier(),
+	}
+	mobileOAuthHandler := oauth.NewMobileOAuthHandler(oauthService, verifiers, dc.slogLogger)
 
 	logoutHandler := auth.NewLogoutHandler(dc.Repo)
 	refreshTokenHandler := auth.NewRefreshTokenHandler(dc.Repo, dc.jweTokenService)
@@ -166,6 +175,8 @@ func SetupRoutes(app *fiber.App) {
 
 	app.Get("/api/auth/google/callback", googleOAuthService.Callback)
 	app.Get("/api/auth/facebook/callback", facebookOAuthService.Callback)
+
+	app.Post("/api/auth/oauth/mobile", mobileOAuthHandler.Handle)
 
 	usersPublicApp := app.Group("/users")
 	usersPublicApp.Post("/forgot-password", Handle(forgotPasswordHandler, sl))

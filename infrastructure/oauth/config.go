@@ -21,7 +21,8 @@ type OAuthDependenciesConfig struct {
 
 type OAuthProvider struct {
 	OAuthDependenciesConfig
-	config *oauth2.Config
+	config  *oauth2.Config
+	Service *OAuthService
 }
 
 func NewOAuthProvider(cfg *OAuthDependenciesConfig, endpoint oauth2.Endpoint, scopes []string) *OAuthProvider {
@@ -34,5 +35,6 @@ func NewOAuthProvider(cfg *OAuthDependenciesConfig, endpoint oauth2.Endpoint, sc
 			Endpoint:     endpoint,
 			Scopes:       scopes,
 		},
+		Service: NewOAuthService(cfg.Repository, cfg.TokenService),
 	}
 }
