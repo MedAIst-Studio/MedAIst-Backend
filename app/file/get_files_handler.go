@@ -17,6 +17,7 @@ type File struct {
 	Id        uuid.UUID `json:"id"`
 	Title     string    `json:"title"`
 	Size      int64     `json:"size"`
+	Url       string    `json:"url"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

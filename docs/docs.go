@@ -1353,6 +1353,9 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                },
+                "url": {
+                    "type": "string"
                 }
             }
         },

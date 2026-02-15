@@ -19,7 +19,7 @@ func (r *Repository) SaveFileInformation(ctx context.Context, file *domain.File)
 }
 
 func (r *Repository) GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]file.File, error) {
-	query := `SELECT id, title, size,  created_at FROM files WHERE user_id = $1`
+	query := `SELECT id, title, size, path, created_at FROM files WHERE user_id = $1`
 	rows, err := r.db.QueryContext(ctx, query, userId)
 	if err != nil {
 		return nil, domain.ErrInternalServer
@@ -29,9 +29,11 @@ func (r *Repository) GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]
 	var files []file.File
 	for rows.Next() {
 		var f file.File
-		if err := rows.Scan(&f.Id, &f.Title, &f.Size, &f.CreatedAt); err != nil {
+		var path string
+		if err := rows.Scan(&f.Id, &f.Title, &f.Size, &path, &f.CreatedAt); err != nil {
 			return nil, domain.ErrInternalServer
 		}
+		f.Url = path
 		files = append(files, f)
 	}
 	return files, nil
