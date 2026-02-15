@@ -1,7 +1,7 @@
 definitions:
-  admin.GetUsersRequest:
+  app_admin.GetUsersRequest:
     type: object
-  admin.UserInfo:
+  app_admin.UserInfo:
     properties:
       email:
         type: string
@@ -10,19 +10,19 @@ definitions:
       username:
         type: string
     type: object
-  auth.ExchangeRequest:
+  app_auth.ExchangeRequest:
     properties:
       session:
         type: string
     type: object
-  auth.ExchangeResponse:
+  app_auth.ExchangeResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
     type: object
-  auth.LoginRequest:
+  app_auth.LoginRequest:
     properties:
       email:
         type: string
@@ -32,24 +32,24 @@ definitions:
     - email
     - password
     type: object
-  auth.LoginResponse:
+  app_auth.LoginResponse:
     properties:
       accessToken:
         type: string
       refreshToken:
         type: string
     type: object
-  auth.RefreshTokenRequest:
+  app_auth.RefreshTokenRequest:
     properties:
       refresh_token:
         type: string
     type: object
-  auth.RefreshTokenResponse:
+  app_auth.RefreshTokenResponse:
     properties:
       access_token:
         type: string
     type: object
-  auth.SignupRequest:
+  app_auth.SignupRequest:
     properties:
       email:
         type: string
@@ -62,9 +62,9 @@ definitions:
     - password
     - username
     type: object
-  auth.SignupResponse:
+  app_auth.SignupResponse:
     type: object
-  chat.Chat:
+  app_chat.Chat:
     properties:
       created_at:
         type: string
@@ -73,7 +73,7 @@ definitions:
       title:
         type: string
     type: object
-  chat.Message:
+  app_chat.Message:
     properties:
       attachments:
         items:
@@ -87,6 +87,296 @@ definitions:
         type: boolean
       timestamp:
         type: string
+    type: object
+  app_file.File:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      size:
+        type: integer
+      title:
+        type: string
+    type: object
+  app_file.UploadFileRequest:
+    properties:
+      file_data:
+        $ref: '#/definitions/multipart.FileHeader'
+      file_title:
+        type: string
+    type: object
+  app_file.UploadFileResponse:
+    properties:
+      url:
+        type: string
+    type: object
+  app_message.SendMessageRequest:
+    properties:
+      chat_id:
+        type: string
+      content:
+        minLength: 1
+        type: string
+      image_url:
+        type: string
+      pdf_id:
+        type: string
+    required:
+    - content
+    type: object
+  app_message.SendMessageResponse:
+    properties:
+      ai_message_id:
+        type: string
+      ai_response:
+        type: string
+      chat_id:
+        type: string
+      title:
+        type: string
+      user_message_id:
+        type: string
+    type: object
+  app_quiz.Answer:
+    properties:
+      question_no:
+        minimum: 1
+        type: integer
+      selected_option:
+        enum:
+        - A
+        - B
+        - C
+        - D
+        - E
+        type: string
+    required:
+    - question_no
+    - selected_option
+    type: object
+  app_quiz.AnswerFeedback:
+    properties:
+      correct_option:
+        type: string
+      explanation:
+        description: Doğru cevap açıklaması
+        type: string
+      is_correct:
+        type: boolean
+      question_no:
+        type: integer
+      selected_option:
+        type: string
+    type: object
+  app_quiz.AttemptAnswerDetail:
+    properties:
+      correct_option:
+        type: string
+      explanation:
+        type: string
+      is_correct:
+        type: boolean
+      question_no:
+        type: integer
+      question_text:
+        type: string
+      selected_option:
+        type: string
+    type: object
+  app_quiz.GenerateQuizRequest:
+    properties:
+      endPage:
+        type: integer
+      fileId:
+        type: string
+      quizName:
+        type: string
+      startPage:
+        type: integer
+    required:
+    - fileId
+    - quizName
+    type: object
+  app_quiz.GenerateQuizResponse:
+    properties:
+      quizId:
+        type: string
+    type: object
+  app_quiz.GetAttemptByIdResponse:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/app_quiz.AttemptAnswerDetail'
+        type: array
+      completed_at:
+        type: string
+      id:
+        type: string
+      percentage:
+        type: number
+      quiz_id:
+        type: string
+      quiz_title:
+        type: string
+      score:
+        type: integer
+      total_questions:
+        type: integer
+    type: object
+  app_quiz.GetQuizAttemptsResponse:
+    properties:
+      attempts:
+        items:
+          $ref: '#/definitions/app_quiz.QuizAttemptDetail'
+        type: array
+      total_count:
+        type: integer
+    type: object
+  app_quiz.GetQuizByIdResponse:
+    properties:
+      id:
+        type: string
+      questions:
+        items:
+          $ref: '#/definitions/app_quiz.Question'
+        type: array
+      title:
+        type: string
+    type: object
+  app_quiz.Option:
+    properties:
+      label:
+        type: string
+      text:
+        type: string
+    type: object
+  app_quiz.Question:
+    properties:
+      correct_option:
+        type: string
+      explanation:
+        type: string
+      "no":
+        type: integer
+      options:
+        items:
+          $ref: '#/definitions/app_quiz.Option'
+        type: array
+      text:
+        type: string
+    type: object
+  app_quiz.QuizAttemptDetail:
+    properties:
+      completed_at:
+        type: string
+      id:
+        type: string
+      percentage:
+        type: number
+      quiz_id:
+        type: string
+      quiz_title:
+        type: string
+      score:
+        type: integer
+      total_questions:
+        type: integer
+    type: object
+  app_quiz.QuizSummary:
+    properties:
+      createdAt:
+        type: string
+      quizId:
+        type: string
+      title:
+        type: string
+    type: object
+  app_quiz.SolveQuizRequest:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/app_quiz.Answer'
+        type: array
+      id:
+        type: string
+    required:
+    - answers
+    - id
+    type: object
+  app_quiz.SolveQuizResponse:
+    properties:
+      answers:
+        description: Detaylı cevap bilgisi
+        items:
+          $ref: '#/definitions/app_quiz.AnswerFeedback'
+        type: array
+      attempt_id:
+        type: string
+      percentage:
+        type: number
+      score:
+        type: integer
+      total_questions:
+        type: integer
+    type: object
+  app_user.ChangePasswordRequest:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  app_user.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  app_user.GetCurrentUserResponse:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      isEmailVerified:
+        type: boolean
+      username:
+        type: string
+    type: object
+  app_user.ResetPasswordRequest:
+    properties:
+      password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - password
+    - token
+    type: object
+  app_user.UpdateUsernameRequest:
+    properties:
+      address:
+        type: string
+      username:
+        type: string
+    required:
+    - address
+    - username
+    type: object
+  app_user.VerifiyEmailRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
     type: object
   domain.Attachment:
     properties:
@@ -111,54 +401,22 @@ definitions:
       title:
         type: string
     type: object
-  file.File:
+  infrastructure_oauth.MobileLoginRequest:
     properties:
-      created_at:
+      accessToken:
+        description: For Facebook
         type: string
-      id:
+      idToken:
+        description: For Google
         type: string
-      size:
-        type: integer
-      title:
+      provider:
         type: string
     type: object
-  file.UploadFileRequest:
+  infrastructure_oauth.OAuthTokens:
     properties:
-      file_data:
-        $ref: '#/definitions/multipart.FileHeader'
-      file_title:
+      access_token:
         type: string
-    type: object
-  file.UploadFileResponse:
-    properties:
-      url:
-        type: string
-    type: object
-  message.SendMessageRequest:
-    properties:
-      chat_id:
-        type: string
-      content:
-        minLength: 1
-        type: string
-      image_url:
-        type: string
-      pdf_id:
-        type: string
-    required:
-    - content
-    type: object
-  message.SendMessageResponse:
-    properties:
-      ai_message_id:
-        type: string
-      ai_response:
-        type: string
-      chat_id:
-        type: string
-      title:
-        type: string
-      user_message_id:
+      refresh_token:
         type: string
     type: object
   multipart.FileHeader:
@@ -171,251 +429,11 @@ definitions:
         format: int64
         type: integer
     type: object
-  quiz.Answer:
-    properties:
-      question_no:
-        minimum: 1
-        type: integer
-      selected_option:
-        enum:
-        - A
-        - B
-        - C
-        - D
-        - E
-        type: string
-    required:
-    - question_no
-    - selected_option
-    type: object
-  quiz.AnswerFeedback:
-    properties:
-      correct_option:
-        type: string
-      explanation:
-        description: Doğru cevap açıklaması
-        type: string
-      is_correct:
-        type: boolean
-      question_no:
-        type: integer
-      selected_option:
-        type: string
-    type: object
-  quiz.AttemptAnswerDetail:
-    properties:
-      correct_option:
-        type: string
-      explanation:
-        type: string
-      is_correct:
-        type: boolean
-      question_no:
-        type: integer
-      question_text:
-        type: string
-      selected_option:
-        type: string
-    type: object
-  quiz.GenerateQuizRequest:
-    properties:
-      endPage:
-        type: integer
-      fileId:
-        type: string
-      quizName:
-        type: string
-      startPage:
-        type: integer
-    required:
-    - fileId
-    - quizName
-    type: object
-  quiz.GenerateQuizResponse:
-    properties:
-      quizId:
-        type: string
-    type: object
-  quiz.GetAttemptByIdResponse:
-    properties:
-      answers:
-        items:
-          $ref: '#/definitions/quiz.AttemptAnswerDetail'
-        type: array
-      completed_at:
-        type: string
-      id:
-        type: string
-      percentage:
-        type: number
-      quiz_id:
-        type: string
-      quiz_title:
-        type: string
-      score:
-        type: integer
-      total_questions:
-        type: integer
-    type: object
-  quiz.GetQuizAttemptsResponse:
-    properties:
-      attempts:
-        items:
-          $ref: '#/definitions/quiz.QuizAttemptDetail'
-        type: array
-      total_count:
-        type: integer
-    type: object
-  quiz.GetQuizByIdResponse:
-    properties:
-      id:
-        type: string
-      questions:
-        items:
-          $ref: '#/definitions/quiz.Question'
-        type: array
-      title:
-        type: string
-    type: object
-  quiz.Option:
-    properties:
-      label:
-        type: string
-      text:
-        type: string
-    type: object
-  quiz.Question:
-    properties:
-      correct_option:
-        type: string
-      explanation:
-        type: string
-      "no":
-        type: integer
-      options:
-        items:
-          $ref: '#/definitions/quiz.Option'
-        type: array
-      text:
-        type: string
-    type: object
-  quiz.QuizAttemptDetail:
-    properties:
-      completed_at:
-        type: string
-      id:
-        type: string
-      percentage:
-        type: number
-      quiz_id:
-        type: string
-      quiz_title:
-        type: string
-      score:
-        type: integer
-      total_questions:
-        type: integer
-    type: object
-  quiz.QuizSummary:
-    properties:
-      createdAt:
-        type: string
-      quizId:
-        type: string
-      title:
-        type: string
-    type: object
-  quiz.SolveQuizRequest:
-    properties:
-      answers:
-        items:
-          $ref: '#/definitions/quiz.Answer'
-        type: array
-      id:
-        type: string
-    required:
-    - answers
-    - id
-    type: object
-  quiz.SolveQuizResponse:
-    properties:
-      answers:
-        description: Detaylı cevap bilgisi
-        items:
-          $ref: '#/definitions/quiz.AnswerFeedback'
-        type: array
-      attempt_id:
-        type: string
-      percentage:
-        type: number
-      score:
-        type: integer
-      total_questions:
-        type: integer
-    type: object
   textproto.MIMEHeader:
     additionalProperties:
       items:
         type: string
       type: array
-    type: object
-  user.ChangePasswordRequest:
-    properties:
-      new_password:
-        type: string
-      old_password:
-        type: string
-    required:
-    - new_password
-    - old_password
-    type: object
-  user.ForgotPasswordRequest:
-    properties:
-      email:
-        type: string
-    required:
-    - email
-    type: object
-  user.GetCurrentUserResponse:
-    properties:
-      createdAt:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      isEmailVerified:
-        type: boolean
-      username:
-        type: string
-    type: object
-  user.ResetPasswordRequest:
-    properties:
-      password:
-        minLength: 8
-        type: string
-      token:
-        type: string
-    required:
-    - password
-    - token
-    type: object
-  user.UpdateUsernameRequest:
-    properties:
-      address:
-        type: string
-      username:
-        type: string
-    required:
-    - address
-    - username
-    type: object
-  user.VerifiyEmailRequest:
-    properties:
-      token:
-        type: string
-    required:
-    - token
     type: object
 info:
   contact: {}
@@ -487,7 +505,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/admin.GetUsersRequest'
+          $ref: '#/definitions/app_admin.GetUsersRequest'
       produces:
       - application/json
       responses:
@@ -495,7 +513,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/admin.UserInfo'
+              $ref: '#/definitions/app_admin.UserInfo'
             type: array
         "400":
           description: Bad Request
@@ -514,19 +532,47 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/auth.ExchangeRequest'
+          $ref: '#/definitions/app_auth.ExchangeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.ExchangeResponse'
+            $ref: '#/definitions/app_auth.ExchangeResponse'
         "400":
           description: Bad Request
         "500":
           description: Internal Server Error
       summary: Exchange OAuth2 tokens
+  /api/auth/oauth/mobile:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user via Google or Facebook mobile tokens.
+      parameters:
+      - description: Mobile Login Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/infrastructure_oauth.MobileLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/infrastructure_oauth.OAuthTokens'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Mobile OAuth Login
+      tags:
+      - Auth
   /auth/login:
     post:
       consumes:
@@ -538,14 +584,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/auth.LoginRequest'
+          $ref: '#/definitions/app_auth.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.LoginResponse'
+            $ref: '#/definitions/app_auth.LoginResponse'
         "400":
           description: Bad Request
         "401":
@@ -585,14 +631,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/auth.RefreshTokenRequest'
+          $ref: '#/definitions/app_auth.RefreshTokenRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.RefreshTokenResponse'
+            $ref: '#/definitions/app_auth.RefreshTokenResponse'
         "401":
           description: Unauthorized
         "500":
@@ -611,14 +657,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/auth.SignupRequest'
+          $ref: '#/definitions/app_auth.SignupRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.SignupResponse'
+            $ref: '#/definitions/app_auth.SignupResponse'
         "400":
           description: Bad Request
         "409":
@@ -640,7 +686,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/chat.Chat'
+              $ref: '#/definitions/app_chat.Chat'
             type: array
         "500":
           description: Internal Server Error
@@ -691,7 +737,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/chat.Message'
+              $ref: '#/definitions/app_chat.Message'
             type: array
         "404":
           description: Not Found
@@ -746,7 +792,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/file.File'
+              $ref: '#/definitions/app_file.File'
             type: array
         "500":
           description: Internal Server Error
@@ -823,14 +869,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/file.UploadFileRequest'
+          $ref: '#/definitions/app_file.UploadFileRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/file.UploadFileResponse'
+            $ref: '#/definitions/app_file.UploadFileResponse'
         "400":
           description: Bad Request
         "500":
@@ -866,14 +912,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/message.SendMessageRequest'
+          $ref: '#/definitions/app_message.SendMessageRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/message.SendMessageResponse'
+            $ref: '#/definitions/app_message.SendMessageResponse'
         "400":
           description: Bad Request
         "500":
@@ -895,7 +941,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/quiz.QuizSummary'
+              $ref: '#/definitions/app_quiz.QuizSummary'
             type: array
         "500":
           description: Internal Server Error
@@ -912,14 +958,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/quiz.GenerateQuizRequest'
+          $ref: '#/definitions/app_quiz.GenerateQuizRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/quiz.GenerateQuizResponse'
+            $ref: '#/definitions/app_quiz.GenerateQuizResponse'
         "400":
           description: Bad Request
         "500":
@@ -944,7 +990,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/quiz.GetQuizByIdResponse'
+            $ref: '#/definitions/app_quiz.GetQuizByIdResponse'
         "404":
           description: Not Found
       summary: Get Quiz by ID
@@ -966,14 +1012,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/quiz.SolveQuizRequest'
+          $ref: '#/definitions/app_quiz.SolveQuizRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/quiz.SolveQuizResponse'
+            $ref: '#/definitions/app_quiz.SolveQuizResponse'
         "400":
           description: Bad Request
         "404":
@@ -1005,7 +1051,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/quiz.GetQuizAttemptsResponse'
+            $ref: '#/definitions/app_quiz.GetQuizAttemptsResponse'
         "401":
           description: Unauthorized
         "500":
@@ -1031,7 +1077,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/quiz.GetAttemptByIdResponse'
+            $ref: '#/definitions/app_quiz.GetAttemptByIdResponse'
         "404":
           description: Not Found
       summary: Get Quiz Attempt by ID
@@ -1064,7 +1110,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.UpdateUsernameRequest'
+          $ref: '#/definitions/app_user.UpdateUsernameRequest'
       produces:
       - application/json
       responses:
@@ -1092,7 +1138,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.ForgotPasswordRequest'
+          $ref: '#/definitions/app_user.ForgotPasswordRequest'
       produces:
       - application/json
       responses:
@@ -1118,7 +1164,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.ChangePasswordRequest'
+          $ref: '#/definitions/app_user.ChangePasswordRequest'
       produces:
       - application/json
       responses:
@@ -1150,7 +1196,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/user.GetCurrentUserResponse'
+            $ref: '#/definitions/app_user.GetCurrentUserResponse'
         "400":
           description: Bad Request
         "401":
@@ -1173,7 +1219,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.ResetPasswordRequest'
+          $ref: '#/definitions/app_user.ResetPasswordRequest'
       produces:
       - application/json
       responses:
@@ -1199,7 +1245,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/user.VerifiyEmailRequest'
+          $ref: '#/definitions/app_user.VerifiyEmailRequest'
       produces:
       - application/json
       responses:

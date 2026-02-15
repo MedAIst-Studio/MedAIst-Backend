@@ -1,8 +1,11 @@
+SWAG=$(HOME)/go/bin/swag
+
 swagger: 
-	swag fmt
-	swag init -g ../infrastructure/fiber/router.go -d .,../app,../infrastructure,../domain -o ../docs
+	@echo "Generating swagger docs..."
+	$(SWAG) fmt
+	$(SWAG) init -g infrastructure/fiber/router.go -d . --parseDependency --parseInternal -o ./docs
 dev: swagger
-	docker-compose up 
+	docker compose up 
 
 build:
 	go build -o  ./main ./cmd/main.go
