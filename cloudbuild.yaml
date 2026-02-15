@@ -17,6 +17,8 @@ steps:
       - 'europe-west3'
       - '--platform'
       - 'managed'
+      - '--service-account'
+      - 'cloud-run-builder@scope-486312.iam.gserviceaccount.com'
 
 options:
   logging: CLOUD_LOGGING_ONLY
