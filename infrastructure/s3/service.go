@@ -142,7 +142,6 @@ func (s *S3Service) DeleteFiles(ctx context.Context, filePaths []string) error {
 		return nil
 	}
 
-	// Concurrent deletion could be faster, loop is safe default
 	var errorMsgs []string
 	for _, filePath := range filePaths {
 		_, err := s.client.DeleteObject(ctx, &s3.DeleteObjectInput{
