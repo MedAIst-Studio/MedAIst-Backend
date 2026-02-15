@@ -32,7 +32,6 @@ type S3Config struct {
 }
 
 func NewS3Service(config *S3Config) *S3Service {
-	// Simple validation
 	if config.Endpoint == "" {
 		config.Endpoint = "s3.amazonaws.com"
 	}
