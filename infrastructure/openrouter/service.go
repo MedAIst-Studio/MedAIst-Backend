@@ -377,28 +377,31 @@ func (s *OpenRouterService) ExpandQuery(ctx context.Context, content string) ([]
 // ----------------------------------------------------------------------
 
 func (s *OpenRouterService) GenerateQuizQuestion(ctx context.Context, chunk string) (*domain.QuizQuestion, error) {
-	prompt := fmt.Sprintf(`
-Verilen metne dayanarak YKS (TYT/AYT) formatında, kaliteli bir çoktan seçmeli soru oluştur.
+	prompt := fmt.Sprintf(`Aşağıdaki metin parçasını dikkatlice oku ve bu metne dayalı bir çoktan seçmeli soru üret.
 
-Metin:
+--- METİN BAŞLANGIÇ ---
 %s
+--- METİN BİTİŞ ---
 
-Kurallar:
-- Rol: Kıdemli YKS soru hazırlayıcısı.
-- Soru Tarzı: ÖSYM standartlarına uygun, muhakeme ve bilgi ölçen nitelikli bir soru olsun.
-- Zorluk: Orta veya zor seviye (Öğrenciyi düşündüren).
-- Uzunluk: Gereksiz uzun olmasın, net ve anlaşılır olsun.
-- Şıklar: Tam 5 şık (A-E).
-- Tutarlılık: Şıkların HEPSİ soru köküyle ve metinle doğrudan ilgili olmalı. Alakasız veya saçma şıklar yazma.
-- Çeldiriciler: Güçlü ve mantıklı çeldiriciler kullan. Soru bağlamından kopuk olmamalılar.
-- Tek Doğru: Sadece bir şık isCorrect: true olsun.
-- Çıktı: SADECE JSON formatında yanıt ver.
+SORU ÜRETME ADIMLARI (Sırasıyla uygula):
 
-Kısıtlamalar:
-- "Hangisi değildir" gibi olumsuz köklü sorulardan kaçınmaya çalış (zorunluysa kullanabilirsin ama pozitif köklü sorular öncelikli).
-- Metindeki en önemli kavramı odak noktası yap.
-- Türkçe kullan.
-`, chunk)
+1. METİN ANALİZİ: Metindeki en önemli kavramı, ilişkiyi veya bilgiyi belirle.
+2. SORU KÖKÜ YAZIMI: Bu kavramı ölçen, net ve anlaşılır bir soru kökü yaz (20-40 kelime). Soru kökü tek başına okunduğunda ne sorulduğu anlaşılmalı.
+3. DOĞRU ŞIK: Metne dayalı olarak doğru cevabı yaz.
+4. ÇELDİRİCİ ŞIKLAR: Kalan 4 şıkkı oluştururken şu kriterlere MUTLAKA uy:
+   a) Her çeldirici, soru kökünü doğal şekilde tamamlamalı veya cevaplamalıdır.
+   b) Çeldiriciler, sorunun konusuyla AYNI konu alanından olmalıdır.
+   c) Çeldiriciler mantıklı ama yanlış olmalıdır — rastgele veya alakasız bilgi YAZMA.
+   d) Tüm şıklar benzer uzunlukta ve dil yapısında olmalıdır.
+   e) Bir öğrenci şıklara baktığında hepsinin makul bir cevap olabileceğini düşünmeli.
+5. AÇIKLAMA: Doğru cevabın neden doğru olduğunu kısaca açıkla.
+
+FORMAT KURALLARI:
+- ÖSYM/YKS standardında ol.
+- Zorluk: Orta-zor (öğrenciyi düşündüren).
+- Tam 5 şık (A-E), sadece 1 tanesi doğru.
+- Türkçe yaz.
+- SADECE JSON çıktısı ver, başka metin yazma.`, chunk)
 
 	schemaJSON, err := json.Marshal(quizQuestionSchema)
 	if err != nil {
@@ -409,8 +412,16 @@ Kısıtlamalar:
 		Model: s.GenerateQuestionModel,
 		Messages: []ChatCompletionMessage{
 			{
-				Role:    "system",
-				Content: "Sen uzman bir YKS soru hazırlayıcısısın. TYT ve AYT müfredatına uygun, ölçücü ve öğretici sorular hazırlarsın. Sadece verilen şemaya uygun JSON formatında çıktı verirsin.",
+				Role: "system",
+				Content: `Sen 20 yıllık deneyime sahip, kıdemli bir ÖSYM soru hazırlayıcısısın.
+
+TEMEL GÖREVİN: Verilen metne dayalı, yüksek kaliteli çoktan seçmeli sorular üretmek.
+
+KRİTİK KURALLAR:
+1. TUTARLILIK: Ürettiğin her şık (A-E), soru köküyle dilbilgisel ve anlamsal olarak uyumlu olmalıdır. Soru kökünü oku, ardından her şıkkı soru köküne ekleyerek oku — cümle doğal ve anlamlı olmalı.
+2. KONU BİRLİĞİ: Tüm şıklar aynı konu alanından olmalıdır. Örneğin soru hücre bölünmesi hakkındaysa, şıkların hepsi biyoloji/hücre biyolojisi alanından olmalı.
+3. ÇELDİRİCİ KALİTESİ: Yanlış şıklar, "neredeyse doğru" olmalı — tamamen alakasız veya saçma olmamalı. İyi bir çeldirici, konuyu yüzeysel bilen öğrenciyi yanıltabilmelidir.
+4. Sadece verilen JSON şemasına uygun çıktı üret.`,
 			},
 			{
 				Role:    "user",
@@ -425,7 +436,7 @@ Kısıtlamalar:
 				Strict: true,
 			},
 		},
-		Temperature: 0,
+		Temperature: 0.3,
 	}
 
 	var apiResp ChatCompletionResponse
@@ -499,23 +510,37 @@ func (s *OpenRouterService) ExtractTextFromImage(ctx context.Context, imageBase6
 }
 
 func (s *OpenRouterService) SolveQuestionWithReasoning(ctx context.Context, questionText string) (string, error) {
-	prompt := fmt.Sprintf(`Sen uzman bir YKS öğretmenisin. Öğrencinin sorduğu soruyu adım adım, anlaşılır ve açıklayıcı bir şekilde çöz.
-
-Soru:
-%s
-
-Yönergeler:
-1. Soruyu dikkatlice analiz et ve hangi konudan olduğunu belirle.
-2. Çözüm adımlarını mantıksal bir sırayla yaz (işlem önceliği, formüller, mantık yürütme).
-3. Sonucu net bir şekilde belirt.
-4. Türkçe yanıtla.
-`, questionText)
-
 	apiReq := ChatCompletionRequest{
 		Model: s.ReasoningModel,
 		Messages: []ChatCompletionMessage{
-			{Role: "user", Content: prompt},
+			{
+				Role: "system",
+				Content: `Soru çözücüsün. Giriş cümlesi olmadan direkt çözüme başla.
+
+FORMAT (Markdown kullan):
+### Konu: [Konuyu kısa belirt]
+
+###  Çözüm
+Adımları numaralı liste halinde yaz. Her adımda:
+- Önemli terimleri **kalın** yap
+- Formülleri LaTeX formatında yaz: $formül$
+- Gerekirse kısa açıklama ekle
+
+### Cevap
+Sonucu net ve belirgin şekilde yaz.
+
+KURALLAR:
+- Kendini tanıtma, selamlama, "Merhaba", "Hadi bakalım" gibi dolgu cümleler YAZMA
+- Soruyu tekrar alıntılama
+- Her adım öz ve anlaşılır olsun, ama gerekli açıklamayı atla demek değil
+- Türkçe yanıtla`,
+			},
+			{
+				Role:    "user",
+				Content: questionText,
+			},
 		},
+		Temperature: 0.4,
 	}
 
 	var apiResp ChatCompletionResponse
