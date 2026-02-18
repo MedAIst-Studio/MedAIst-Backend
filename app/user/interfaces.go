@@ -10,7 +10,6 @@ import (
 type Repository interface {
 	GetUserById(ctx context.Context, id uuid.UUID) (*GetCurrentUserResponse, error)
 	CheckEmail(ctx context.Context, email string) error
-	// DeleteAccount deletes a user account and returns the files associated with the user (for cleanup)
 	DeleteAccount(ctx context.Context, id uuid.UUID) ([]*domain.File, error)
 	GetUserOnlyHavingPasswordById(ctx context.Context, id uuid.UUID) (*domain.User, error)
 	EmailExists(ctx context.Context, email string) (bool, error)
@@ -19,6 +18,9 @@ type Repository interface {
 	UpdateUsername(ctx context.Context, id uuid.UUID, username string) error
 	VerifyEmail(ctx context.Context, email string) error
 	GetUserNameAndEmailByIdForSendingVerificationEmail(ctx context.Context, id uuid.UUID) (string, string, error)
+	UpdateUserPreferences(ctx context.Context, id uuid.UUID, preferences *domain.UserPreferences) error
+	GetUserFCMTokenAndPreferences(ctx context.Context, id uuid.UUID) (string, *domain.UserPreferences, error)
+	UpdateFCMToken(ctx context.Context, id uuid.UUID, token string) error
 }
 
 type TokenService interface {

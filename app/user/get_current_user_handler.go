@@ -11,11 +11,12 @@ import (
 type GetCurrentUserRequest struct{}
 
 type GetCurrentUserResponse struct {
-	Id              string    `json:"id"`
-	Username        string    `json:"username"`
-	Email           string    `json:"email"`
-	IsEmailVerified bool      `json:"isEmailVerified"`
-	CreatedAt       time.Time `json:"createdAt"`
+	Id              string                  `json:"id"`
+	Username        string                  `json:"username"`
+	Email           string                  `json:"email"`
+	IsEmailVerified bool                    `json:"isEmailVerified"`
+	CreatedAt       time.Time               `json:"createdAt"`
+	Preferences     *domain.UserPreferences `json:"preferences,omitempty"`
 }
 
 type GetCurrentUserHandler struct {

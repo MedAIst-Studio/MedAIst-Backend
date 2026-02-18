@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS  users (
     id UUID PRIMARY KEY,
     username TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
+    fcm_token TEXT DEFAULT NULL,
     password TEXT, -- encrypted
     created_at TIMESTAMP NOT NULL
 );
@@ -175,6 +176,7 @@ CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
 	migrationQuery := `
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS context_snapshot JSONB;
 	ALTER TABLE messages ADD COLUMN IF NOT EXISTS attachments JSONB;
+	ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences JSONB DEFAULT '{"theme":"system","notifications":{"motivation":true,"reminders":true,"updates":true}}';
 	`
 	_, err = db.Exec(migrationQuery)
 	if err != nil {

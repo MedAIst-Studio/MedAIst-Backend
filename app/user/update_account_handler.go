@@ -10,7 +10,6 @@ import (
 
 type UpdateUsernameRequest struct {
 	Username string `json:"username,omitempty" validate:"required"`
-	Address  string `json:"address,omitempty" validate:"required"`
 }
 
 type UpdateUsernameResponse struct{}

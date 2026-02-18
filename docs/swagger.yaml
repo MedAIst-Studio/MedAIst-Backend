@@ -349,6 +349,8 @@ definitions:
         type: string
       isEmailVerified:
         type: boolean
+      preferences:
+        $ref: '#/definitions/domain.UserPreferences'
       username:
         type: string
     type: object
@@ -363,14 +365,25 @@ definitions:
     - password
     - token
     type: object
+  app_user.UpdatePreferencesRequest:
+    properties:
+      notifications:
+        properties:
+          motivation:
+            type: boolean
+          reminders:
+            type: boolean
+          updates:
+            type: boolean
+        type: object
+      theme:
+        type: string
+    type: object
   app_user.UpdateUsernameRequest:
     properties:
-      address:
-        type: string
       username:
         type: string
     required:
-    - address
     - username
     type: object
   app_user.VerifiyEmailRequest:
@@ -398,9 +411,25 @@ definitions:
         description: '"pdf", "book", etc.'
         type: string
     type: object
+  domain.NotificationPreferences:
+    properties:
+      motivation:
+        type: boolean
+      reminders:
+        type: boolean
+      updates:
+        type: boolean
+    type: object
   domain.UpdateChatRequest:
     properties:
       title:
+        type: string
+    type: object
+  domain.UserPreferences:
+    properties:
+      notifications:
+        $ref: '#/definitions/domain.NotificationPreferences'
+      theme:
         type: string
     type: object
   infrastructure_oauth.MobileLoginRequest:
@@ -1185,6 +1214,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Change User Password
+      tags:
+      - User
+  /users/preferences:
+    patch:
+      consumes:
+      - application/json
+      description: Update the current user's preferences (theme and notification settings)
+      parameters:
+      - description: Update Preferences Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/app_user.UpdatePreferencesRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update User Preferences
       tags:
       - User
   /users/profile:

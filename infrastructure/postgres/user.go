@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -14,22 +15,80 @@ import (
 )
 
 func (r *Repository) GetUserById(ctx context.Context, id uuid.UUID) (*user.GetCurrentUserResponse, error) {
-	row := r.db.QueryRowContext(ctx, "SELECT id, username,  email, created_at FROM users WHERE id = $1", id)
+	row := r.db.QueryRowContext(ctx, "SELECT id, username, email, created_at, preferences FROM users WHERE id = $1", id)
 
 	if err := row.Err(); err != nil {
 		return nil, err
 	}
 
-	var user user.GetCurrentUserResponse
+	var u user.GetCurrentUserResponse
+	var prefsJSON sql.NullString
 
-	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.CreatedAt)
+	err := row.Scan(&u.Id, &u.Username, &u.Email, &u.CreatedAt, &prefsJSON)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.ErrUserNotFound
 		}
 		return nil, err
 	}
-	return &user, nil
+
+	if prefsJSON.Valid {
+		var prefs domain.UserPreferences
+		if err := json.Unmarshal([]byte(prefsJSON.String), &prefs); err != nil {
+			return nil, fmt.Errorf("failed to parse preferences: %w", err)
+		}
+		u.Preferences = &prefs
+	}
+
+	return &u, nil
+}
+
+func (r *Repository) UpdateUserPreferences(ctx context.Context, id uuid.UUID, preferences *domain.UserPreferences) error {
+	prefsJSON, err := json.Marshal(preferences)
+	if err != nil {
+		return fmt.Errorf("failed to marshal preferences: %w", err)
+	}
+
+	_, err = r.db.ExecContext(ctx,
+		"UPDATE users SET preferences = $1 WHERE id = $2",
+		prefsJSON, id)
+	return err
+}
+
+func (r *Repository) GetUserFCMTokenAndPreferences(ctx context.Context, id uuid.UUID) (string, *domain.UserPreferences, error) {
+	row := r.db.QueryRowContext(ctx, "SELECT fcm_token, preferences FROM users WHERE id = $1", id)
+
+	var fcmToken sql.NullString
+	var prefsJSON sql.NullString
+
+	err := row.Scan(&fcmToken, &prefsJSON)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", nil, domain.ErrUserNotFound
+		}
+		return "", nil, err
+	}
+
+	var prefs domain.UserPreferences
+	if prefsJSON.Valid {
+		if err := json.Unmarshal([]byte(prefsJSON.String), &prefs); err != nil {
+			return "", nil, fmt.Errorf("failed to parse preferences: %w", err)
+		}
+	}
+
+	token := ""
+	if fcmToken.Valid {
+		token = fcmToken.String
+	}
+
+	return token, &prefs, nil
+}
+
+func (r *Repository) UpdateFCMToken(ctx context.Context, id uuid.UUID, token string) error {
+	_, err := r.db.ExecContext(ctx,
+		"UPDATE users SET fcm_token = $1 WHERE id = $2",
+		token, id)
+	return err
 }
 
 func (r *Repository) DeleteAccount(ctx context.Context, id uuid.UUID) ([]*domain.File, error) {

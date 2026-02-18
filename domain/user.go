@@ -98,3 +98,14 @@ func ValidateUsername(username string) error {
 func IsPasswordTooShort(password string) bool {
 	return len(password) < 8
 }
+
+type NotificationPreferences struct {
+	Motivation bool `json:"motivation"`
+	Reminders  bool `json:"reminders"`
+	Updates    bool `json:"updates"`
+}
+
+type UserPreferences struct {
+	Theme         string                  `json:"theme"`
+	Notifications NotificationPreferences `json:"notifications"`
+}

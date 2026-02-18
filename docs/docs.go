@@ -1083,6 +1083,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/preferences": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the current user's preferences (theme and notification settings)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update User Preferences",
+                "parameters": [
+                    {
+                        "description": "Update Preferences Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app_user.UpdatePreferencesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/profile": {
             "get": {
                 "security": [
@@ -1735,6 +1780,9 @@ const docTemplate = `{
                 "isEmailVerified": {
                     "type": "boolean"
                 },
+                "preferences": {
+                    "$ref": "#/definitions/domain.UserPreferences"
+                },
                 "username": {
                     "type": "string"
                 }
@@ -1756,16 +1804,34 @@ const docTemplate = `{
                 }
             }
         },
+        "app_user.UpdatePreferencesRequest": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "object",
+                    "properties": {
+                        "motivation": {
+                            "type": "boolean"
+                        },
+                        "reminders": {
+                            "type": "boolean"
+                        },
+                        "updates": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "theme": {
+                    "type": "string"
+                }
+            }
+        },
         "app_user.UpdateUsernameRequest": {
             "type": "object",
             "required": [
-                "address",
                 "username"
             ],
             "properties": {
-                "address": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
                 }
@@ -1809,10 +1875,35 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.NotificationPreferences": {
+            "type": "object",
+            "properties": {
+                "motivation": {
+                    "type": "boolean"
+                },
+                "reminders": {
+                    "type": "boolean"
+                },
+                "updates": {
+                    "type": "boolean"
+                }
+            }
+        },
         "domain.UpdateChatRequest": {
             "type": "object",
             "properties": {
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UserPreferences": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "$ref": "#/definitions/domain.NotificationPreferences"
+                },
+                "theme": {
                     "type": "string"
                 }
             }
