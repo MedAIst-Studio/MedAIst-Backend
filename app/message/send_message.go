@@ -37,6 +37,7 @@ type Config struct {
 	Ems               EmbeddingService
 	ChatSvc           AIService
 	FileService       file.FileService
+	StreakRepo        domain.StreakRepository
 }
 
 type SendMessageHandler struct {
@@ -183,6 +184,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 				return nil, 500, err
 			}
 
+			domain.CheckAndUpdateStreak(ctx, h.StreakRepo, userId)
 			return h.buildResponse(userMessage, aiMessage, chatTitle, isNewChat), 200, nil
 		}
 	}
@@ -198,6 +200,7 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		return nil, 500, err
 	}
 
+	domain.CheckAndUpdateStreak(ctx, h.StreakRepo, userId)
 	return h.buildResponse(userMessage, aiMessage, chatTitle, isNewChat), 200, nil
 }
 

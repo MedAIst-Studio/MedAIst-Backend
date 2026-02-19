@@ -21,18 +21,20 @@ type UploadFileResponse struct {
 }
 
 type UploadFileHandler struct {
-	Factory *FileProcessorFactory
-	repo    Repository
-	fl      FileService
-	vb      VectorDB
+	Factory    *FileProcessorFactory
+	repo       Repository
+	fl         FileService
+	vb         VectorDB
+	streakRepo domain.StreakRepository
 }
 
-func NewUploadFileHandler(repo Repository, fl FileService, vb VectorDB, factory *FileProcessorFactory) *UploadFileHandler {
+func NewUploadFileHandler(repo Repository, fl FileService, vb VectorDB, factory *FileProcessorFactory, streakRepo domain.StreakRepository) *UploadFileHandler {
 	return &UploadFileHandler{
-		repo:    repo,
-		fl:      fl,
-		vb:      vb,
-		Factory: factory,
+		repo:       repo,
+		fl:         fl,
+		vb:         vb,
+		Factory:    factory,
+		streakRepo: streakRepo,
 	}
 }
 
@@ -98,10 +100,11 @@ func (h *UploadFileHandler) Handle(ctx context.Context, req *UploadFileRequest) 
 	}
 
 	if err := processor.Process(ctx, newFile, fileBytes); err != nil {
-		// If processing fails, we should probably rollback the file upload/save
 		h.recover(ctx, newFile.Id, newFile.Path)
 		return nil, 500, err
 	}
+
+	domain.CheckAndUpdateStreak(ctx, h.streakRepo, domain.GetUserID(ctx))
 
 	return &UploadFileResponse{Url: fileUrl}, 200, nil
 }

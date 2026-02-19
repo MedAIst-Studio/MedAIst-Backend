@@ -57,11 +57,12 @@ type QuizAttemptAnswer struct {
 }
 
 type SolveQuizHandler struct {
-	repo Repository
+	repo       Repository
+	streakRepo domain.StreakRepository
 }
 
-func NewSolveQuizHandler(repo Repository) *SolveQuizHandler {
-	return &SolveQuizHandler{repo: repo}
+func NewSolveQuizHandler(repo Repository, streakRepo domain.StreakRepository) *SolveQuizHandler {
+	return &SolveQuizHandler{repo: repo, streakRepo: streakRepo}
 }
 
 // @Summary		Solve Quiz
@@ -139,6 +140,8 @@ func (h *SolveQuizHandler) Handle(ctx context.Context, req *SolveQuizRequest) (*
 	if err := h.repo.SaveQuizAttemptWithAnswers(ctx, attempt, attemptAnswers); err != nil {
 		return nil, 500, err
 	}
+
+	domain.CheckAndUpdateStreak(ctx, h.streakRepo, userID)
 
 	return &SolveQuizResponse{
 		AttemptID:      attemptID,

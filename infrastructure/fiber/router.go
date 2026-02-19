@@ -141,7 +141,7 @@ func SetupRoutes(app *fiber.App) {
 	imageProcessor := file.NewImageProcessor()
 	fileProcessorFactory := file.NewFileProcessorFactory(pdfProcessor, imageProcessor)
 
-	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, fileProcessorFactory)
+	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, fileProcessorFactory, dc.Repo)
 	getFilesHandler := file.NewGetFilesHandler(dc.Repo)
 	deleteFileByIdHandler := file.NewDeleteFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB)
 	getFileHandler := file.NewGetFileHandler(dc.Repo, dc.FileStorage)
@@ -154,12 +154,13 @@ func SetupRoutes(app *fiber.App) {
 		Vb:                dc.VectorDB,
 		ChatSvc:           dc.AIService,
 		FileService:       dc.FileStorage,
+		StreakRepo:        dc.Repo,
 	})
 
 	generateQuizHandler := quiz.NewGenerateQuizHandler(dc.AIService, dc.Repo, dc.VectorDB)
 	getQuizzesHandler := quiz.NewGetQuizzesHandler(dc.Repo)
 	getQuizByIdHandler := quiz.NewGetQuizByIdHandler(dc.Repo)
-	solveQuizHandler := quiz.NewSolveQuizHandler(dc.Repo)
+	solveQuizHandler := quiz.NewSolveQuizHandler(dc.Repo, dc.Repo)
 	getQuizAttemptsHandler := quiz.NewGetQuizAttemptsHandler(dc.Repo)
 	getQuizAttemptByIdHandler := quiz.NewGetAttemptByIdHandler(dc.Repo)
 
