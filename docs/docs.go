@@ -992,6 +992,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/fcm-token": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Register or update the user's FCM push notification token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update FCM Token",
+                "parameters": [
+                    {
+                        "description": "FCM Token Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app_user.UpdateFCMTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/forgot-password": {
             "post": {
                 "description": "It sends  a password reset link to the user's email address.",
@@ -1800,6 +1845,17 @@ const docTemplate = `{
                     "minLength": 8
                 },
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "app_user.UpdateFCMTokenRequest": {
+            "type": "object",
+            "required": [
+                "fcm_token"
+            ],
+            "properties": {
+                "fcm_token": {
                     "type": "string"
                 }
             }

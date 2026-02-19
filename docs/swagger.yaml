@@ -365,6 +365,13 @@ definitions:
     - password
     - token
     type: object
+  app_user.UpdateFCMTokenRequest:
+    properties:
+      fcm_token:
+        type: string
+    required:
+    - fcm_token
+    type: object
   app_user.UpdatePreferencesRequest:
     properties:
       notifications:
@@ -1156,6 +1163,34 @@ paths:
       security:
       - BearerAuth: []
       summary: Update User Account
+      tags:
+      - User
+  /users/fcm-token:
+    patch:
+      consumes:
+      - application/json
+      description: Register or update the user's FCM push notification token
+      parameters:
+      - description: FCM Token Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/app_user.UpdateFCMTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update FCM Token
       tags:
       - User
   /users/forgot-password:
