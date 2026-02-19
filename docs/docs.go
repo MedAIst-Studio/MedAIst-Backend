@@ -1250,6 +1250,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/usage-stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the current user's streak and usage statistics",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get Usage Stats (Streak)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app_user.GetStreakResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Check and update the current user's streak. Call this on any activity to advance the streak.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update Usage Stats (Streak)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app_user.UpdateStreakResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/verify-email": {
             "post": {
                 "description": "Verifies a user's email address using a token",
@@ -1833,6 +1899,26 @@ const docTemplate = `{
                 }
             }
         },
+        "app_user.GetStreakResponse": {
+            "type": "object",
+            "properties": {
+                "currentStreak": {
+                    "type": "integer"
+                },
+                "hasPlayedToday": {
+                    "type": "boolean"
+                },
+                "maxStreak": {
+                    "type": "integer"
+                },
+                "recentActiveDates": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "app_user.ResetPasswordRequest": {
             "type": "object",
             "required": [
@@ -1879,6 +1965,26 @@ const docTemplate = `{
                 },
                 "theme": {
                     "type": "string"
+                }
+            }
+        },
+        "app_user.UpdateStreakResponse": {
+            "type": "object",
+            "properties": {
+                "currentStreak": {
+                    "type": "integer"
+                },
+                "hasPlayedToday": {
+                    "type": "boolean"
+                },
+                "maxStreak": {
+                    "type": "integer"
+                },
+                "recentActiveDates": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },

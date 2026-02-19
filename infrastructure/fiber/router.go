@@ -130,6 +130,7 @@ func SetupRoutes(app *fiber.App) {
 	updateFCMTokenHandler := user.NewUpdateFCMTokenHandler(dc.Repo, dc.Validator)
 	forgotPasswordHandler := user.NewForgotPasswordHandler(dc.Repo, dc.mailerSender, dc.jweTokenService, dc.slogLogger, dc.Validator)
 	resetPasswordHandler := user.NewResetPasswordHandler(dc.Repo, dc.jweTokenService, dc.slogLogger, dc.Validator)
+	getStreakHandler := user.NewGetStreakHandler(dc.Repo)
 
 	getChatsHandler := chat.NewGetChatsHandler(dc.Repo)
 	getChatByIDHandler := chat.NewGetChatByIDHandler(dc.Repo)
@@ -191,6 +192,7 @@ func SetupRoutes(app *fiber.App) {
 	usersApp.Patch("/password", Handle(updatePasswordHandler, sl))
 	usersApp.Patch("/preferences", Handle(updatePreferencesHandler, sl))
 	usersApp.Patch("/fcm-token", Handle(updateFCMTokenHandler, sl))
+	usersApp.Get("/usage-stats", Handle(getStreakHandler, sl))
 
 	chatsApp := app.Group("/chats", middlewareManager.AuthMiddleware)
 	chatsApp.Get("/", Handle(getChatsHandler, sl))
