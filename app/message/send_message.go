@@ -104,14 +104,14 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 		}
 	}
 
-	if req.ImageUrl != "" {
+	isGeneralChat := req.PdfId == uuid.Nil && req.ImageUrl == ""
+
+	if isGeneralChat {
+		queryType = domain.GeneralChatQuery
+	} else if req.ImageUrl != "" {
 		queryType = domain.ImageQuery
 	} else {
-		var err error
-		queryType, err = h.ChatSvc.CheckUserQuery(ctx, req.Content)
-		if err != nil {
-			return nil, 500, err
-		}
+		queryType = domain.PdfSearchQuery
 	}
 
 	if err := h.Repo.SaveMessage(ctx, userMessage); err != nil {
@@ -129,12 +129,6 @@ func (h *SendMessageHandler) Handle(ctx context.Context, req *SendMessageRequest
 				}
 			}
 		}
-	}
-
-	isClarification := crm.IsClarificationQuery()
-
-	if isNewChat && isClarification {
-		return h.handleUnallowedClarification(ctx, userMessage, chatTitle, isNewChat)
 	}
 
 	if err := h.processQuery(ctx, req, userMessage, crm, isNewChat); err != nil {
@@ -225,10 +219,6 @@ func (h *SendMessageHandler) handleNewChatIfNeeded(ctx context.Context, req *Sen
 
 func (h *SendMessageHandler) processQuery(ctx context.Context, req *SendMessageRequest, userMessage *domain.Message, crm *domain.ChatRequestManager, isNewChat bool,
 ) error {
-	if crm.IsGeneralQuery() {
-		return nil
-	}
-
 	if !isNewChat {
 		pastMessages, err := h.Repo.GetChatHistoryForAIContext(
 			ctx,
@@ -303,20 +293,6 @@ func (h *SendMessageHandler) addPdfContext(ctx context.Context, req *SendMessage
 	}
 	crm.Req.AddRelevantExcerpts(rerankedChunks)
 	return nil
-}
-
-func (h *SendMessageHandler) handleUnallowedClarification(ctx context.Context, userMessage *domain.Message, chatTitle string, isNewChat bool) (*SendMessageResponse, int, error) {
-	aiMessage := domain.NewMessage(
-		userMessage.ChatId,
-		domain.UnallowedClarificationMsg,
-		false,
-	)
-
-	if err := h.Repo.SaveMessage(ctx, aiMessage); err != nil {
-		return nil, 500, err
-	}
-
-	return h.buildResponse(userMessage, aiMessage, chatTitle, isNewChat), 200, nil
 }
 
 func (h *SendMessageHandler) handleInfoNotFound(ctx context.Context, userMessage *domain.Message, chatTitle string, isNewChat bool, err error) (*SendMessageResponse, int, error) {

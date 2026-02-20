@@ -1282,38 +1282,6 @@ const docTemplate = `{
                         "description": "Internal Server Error"
                     }
                 }
-            },
-            "patch": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Check and update the current user's streak. Call this on any activity to advance the streak.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Update Usage Stats (Streak)",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/app_user.UpdateStreakResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
             }
         },
         "/users/verify-email": {
@@ -1902,16 +1870,16 @@ const docTemplate = `{
         "app_user.GetStreakResponse": {
             "type": "object",
             "properties": {
-                "currentStreak": {
+                "current_streak": {
                     "type": "integer"
                 },
-                "hasPlayedToday": {
+                "has_played_today": {
                     "type": "boolean"
                 },
-                "maxStreak": {
+                "max_streak": {
                     "type": "integer"
                 },
-                "recentActiveDates": {
+                "recent_active_dates": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -1965,26 +1933,6 @@ const docTemplate = `{
                 },
                 "theme": {
                     "type": "string"
-                }
-            }
-        },
-        "app_user.UpdateStreakResponse": {
-            "type": "object",
-            "properties": {
-                "currentStreak": {
-                    "type": "integer"
-                },
-                "hasPlayedToday": {
-                    "type": "boolean"
-                },
-                "maxStreak": {
-                    "type": "integer"
-                },
-                "recentActiveDates": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },

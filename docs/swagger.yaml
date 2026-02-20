@@ -356,13 +356,13 @@ definitions:
     type: object
   app_user.GetStreakResponse:
     properties:
-      currentStreak:
+      current_streak:
         type: integer
-      hasPlayedToday:
+      has_played_today:
         type: boolean
-      maxStreak:
+      max_streak:
         type: integer
-      recentActiveDates:
+      recent_active_dates:
         items:
           type: string
         type: array
@@ -398,19 +398,6 @@ definitions:
         type: object
       theme:
         type: string
-    type: object
-  app_user.UpdateStreakResponse:
-    properties:
-      currentStreak:
-        type: integer
-      hasPlayedToday:
-        type: boolean
-      maxStreak:
-        type: integer
-      recentActiveDates:
-        items:
-          type: string
-        type: array
     type: object
   app_user.UpdateUsernameRequest:
     properties:
@@ -1373,27 +1360,6 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Usage Stats (Streak)
-      tags:
-      - User
-    patch:
-      consumes:
-      - application/json
-      description: Check and update the current user's streak. Call this on any activity
-        to advance the streak.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app_user.UpdateStreakResponse'
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-      security:
-      - BearerAuth: []
-      summary: Update Usage Stats (Streak)
       tags:
       - User
   /users/verify-email:

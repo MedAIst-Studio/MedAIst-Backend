@@ -152,7 +152,6 @@ type Config struct {
 	ChatModel              string
 	GenerateQuestionModel  string
 	ExpandQuestionModel    string
-	CheckUserQueryModel    string
 	GenerateChatTitleModel string
 	ReasoningModel         string
 	VisionModel            string
@@ -311,38 +310,6 @@ func (s *OpenRouterService) GenerateChatTitle(ctx context.Context, req *domain.C
 // ----------------------------------------------------------------------
 // CLASSIFICATION & EXPANSION
 // ----------------------------------------------------------------------
-
-func (s *OpenRouterService) CheckUserQuery(ctx context.Context, userContent string) (domain.QueryType, error) {
-	apiReq := ChatCompletionRequest{
-		Model: s.CheckUserQueryModel,
-		Messages: []ChatCompletionMessage{
-			{Role: "system", Content: domain.QueryClassificationSystemPrompt},
-			{Role: "user", Content: userContent},
-		},
-	}
-
-	var apiResp ChatCompletionResponse
-	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
-		return domain.GeneralQuery, fmt.Errorf("classification failed: %w", err)
-	}
-	if len(apiResp.Choices) == 0 {
-		return domain.GeneralQuery, fmt.Errorf("empty response")
-	}
-
-	content, _ := apiResp.Choices[0].Message.Content.(string)
-	text := strings.TrimSpace(content)
-
-	switch text {
-	case "General":
-		return domain.GeneralQuery, nil
-	case "Clarification":
-		return domain.ClarificationQuery, nil
-	case "PDFSearch":
-		return domain.PdfSearchQuery, nil
-	default:
-		return domain.GeneralQuery, nil
-	}
-}
 
 func (s *OpenRouterService) ExpandQuery(ctx context.Context, content string) ([]string, error) {
 	apiReq := ChatCompletionRequest{

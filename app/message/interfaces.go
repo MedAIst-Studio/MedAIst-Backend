@@ -34,7 +34,6 @@ type EmbeddingService interface {
 type AIService interface {
 	SendChatRequest(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error)
 	GenerateChatTitle(ctx context.Context, req *domain.ChatRequest) (*domain.ChatResponse, error)
-	CheckUserQuery(ctx context.Context, userContent string) (domain.QueryType, error)
 	ExpandQuery(ctx context.Context, content string) ([]string, error)
 	RerankChunks(ctx context.Context, chunks []string, userQuestion string) ([]string, error)
 	ExtractTextFromImage(ctx context.Context, imageUrl string) (string, error)

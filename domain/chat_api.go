@@ -11,16 +11,14 @@ const (
 type QueryType string
 
 const (
-	PdfSearchQuery     QueryType = "pdf_search_query"
-	ClarificationQuery QueryType = "clarification_query"
-	GeneralQuery       QueryType = "general_query"
-	ImageQuery         QueryType = "image_query"
+	PdfSearchQuery   QueryType = "pdf_search_query"
+	ImageQuery       QueryType = "image_query"
+	GeneralChatQuery QueryType = "general_chat_query"
 )
 
 const (
-	generalQuerySystemMessage = "Sen bir YKS rehberlik asistanısın. Öğrencinin sınav süreci, çalışma programı, motivasyon ve genel sorularını en iyi şekilde yanıtla. Cevaplarını Türkçe ver."
-
-	clarificationQuerySystemMessage = "Sen bir öğrenci koçu ve eğitmensin. Önceki verdiğin cevabı daha basitleştirerek veya detaylandırarak açıkla. Yeni konu açma, mevcut konuyu pekiştirerek anlat."
+	generalChatSystemMessage = `Sen yardımsever ve samimi bir yapay zeka asistanısın. Kullanıcının her türlü sorusuna bilgilendirici ve doğal yanıtlar ver.
+Cevaplarını Türkçe ver. Gerektiğinde Markdown formatını kullan.`
 
 	imageQuerySystemMessage = "Sen bir soru çözüm asistanısın. Gönderilen görseldeki soruyu analiz et ve çözümünü ver. Eğer görsel dersle/sınavla ilgili değilse, nazikçe cevap veremeyeceğini belirt."
 
@@ -40,33 +38,6 @@ KRİTİK KURALLAR:
 4. **Önemli:**
    - Konuyla dolaylı ilgili bilgi varsa ekle.
 `
-
-	QueryClassificationSystemPrompt = `Kullanıcının sorgusunu tam olarak aşağıdaki kategorilerden birine sınıflandır.
-Sadece tek bir kelime döndür: PDFSearch, Clarification veya General.
-
-Kuralları sırasıyla uygula:
-
-1. Clarification
-   SADECE şu durumlarda Clarification seç:
-     - Sorgu açıkça önceki cevabına veya kullanıcının önceki sorusuna atıfta bulunuyorsa.
-     - Kullanıcı daha fazla detay, basitleştirme veya açıklama istiyorsa.
-   Örnekler:
-     "Daha detaylı anlatabilir misin?"
-     "Ne demek istedim?"
-     "Son kısmı açar mısın?"
-     "Devam et"
-
-2. General
-   SADECE şu durumlarda General seç:
-     - Kullanıcı selamlaşma, sohbet veya ders dışı kişisel sorular soruyorsa.
-   Örnekler:
-     "merhaba"
-     "kimsin sen?"
-     "nasılsın?"
-     "bir fıkra anlat"
-
-	 Talimatlar:
-	Tek bir kelime ile cevap ver: "PDFSearch", "Clarification" veya "General". Emin olmadığında dersle ilgili her şey için "PDFSearch" seç.`
 
 	QueryExpansionSystemPrompt = `Sen bir arama sorgusu genişletme uzmanısın. Görevin, kullanıcının asıl niyetini koruyarak farklı açılardan 5 adet Türkçe arama sorgusu üretmektir.
 
@@ -141,16 +112,14 @@ func NewChatRequest(queryType QueryType, userContent string) *ChatRequest {
 
 func getSystemMessageForQueryType(queryType QueryType) string {
 	switch queryType {
-	case GeneralQuery:
-		return generalQuerySystemMessage
-	case ClarificationQuery:
-		return clarificationQuerySystemMessage
 	case PdfSearchQuery:
 		return pdfSearchQuerySystemMessage
 	case ImageQuery:
 		return imageQuerySystemMessage
+	case GeneralChatQuery:
+		return generalChatSystemMessage
 	default:
-		return generalQuerySystemMessage
+		return generalChatSystemMessage
 	}
 }
 
@@ -201,14 +170,10 @@ func buildTitleGenerationMessage(firstUserMessage string) []ChatMessage {
 	}
 }
 
-func (crm *ChatRequestManager) IsGeneralQuery() bool {
-	return crm.QueryType == GeneralQuery
-}
-
-func (crm *ChatRequestManager) IsClarificationQuery() bool {
-	return crm.QueryType == ClarificationQuery
-}
-
 func (crm *ChatRequestManager) IsPdfSearchQuery() bool {
 	return crm.QueryType == PdfSearchQuery
+}
+
+func (crm *ChatRequestManager) IsGeneralChatQuery() bool {
+	return crm.QueryType == GeneralChatQuery
 }

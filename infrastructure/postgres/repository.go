@@ -182,11 +182,9 @@ CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
 		panic("Failed to create tables: " + err.Error())
 	}
 
-	// Migrations for existing tables
 	migrationQuery := `
-	ALTER TABLE messages ADD COLUMN IF NOT EXISTS context_snapshot JSONB;
-	ALTER TABLE messages ADD COLUMN IF NOT EXISTS attachments JSONB;
 	ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences JSONB DEFAULT '{"theme":"system","notifications":{"motivation":true,"reminders":true,"updates":true}}';
+	ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT DEFAULT NULL;
 	`
 	_, err = db.Exec(migrationQuery)
 	if err != nil {

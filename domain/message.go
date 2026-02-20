@@ -6,11 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	UnallowedClarificationMsg = `Bu konuyu biraz daha açmak isterim! Ancak, şu anda hangi meseleden bahsettiğinizi bilmiyorum. 🤔 
-	Lütfen bana hangi konu, olay, fikir veya sorundan bahsettiğinizi söyleyin ki, o meseleyi daha detaylı bir şekilde açıklayabileyim.`
-)
-
 type Message struct {
 	Id              uuid.UUID
 	ChatId          uuid.UUID

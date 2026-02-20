@@ -84,7 +84,6 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		ChatModel:              getEnv("OPENROUTER_CHAT_MODEL", "openai/gpt-4o-mini"),
 		GenerateQuestionModel:  getEnv("OPENROUTER_QUESTION_MODEL", "openai/gpt-4o-mini"),
 		ExpandQuestionModel:    getEnv("OPENROUTER_EXPAND_MODEL", "openai/gpt-4o-mini"),
-		CheckUserQueryModel:    getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
 		GenerateChatTitleModel: getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
 		ReasoningModel:         getEnv("OPENROUTER_REASONING_MODEL", "google/gemini-3-flash-preview"),
 		VisionModel:            getEnv("OPENROUTER_VISION_MODEL", "google/gemini-3-flash-preview"),
