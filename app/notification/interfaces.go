@@ -16,6 +16,8 @@ const (
 
 type Repository interface {
 	GetUserFCMTokenAndPreferences(ctx context.Context, id uuid.UUID) (string, *domain.UserPreferences, error)
+	GetUsersForMorningMotivation(ctx context.Context) ([]uuid.UUID, error)
+	GetLazyUsersForEveningReminder(ctx context.Context) ([]uuid.UUID, error)
 }
 
 type NotificationService struct {

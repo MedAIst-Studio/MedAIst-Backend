@@ -21,6 +21,8 @@ type Repository interface {
 	UpdateUserPreferences(ctx context.Context, id uuid.UUID, preferences *domain.UserPreferences) error
 	GetUserFCMTokenAndPreferences(ctx context.Context, id uuid.UUID) (string, *domain.UserPreferences, error)
 	UpdateFCMToken(ctx context.Context, id uuid.UUID, token string) error
+	GetUsersForMorningMotivation(ctx context.Context) ([]uuid.UUID, error)
+	GetLazyUsersForEveningReminder(ctx context.Context) ([]uuid.UUID, error)
 }
 
 type TokenService interface {

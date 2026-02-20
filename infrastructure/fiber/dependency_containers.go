@@ -8,7 +8,9 @@ import (
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/notification"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
+	firebaseInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/firebase"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openrouter"
 
@@ -35,6 +37,7 @@ type DependencyContainer struct {
 	Validator       *validatorInfra.Validator
 	mailerSender    *mailersendInfra.MailerSendService
 	AIService       *MultiModelService
+	Notification    *notification.NotificationService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
@@ -105,6 +108,16 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		OAuthSessionTTL: time.Minute * 15,
 	})
 
+	var notifService *notification.NotificationService
+	fcmCtx := context.Background()
+
+	messagingClient, err := firebaseInfra.NewFCMClient(fcmCtx)
+	if err == nil {
+		notifService = notification.NewNotificationService(messagingClient, postgresRepo)
+	} else {
+		fmt.Printf("Warning: FCM Client initialization failed: %v\n", err)
+	}
+
 	return &DependencyContainer{
 		Repo:            postgresRepo,
 		Chunker:         chunker,
@@ -117,6 +130,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		slogLogger:      slogLogger,
 		mailerSender:    mailersendService,
 		AIService:       aiService,
+		Notification:    notifService,
 	}
 }
 

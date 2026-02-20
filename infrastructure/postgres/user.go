@@ -228,3 +228,65 @@ func (r *Repository) GetUserNameAndEmailByIdForSendingVerificationEmail(ctx cont
 	}
 	return username, email, nil
 }
+
+func (r *Repository) GetUsersForMorningMotivation(ctx context.Context) ([]uuid.UUID, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT id 
+		FROM users 
+		WHERE fcm_token IS NOT NULL 
+		AND (preferences->'notifications'->>'motivation')::boolean = true
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var userIDs []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		userIDs = append(userIDs, id)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return userIDs, nil
+}
+
+func (r *Repository) GetLazyUsersForEveningReminder(ctx context.Context) ([]uuid.UUID, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT u.id 
+		FROM users u 
+		LEFT JOIN usage_stats us ON u.id = us.user_id 
+		WHERE u.fcm_token IS NOT NULL 
+		AND (u.preferences->'notifications'->>'reminders')::boolean = true 
+		AND (
+			us.id IS NULL 
+			OR us.current_streak = 0 
+			OR us.last_activity_date < CURRENT_DATE - INTERVAL '3 days'
+		)
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var userIDs []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		userIDs = append(userIDs, id)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return userIDs, nil
+}

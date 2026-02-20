@@ -64,9 +64,11 @@
 package fiber
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/oauth"
+	"github.com/MedAIst-Studio/MedAIist-Backend/jobs"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
@@ -235,4 +237,22 @@ func SetupRoutes(app *fiber.App) {
 			Code:    http.StatusNotFound,
 		})
 	})
+
+	if dc.Notification != nil {
+		c, err := jobs.SetupCronJobs(dc.Repo, dc.Notification)
+		if err != nil {
+			fmt.Printf("Warning: Failed to setup cron jobs: %v\n", err)
+		} else {
+			c.Start()
+			fmt.Println("Cron jobs started")
+
+			app.Hooks().OnShutdown(func() error {
+				fmt.Println("Shutting down cron jobs...")
+				c.Stop()
+				return nil
+			})
+		}
+	} else {
+		fmt.Println("Warning: Notification service is nil, skipping cron jobs startup.")
+	}
 }
