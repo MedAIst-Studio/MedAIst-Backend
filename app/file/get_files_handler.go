@@ -23,10 +23,14 @@ type File struct {
 
 type GetFilesHandler struct {
 	repo Repository
+	fs   FileService
 }
 
-func NewGetFilesHandler(repo Repository) *GetFilesHandler {
-	return &GetFilesHandler{repo: repo}
+func NewGetFilesHandler(repo Repository, fs FileService) *GetFilesHandler {
+	return &GetFilesHandler{
+		repo: repo,
+		fs:   fs,
+	}
 }
 
 // godoc
@@ -46,6 +50,22 @@ func (h *GetFilesHandler) Handle(ctx context.Context, req *GetFilesRequest) (*Ge
 	files, err := h.repo.GetFilesByUserID(ctx, userId)
 	if err != nil {
 		return nil, 500, err
+	}
+
+	if len(files) > 0 {
+		var paths []string
+		for _, f := range files {
+			paths = append(paths, f.Url)
+		}
+
+		urls, err := h.fs.GetFiles(ctx, paths)
+		if err != nil {
+			return nil, 500, err
+		}
+
+		for i := range files {
+			files[i].Url = urls[i]
+		}
 	}
 
 	response := GetFilesResponse(files)

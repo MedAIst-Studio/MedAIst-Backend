@@ -144,7 +144,7 @@ func SetupRoutes(app *fiber.App) {
 	fileProcessorFactory := file.NewFileProcessorFactory(pdfProcessor, imageProcessor)
 
 	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, fileProcessorFactory, dc.Repo)
-	getFilesHandler := file.NewGetFilesHandler(dc.Repo)
+	getFilesHandler := file.NewGetFilesHandler(dc.Repo, dc.FileStorage)
 	deleteFileByIdHandler := file.NewDeleteFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB)
 	getFileHandler := file.NewGetFileHandler(dc.Repo, dc.FileStorage)
 

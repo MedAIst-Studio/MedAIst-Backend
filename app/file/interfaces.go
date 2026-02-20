@@ -36,6 +36,7 @@ type FileService interface {
 	DeleteFile(ctx context.Context, filePath string) error
 	GetFile(ctx context.Context, filePath string) ([]byte, error)
 	DeleteFiles(ctx context.Context, filePaths []string) error
+	GetFiles(ctx context.Context, filePaths []string) ([]string, error)
 }
 
 type Chunker interface {
