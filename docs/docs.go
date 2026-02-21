@@ -15,49 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/users": {
-            "post": {
-                "description": "Retrieve a list of all users",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Admin"
-                ],
-                "summary": "Get Users",
-                "parameters": [
-                    {
-                        "description": "Get Users request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app_admin.GetUsersRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/app_admin.UserInfo"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/api/auth/exchange": {
             "post": {
                 "consumes": [
@@ -74,7 +31,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_auth.ExchangeRequest"
+                            "$ref": "#/definitions/handlers_auth.ExchangeRequest"
                         }
                     }
                 ],
@@ -82,7 +39,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_auth.ExchangeResponse"
+                            "$ref": "#/definitions/handlers_auth.ExchangeResponse"
                         }
                     },
                     "400": {
@@ -157,7 +114,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_auth.LoginRequest"
+                            "$ref": "#/definitions/handlers_auth.LoginRequest"
                         }
                     }
                 ],
@@ -165,7 +122,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_auth.LoginResponse"
+                            "$ref": "#/definitions/handlers_auth.LoginResponse"
                         }
                     },
                     "400": {
@@ -226,7 +183,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_auth.RefreshTokenRequest"
+                            "$ref": "#/definitions/handlers_auth.RefreshTokenRequest"
                         }
                     }
                 ],
@@ -234,7 +191,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_auth.RefreshTokenResponse"
+                            "$ref": "#/definitions/handlers_auth.RefreshTokenResponse"
                         }
                     },
                     "401": {
@@ -266,7 +223,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_auth.SignupRequest"
+                            "$ref": "#/definitions/handlers_auth.SignupRequest"
                         }
                     }
                 ],
@@ -274,7 +231,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_auth.SignupResponse"
+                            "$ref": "#/definitions/handlers_auth.SignupResponse"
                         }
                     },
                     "400": {
@@ -313,7 +270,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/app_chat.Chat"
+                                "$ref": "#/definitions/domain.ChatResponseDTO"
                             }
                         }
                     },
@@ -356,7 +313,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/app_chat.Message"
+                                "$ref": "#/definitions/domain.MessageDTO"
                             }
                         }
                     },
@@ -410,20 +367,42 @@ const docTemplate = `{
                 "security": [
                     {
                         "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
                     }
                 ],
-                "description": "Updates the title of a chat by its ID.",
+                "description": "Updates the title of a chat by its ID.\nUpdates the title of a chat by its ID.",
                 "consumes": [
+                    "application/json",
                     "application/json"
                 ],
                 "produces": [
+                    "application/json",
                     "application/json"
                 ],
                 "tags": [
+                    "Chats",
                     "Chats"
                 ],
                 "summary": "Update Chat Title",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Title",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateChatRequest"
+                        }
+                    },
                     {
                         "type": "string",
                         "description": "Chat ID",
@@ -481,7 +460,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/app_file.File"
+                                "$ref": "#/definitions/domain.FileResponseDTO"
                             }
                         }
                     },
@@ -516,7 +495,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_file.UploadFileRequest"
+                            "$ref": "#/definitions/domain.UploadFileRequest"
                         }
                     }
                 ],
@@ -524,7 +503,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_file.UploadFileResponse"
+                            "$ref": "#/definitions/domain.UploadFileResponse"
                         }
                     },
                     "400": {
@@ -669,7 +648,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_message.SendMessageRequest"
+                            "$ref": "#/definitions/domain.SendMessageRequest"
                         }
                     }
                 ],
@@ -677,7 +656,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_message.SendMessageResponse"
+                            "$ref": "#/definitions/domain.SendMessageResponse"
                         }
                     },
                     "400": {
@@ -691,10 +670,7 @@ const docTemplate = `{
         },
         "/quizzes": {
             "get": {
-                "description": "Retrieve a list of quizzes for the authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get all quizzes for the current user",
                 "produces": [
                     "application/json"
                 ],
@@ -708,7 +684,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/app_quiz.QuizSummary"
+                                "$ref": "#/definitions/domain.QuizResponseDTO"
                             }
                         }
                     },
@@ -736,7 +712,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.GenerateQuizRequest"
+                            "$ref": "#/definitions/domain.GenerateQuizRequest"
                         }
                     }
                 ],
@@ -744,7 +720,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.GenerateQuizResponse"
+                            "$ref": "#/definitions/domain.GenerateQuizResponse"
                         }
                     },
                     "400": {
@@ -758,10 +734,7 @@ const docTemplate = `{
         },
         "/quizzes/attempts": {
             "get": {
-                "description": "Get all quiz attempts for the current user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get paginated quiz attempts for the current user",
                 "produces": [
                     "application/json"
                 ],
@@ -772,15 +745,13 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "default": 10,
-                        "description": "Limit",
+                        "description": "Page size (default 10, max 50)",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "default": 0,
-                        "description": "Offset",
+                        "description": "Offset (default 0)",
                         "name": "offset",
                         "in": "query"
                     }
@@ -789,11 +760,8 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.GetQuizAttemptsResponse"
+                            "$ref": "#/definitions/domain.GetAttemptsResponse"
                         }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -803,17 +771,14 @@ const docTemplate = `{
         },
         "/quizzes/attempts/{id}": {
             "get": {
-                "description": "Retrieve a specific quiz attempt by its ID for the authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get full details of a specific quiz attempt",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Quiz"
                 ],
-                "summary": "Get Quiz Attempt by ID",
+                "summary": "Get Attempt Details",
                 "parameters": [
                     {
                         "type": "string",
@@ -827,21 +792,24 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.GetAttemptByIdResponse"
+                            "$ref": "#/definitions/domain.AttemptDetailResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
         "/quizzes/{id}": {
             "get": {
-                "description": "Retrieve a quiz by its ID for the authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get a specific quiz by its ID",
                 "produces": [
                     "application/json"
                 ],
@@ -862,11 +830,17 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.GetQuizByIdResponse"
+                            "$ref": "#/definitions/domain.GetQuizByIdResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -898,7 +872,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.SolveQuizRequest"
+                            "$ref": "#/definitions/domain.SolveQuizRequest"
                         }
                     }
                 ],
@@ -906,7 +880,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_quiz.SolveQuizResponse"
+                            "$ref": "#/definitions/domain.SolveQuizResponse"
                         }
                     },
                     "400": {
@@ -938,7 +912,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_system.VersionResponse"
+                            "$ref": "#/definitions/handlers_system.VersionResponse"
                         }
                     },
                     "500": {
@@ -998,7 +972,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_user.UpdateUsernameRequest"
+                            "$ref": "#/definitions/handlers_user.UpdateUsernameRequest"
                         }
                     }
                 ],
@@ -1043,7 +1017,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_user.UpdateFCMTokenRequest"
+                            "$ref": "#/definitions/handlers_user.UpdateFCMTokenRequest"
                         }
                     }
                 ],
@@ -1083,7 +1057,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_user.ForgotPasswordRequest"
+                            "$ref": "#/definitions/handlers_user.ForgotPasswordRequest"
                         }
                     }
                 ],
@@ -1128,7 +1102,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_user.ChangePasswordRequest"
+                            "$ref": "#/definitions/handlers_user.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -1179,7 +1153,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_user.UpdatePreferencesRequest"
+                            "$ref": "#/definitions/handlers_user.UpdatePreferencesRequest"
                         }
                     }
                 ],
@@ -1221,7 +1195,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_user.GetCurrentUserResponse"
+                            "$ref": "#/definitions/handlers_user.GetCurrentUserResponse"
                         }
                     },
                     "400": {
@@ -1238,7 +1212,7 @@ const docTemplate = `{
         },
         "/users/reset-password": {
             "post": {
-                "description": "It resets a user's password using a token.",
+                "description": "Resets the password completely for the specific user",
                 "consumes": [
                     "application/json"
                 ],
@@ -1256,7 +1230,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app_user.ResetPasswordRequest"
+                            "$ref": "#/definitions/handlers_user.ResetPasswordRequest"
                         }
                     }
                 ],
@@ -1298,48 +1272,8 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app_user.GetStreakResponse"
+                            "$ref": "#/definitions/handlers_user.GetStreakResponse"
                         }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
-        "/users/verify-email": {
-            "post": {
-                "description": "Verifies a user's email address using a token",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Verify user email",
-                "parameters": [
-                    {
-                        "description": "Verify Email Request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app_user.VerifiyEmailRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "No Content"
-                    },
-                    "400": {
-                        "description": "Bad Request"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -1352,224 +1286,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "app_admin.GetUsersRequest": {
-            "type": "object"
-        },
-        "app_admin.UserInfo": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "provider": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.ExchangeRequest": {
-            "type": "object",
-            "properties": {
-                "session": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.ExchangeResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.LoginRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "accessToken": {
-                    "type": "string"
-                },
-                "refreshToken": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.RefreshTokenRequest": {
-            "type": "object",
-            "properties": {
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.RefreshTokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.SignupRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_auth.SignupResponse": {
-            "type": "object"
-        },
-        "app_chat.Chat": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_chat.Message": {
-            "type": "object",
-            "properties": {
-                "attachments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/domain.Attachment"
-                    }
-                },
-                "content": {
-                    "type": "string"
-                },
-                "context_snapshot": {
-                    "$ref": "#/definitions/domain.ContextSnapshot"
-                },
-                "is_user": {
-                    "type": "boolean"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_file.File": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_file.UploadFileRequest": {
-            "type": "object",
-            "properties": {
-                "file_data": {
-                    "$ref": "#/definitions/multipart.FileHeader"
-                },
-                "file_title": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_file.UploadFileResponse": {
-            "type": "object",
-            "properties": {
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_message.SendMessageRequest": {
-            "type": "object",
-            "required": [
-                "content"
-            ],
-            "properties": {
-                "chat_id": {
-                    "type": "string"
-                },
-                "content": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "image_url": {
-                    "type": "string"
-                },
-                "pdf_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_message.SendMessageResponse": {
-            "type": "object",
-            "properties": {
-                "ai_message_id": {
-                    "type": "string"
-                },
-                "ai_response": {
-                    "type": "string"
-                },
-                "chat_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "user_message_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_quiz.Answer": {
+        "domain.Answer": {
             "type": "object",
             "required": [
                 "question_no",
@@ -1592,14 +1309,13 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.AnswerFeedback": {
+        "domain.AnswerFeedback": {
             "type": "object",
             "properties": {
                 "correct_option": {
                     "type": "string"
                 },
                 "explanation": {
-                    "description": "Doğru cevap açıklaması",
                     "type": "string"
                 },
                 "is_correct": {
@@ -1613,7 +1329,19 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.AttemptAnswerDetail": {
+        "domain.Attachment": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"image\"",
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.AttemptAnswerDetail": {
             "type": "object",
             "properties": {
                 "correct_option": {
@@ -1636,7 +1364,88 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.GenerateQuizRequest": {
+        "domain.AttemptDetailResponse": {
+            "type": "object",
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.AttemptAnswerDetail"
+                    }
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "quiz_id": {
+                    "type": "string"
+                },
+                "quiz_title": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "total_questions": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.ChatResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ContextSnapshot": {
+            "type": "object",
+            "properties": {
+                "cached_title": {
+                    "type": "string"
+                },
+                "document_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"pdf\", \"book\", etc.",
+                    "type": "string"
+                }
+            }
+        },
+        "domain.FileResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.GenerateQuizRequest": {
             "type": "object",
             "required": [
                 "fileId",
@@ -1657,7 +1466,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.GenerateQuizResponse": {
+        "domain.GenerateQuizResponse": {
             "type": "object",
             "properties": {
                 "quizId": {
@@ -1665,104 +1474,98 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.GetAttemptByIdResponse": {
-            "type": "object",
-            "properties": {
-                "answers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app_quiz.AttemptAnswerDetail"
-                    }
-                },
-                "completed_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "percentage": {
-                    "type": "number"
-                },
-                "quiz_id": {
-                    "type": "string"
-                },
-                "quiz_title": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "integer"
-                },
-                "total_questions": {
-                    "type": "integer"
-                }
-            }
-        },
-        "app_quiz.GetQuizAttemptsResponse": {
+        "domain.GetAttemptsResponse": {
             "type": "object",
             "properties": {
                 "attempts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/app_quiz.QuizAttemptDetail"
+                        "$ref": "#/definitions/domain.QuizAttemptDetail"
                     }
                 },
-                "total_count": {
+                "count": {
                     "type": "integer"
                 }
             }
         },
-        "app_quiz.GetQuizByIdResponse": {
+        "domain.GetQuizByIdResponse": {
             "type": "object",
             "properties": {
+                "documentId": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
                 "questions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/app_quiz.Question"
+                        "$ref": "#/definitions/domain.QuizQuestion"
                     }
                 },
                 "title": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },
-        "app_quiz.Option": {
+        "domain.MessageDTO": {
             "type": "object",
             "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Attachment"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "context_snapshot": {
+                    "$ref": "#/definitions/domain.ContextSnapshot"
+                },
+                "is_user": {
+                    "type": "boolean"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.NotificationPreferences": {
+            "type": "object",
+            "properties": {
+                "motivation": {
+                    "type": "boolean"
+                },
+                "reminders": {
+                    "type": "boolean"
+                },
+                "updates": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "domain.Option": {
+            "type": "object",
+            "properties": {
+                "isCorrect": {
+                    "type": "boolean"
+                },
                 "label": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_quiz.Question": {
-            "type": "object",
-            "properties": {
-                "correct_option": {
-                    "type": "string"
-                },
-                "explanation": {
                     "type": "string"
                 },
                 "no": {
                     "type": "integer"
                 },
-                "options": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app_quiz.Option"
-                    }
-                },
                 "text": {
                     "type": "string"
                 }
             }
         },
-        "app_quiz.QuizAttemptDetail": {
+        "domain.QuizAttemptDetail": {
             "type": "object",
             "properties": {
                 "completed_at": {
@@ -1788,21 +1591,85 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.QuizSummary": {
+        "domain.QuizQuestion": {
+            "type": "object",
+            "properties": {
+                "correctOptionLabel": {
+                    "type": "string"
+                },
+                "explanation": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Option"
+                    }
+                },
+                "questionText": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.QuizResponseDTO": {
             "type": "object",
             "properties": {
                 "createdAt": {
                     "type": "string"
                 },
-                "quizId": {
+                "id": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
+                },
+                "totalQuestions": {
+                    "type": "integer"
                 }
             }
         },
-        "app_quiz.SolveQuizRequest": {
+        "domain.SendMessageRequest": {
+            "type": "object",
+            "required": [
+                "content"
+            ],
+            "properties": {
+                "chat_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "pdf_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.SendMessageResponse": {
+            "type": "object",
+            "properties": {
+                "ai_message_id": {
+                    "type": "string"
+                },
+                "ai_response": {
+                    "type": "string"
+                },
+                "chat_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_message_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.SolveQuizRequest": {
             "type": "object",
             "required": [
                 "answers",
@@ -1812,7 +1679,7 @@ const docTemplate = `{
                 "answers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/app_quiz.Answer"
+                        "$ref": "#/definitions/domain.Answer"
                     }
                 },
                 "id": {
@@ -1820,14 +1687,13 @@ const docTemplate = `{
                 }
             }
         },
-        "app_quiz.SolveQuizResponse": {
+        "domain.SolveQuizResponse": {
             "type": "object",
             "properties": {
                 "answers": {
-                    "description": "Detaylı cevap bilgisi",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/app_quiz.AnswerFeedback"
+                        "$ref": "#/definitions/domain.AnswerFeedback"
                     }
                 },
                 "attempt_id": {
@@ -1844,7 +1710,125 @@ const docTemplate = `{
                 }
             }
         },
-        "app_system.VersionResponse": {
+        "domain.UpdateChatRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UploadFileRequest": {
+            "type": "object",
+            "properties": {
+                "file": {
+                    "$ref": "#/definitions/multipart.FileHeader"
+                }
+            }
+        },
+        "domain.UploadFileResponse": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UserPreferences": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "$ref": "#/definitions/domain.NotificationPreferences"
+                },
+                "theme": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.ExchangeRequest": {
+            "type": "object",
+            "properties": {
+                "session": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.ExchangeResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.RefreshTokenRequest": {
+            "type": "object",
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.SignupRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.SignupResponse": {
+            "type": "object"
+        },
+        "handlers_system.VersionResponse": {
             "type": "object",
             "properties": {
                 "force_update": {
@@ -1867,7 +1851,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.ChangePasswordRequest": {
+        "handlers_user.ChangePasswordRequest": {
             "type": "object",
             "required": [
                 "new_password",
@@ -1882,7 +1866,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.ForgotPasswordRequest": {
+        "handlers_user.ForgotPasswordRequest": {
             "type": "object",
             "required": [
                 "email"
@@ -1893,7 +1877,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.GetCurrentUserResponse": {
+        "handlers_user.GetCurrentUserResponse": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -1916,7 +1900,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.GetStreakResponse": {
+        "handlers_user.GetStreakResponse": {
             "type": "object",
             "properties": {
                 "current_streak": {
@@ -1936,23 +1920,22 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.ResetPasswordRequest": {
+        "handlers_user.ResetPasswordRequest": {
             "type": "object",
             "required": [
-                "password",
+                "newPassword",
                 "token"
             ],
             "properties": {
-                "password": {
-                    "type": "string",
-                    "minLength": 8
+                "newPassword": {
+                    "type": "string"
                 },
                 "token": {
                     "type": "string"
                 }
             }
         },
-        "app_user.UpdateFCMTokenRequest": {
+        "handlers_user.UpdateFCMTokenRequest": {
             "type": "object",
             "required": [
                 "fcm_token"
@@ -1963,7 +1946,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.UpdatePreferencesRequest": {
+        "handlers_user.UpdatePreferencesRequest": {
             "type": "object",
             "properties": {
                 "notifications": {
@@ -1985,84 +1968,13 @@ const docTemplate = `{
                 }
             }
         },
-        "app_user.UpdateUsernameRequest": {
+        "handlers_user.UpdateUsernameRequest": {
             "type": "object",
             "required": [
                 "username"
             ],
             "properties": {
                 "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "app_user.VerifiyEmailRequest": {
-            "type": "object",
-            "required": [
-                "token"
-            ],
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "domain.Attachment": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "description": "\"image\"",
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
-            }
-        },
-        "domain.ContextSnapshot": {
-            "type": "object",
-            "properties": {
-                "cached_title": {
-                    "type": "string"
-                },
-                "document_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "description": "\"pdf\", \"book\", etc.",
-                    "type": "string"
-                }
-            }
-        },
-        "domain.NotificationPreferences": {
-            "type": "object",
-            "properties": {
-                "motivation": {
-                    "type": "boolean"
-                },
-                "reminders": {
-                    "type": "boolean"
-                },
-                "updates": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "domain.UpdateChatRequest": {
-            "type": "object",
-            "properties": {
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "domain.UserPreferences": {
-            "type": "object",
-            "properties": {
-                "notifications": {
-                    "$ref": "#/definitions/domain.NotificationPreferences"
-                },
-                "theme": {
                     "type": "string"
                 }
             }

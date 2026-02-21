@@ -12,7 +12,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/google/uuid"
 	"github.com/ledongthuc/pdf"
 )
 
@@ -25,12 +26,12 @@ var (
 )
 
 type ChunkingService interface {
-	ChunkPDF(ctx context.Context, fileBytes []byte, fileID string, options file.ChunkOptions) ([]file.Chunk, error)
+	ChunkPDF(ctx context.Context, fileBytes []byte, fileID string, options domain.ChunkOptions) ([]domain.Chunk, error)
 }
 
 type PdfChunkingService struct {
 	abbreviations map[string]bool
-	Config        *file.ChunkOptions
+	Config        *domain.ChunkOptions
 
 	// Advanced patterns for medical/academic documents
 	sectionHeaders  *regexp.Regexp
@@ -55,7 +56,7 @@ type QualityMetrics struct {
 	QualityIssues     []string
 }
 
-func NewChunkingService(config *file.ChunkOptions) *PdfChunkingService {
+func NewChunkingService(config *domain.ChunkOptions) *PdfChunkingService {
 	// Comprehensive abbreviations for medical/academic/business contexts
 	abbreviations := map[string]bool{
 		// Titles
@@ -102,7 +103,7 @@ func NewChunkingService(config *file.ChunkOptions) *PdfChunkingService {
 	}
 }
 
-func (s *PdfChunkingService) ChunkPDF(ctx context.Context, fileBytes []byte, fileID string) ([]file.Chunk, error) {
+func (s *PdfChunkingService) ChunkPDF(ctx context.Context, fileBytes []byte, fileID string) ([]domain.Chunk, error) {
 	// Context cancellation check
 	select {
 	case <-ctx.Done():
@@ -362,8 +363,8 @@ func (s *PdfChunkingService) ensureValidUTF8(text string) string {
 	return text
 }
 
-func (s *PdfChunkingService) semanticChunking(text string, pageRanges []pageRange, fileID string) []file.Chunk {
-	var chunks []file.Chunk
+func (s *PdfChunkingService) semanticChunking(text string, pageRanges []pageRange, fileID string) []domain.Chunk {
+	var chunks []domain.Chunk
 
 	// Detect document structure (sections, paragraphs, lists)
 	sections := s.detectSections(text)
@@ -585,9 +586,9 @@ func (s *PdfChunkingService) intelligentSentenceSplit(text string) []string {
 }
 
 func (s *PdfChunkingService) chunkSentences(sentences []string, fileID string,
-	startChunkIndex, startPos int, pageRanges []pageRange) []file.Chunk {
+	startChunkIndex, startPos int, pageRanges []pageRange) []domain.Chunk {
 
-	var chunks []file.Chunk
+	var chunks []domain.Chunk
 	var current strings.Builder
 	chunkIndex := startChunkIndex
 	currentStartPos := startPos
@@ -667,8 +668,8 @@ func (s *PdfChunkingService) smartOverlap(text string) string {
 	return strings.TrimSpace(overlapText)
 }
 
-func (s *PdfChunkingService) finalizeChunk(chunks []file.Chunk, current *strings.Builder,
-	fileID string, chunkIndex, startPos, endPos int, pageRanges []pageRange) []file.Chunk {
+func (s *PdfChunkingService) finalizeChunk(chunks []domain.Chunk, current *strings.Builder,
+	fileID string, chunkIndex, startPos, endPos int, pageRanges []pageRange) []domain.Chunk {
 
 	text := strings.TrimSpace(current.String())
 	if text == "" {
@@ -684,9 +685,9 @@ func (s *PdfChunkingService) finalizeChunk(chunks []file.Chunk, current *strings
 		return chunks
 	}
 
-	chunk := file.Chunk{
+	chunk := domain.Chunk{
 		Text: text,
-		Metadata: file.ChunkMetadata{
+		Metadata: domain.ChunkMetadata{
 			FileID:      fileID,
 			ChunkIndex:  chunkIndex,
 			PageNumbers: getPagesForRange(startPos, endPos, pageRanges),
@@ -697,8 +698,8 @@ func (s *PdfChunkingService) finalizeChunk(chunks []file.Chunk, current *strings
 	return append(chunks, chunk)
 }
 
-func (s *PdfChunkingService) postProcessChunks(chunks []file.Chunk) []file.Chunk {
-	var processed []file.Chunk
+func (s *PdfChunkingService) postProcessChunks(chunks []domain.Chunk) []domain.Chunk {
+	var processed []domain.Chunk
 
 	for i, chunk := range chunks {
 		text := chunk.Text
@@ -943,7 +944,7 @@ func (s *PdfChunkingService) calculateChunkQuality(text string) float64 {
 	return score
 }
 
-func (s *PdfChunkingService) calculateAverageChunkQuality(chunks []file.Chunk) float64 {
+func (s *PdfChunkingService) calculateAverageChunkQuality(chunks []domain.Chunk) float64 {
 	if len(chunks) == 0 {
 		return 0.0
 	}
@@ -1044,4 +1045,14 @@ func uniquePages(pages1, pages2 []int) []int {
 	}
 	sort.Ints(result)
 	return result
+}
+
+func (s *PdfChunkingService) GetChunks(ctx context.Context, fileId uuid.UUID) ([]string, error) {
+	// Not fully implemented for quiz yet, since chunks are handled differently in DB in real scenario.
+	// But to satisfy interface, we will return some dummy or we can implement real logic.
+	return nil, errors.New("Not Implemented")
+}
+
+func (s *PdfChunkingService) GetChunksByPages(ctx context.Context, fileId uuid.UUID, pageRange []int) ([]string, error) {
+	return nil, errors.New("Not Implemented")
 }

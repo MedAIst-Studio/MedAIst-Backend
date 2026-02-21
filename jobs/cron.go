@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/notification"
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/robfig/cron/v3"
 )
 
-func SetupCronJobs(repo notification.Repository, notifService *notification.NotificationService) (*cron.Cron, error) {
+func SetupCronJobs(repo domain.NotificationRepository, notifService domain.NotificationService) (*cron.Cron, error) {
 	c := cron.New()
 
 	// Morning Motivation at 09:00
@@ -25,7 +25,7 @@ func SetupCronJobs(repo notification.Repository, notifService *notification.Noti
 			err := notifService.SendNotification(
 				ctx,
 				uid,
-				notification.NotifTypeMotivation,
+				domain.NotifTypeMotivation,
 				"Günaydın!",
 				"Güne harika bir başlangıç yap! Hedeflerine bir adım daha yaklaşmak için bugün neler yapacaksın?",
 			)
@@ -52,7 +52,7 @@ func SetupCronJobs(repo notification.Repository, notifService *notification.Noti
 			err := notifService.SendNotification(
 				ctx,
 				uid,
-				notification.NotifTypeReminder,
+				domain.NotifTypeReminder,
 				"Eksik bir şeyler var...",
 				"Bugün henüz bir çalışma yapmadın. Zinciri kırmamak için hemen küçük bir test çözmeye ne dersin?",
 			)

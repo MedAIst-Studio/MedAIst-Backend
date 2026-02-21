@@ -4,17 +4,16 @@ import (
 	"context"
 	"strings"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/gofiber/fiber/v2"
 )
 
 type MiddlewareManager struct {
-	tokenService auth.TokenService
+	tokenService domain.TokenService
 	logger       domain.Logger
 }
 
-func NewMiddlewareManager(tokenService auth.TokenService, logger domain.Logger) *MiddlewareManager {
+func NewMiddlewareManager(tokenService domain.TokenService, logger domain.Logger) *MiddlewareManager {
 	return &MiddlewareManager{
 		tokenService: tokenService,
 		logger:       logger,

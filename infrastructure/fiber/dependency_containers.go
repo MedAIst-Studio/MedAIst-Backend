@@ -6,13 +6,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
-
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/notification"
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
 	firebaseInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/firebase"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openrouter"
+	"github.com/MedAIst-Studio/MedAIist-Backend/services"
 
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
@@ -23,10 +22,11 @@ import (
 	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
+	"github.com/MedAIst-Studio/MedAIist-Backend/repository"
 )
 
 type DependencyContainer struct {
-	Repo            *postgresInfra.Repository
+	Repo            *repository.Repository
 	Chunker         *chunkerInfra.PdfChunkingService
 	Embedding       *openrouter.OpenRouterService
 	VectorDB        *qdrantInfra.QdrantVectorDB
@@ -37,11 +37,12 @@ type DependencyContainer struct {
 	Validator       *validatorInfra.Validator
 	mailerSender    *mailersendInfra.MailerSendService
 	AIService       *MultiModelService
-	Notification    *notification.NotificationService
+	Notification    *services.NotificationService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
-	postgresRepo := postgresInfra.NewRepository(os.Getenv("DATABASE_URL"))
+	postgresDB := postgresInfra.NewDB(os.Getenv("DATABASE_URL"))
+	repo := repository.NewRepository(postgresDB)
 	fmt.Println("Connected to database")
 
 	jweTokenService := jwe.NewJWETokenService(&jwe.Config{
@@ -66,7 +67,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	})
 	fmt.Println("Connected to S3 Storage at", os.Getenv("S3_ENDPOINT"))
 
-	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
+	chunker := chunkerInfra.NewChunkingService(&domain.ChunkOptions{
 		MaxChunkSize:    1024,
 		OverlapSize:     128,
 		PreserveContext: true,
@@ -84,7 +85,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 
 	openRouter := openrouter.NewOpenRouterService(openrouter.Config{
 		ApiKey:                 getEnv("OPENROUTER_API_KEY", ""),
-		ChatModel:              getEnv("OPENROUTER_CHAT_MODEL", "openai/gpt-4o-mini"),
+		ChatModel:              getEnv("OPENROUTER_CHAT_MODEL", "google/gemini-3-flash-preview"),
 		GenerateQuestionModel:  getEnv("OPENROUTER_QUESTION_MODEL", "openai/gpt-4o-mini"),
 		ExpandQuestionModel:    getEnv("OPENROUTER_EXPAND_MODEL", "openai/gpt-4o-mini"),
 		GenerateChatTitleModel: getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
@@ -108,18 +109,18 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		OAuthSessionTTL: time.Minute * 15,
 	})
 
-	var notifService *notification.NotificationService
+	var notifService *services.NotificationService
 	fcmCtx := context.Background()
 
 	messagingClient, err := firebaseInfra.NewFCMClient(fcmCtx)
 	if err == nil {
-		notifService = notification.NewNotificationService(messagingClient, postgresRepo)
+		notifService = services.NewNotificationService(messagingClient, repo)
 	} else {
 		fmt.Printf("Warning: FCM Client initialization failed: %v\n", err)
 	}
 
 	return &DependencyContainer{
-		Repo:            postgresRepo,
+		Repo:            repo,
 		Chunker:         chunker,
 		Embedding:       openRouter, // Using OpenRouter for embeddings
 		VectorDB:        vectorDB,
