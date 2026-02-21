@@ -6,7 +6,6 @@ import (
 	"math/rand/v2"
 	"strconv"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 	"github.com/qdrant/go-client/qdrant"
@@ -98,7 +97,7 @@ func (q *QdrantVectorDB) Close() error {
 	return q.client.Close()
 }
 
-func (q *QdrantVectorDB) InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*file.FileMetadata) error {
+func (q *QdrantVectorDB) InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*domain.FileMetadata) error {
 	if len(docs) == 0 {
 		return nil
 	}

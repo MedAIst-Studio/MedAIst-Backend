@@ -33,3 +33,7 @@ go.work.sum
 # .vscode/
 docs/swagger.json
 docs/swagger.yaml
+
+firebase-dev.json
+firebase-prod.json
+

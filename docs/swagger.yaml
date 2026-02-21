@@ -1,146 +1,5 @@
 definitions:
-  app_admin.GetUsersRequest:
-    type: object
-  app_admin.UserInfo:
-    properties:
-      email:
-        type: string
-      provider:
-        type: string
-      username:
-        type: string
-    type: object
-  app_auth.ExchangeRequest:
-    properties:
-      session:
-        type: string
-    type: object
-  app_auth.ExchangeResponse:
-    properties:
-      access_token:
-        type: string
-      refresh_token:
-        type: string
-    type: object
-  app_auth.LoginRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  app_auth.LoginResponse:
-    properties:
-      accessToken:
-        type: string
-      refreshToken:
-        type: string
-    type: object
-  app_auth.RefreshTokenRequest:
-    properties:
-      refresh_token:
-        type: string
-    type: object
-  app_auth.RefreshTokenResponse:
-    properties:
-      access_token:
-        type: string
-    type: object
-  app_auth.SignupRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - email
-    - password
-    - username
-    type: object
-  app_auth.SignupResponse:
-    type: object
-  app_chat.Chat:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-    type: object
-  app_chat.Message:
-    properties:
-      attachments:
-        items:
-          $ref: '#/definitions/domain.Attachment'
-        type: array
-      content:
-        type: string
-      context_snapshot:
-        $ref: '#/definitions/domain.ContextSnapshot'
-      is_user:
-        type: boolean
-      timestamp:
-        type: string
-    type: object
-  app_file.File:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-      size:
-        type: integer
-      title:
-        type: string
-      url:
-        type: string
-    type: object
-  app_file.UploadFileRequest:
-    properties:
-      file_data:
-        $ref: '#/definitions/multipart.FileHeader'
-      file_title:
-        type: string
-    type: object
-  app_file.UploadFileResponse:
-    properties:
-      url:
-        type: string
-    type: object
-  app_message.SendMessageRequest:
-    properties:
-      chat_id:
-        type: string
-      content:
-        minLength: 1
-        type: string
-      image_url:
-        type: string
-      pdf_id:
-        type: string
-    required:
-    - content
-    type: object
-  app_message.SendMessageResponse:
-    properties:
-      ai_message_id:
-        type: string
-      ai_response:
-        type: string
-      chat_id:
-        type: string
-      title:
-        type: string
-      user_message_id:
-        type: string
-    type: object
-  app_quiz.Answer:
+  domain.Answer:
     properties:
       question_no:
         minimum: 1
@@ -157,12 +16,11 @@ definitions:
     - question_no
     - selected_option
     type: object
-  app_quiz.AnswerFeedback:
+  domain.AnswerFeedback:
     properties:
       correct_option:
         type: string
       explanation:
-        description: Doğru cevap açıklaması
         type: string
       is_correct:
         type: boolean
@@ -171,7 +29,15 @@ definitions:
       selected_option:
         type: string
     type: object
-  app_quiz.AttemptAnswerDetail:
+  domain.Attachment:
+    properties:
+      type:
+        description: '"image"'
+        type: string
+      url:
+        type: string
+    type: object
+  domain.AttemptAnswerDetail:
     properties:
       correct_option:
         type: string
@@ -186,7 +52,60 @@ definitions:
       selected_option:
         type: string
     type: object
-  app_quiz.GenerateQuizRequest:
+  domain.AttemptDetailResponse:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/domain.AttemptAnswerDetail'
+        type: array
+      completed_at:
+        type: string
+      id:
+        type: string
+      percentage:
+        type: number
+      quiz_id:
+        type: string
+      quiz_title:
+        type: string
+      score:
+        type: integer
+      total_questions:
+        type: integer
+    type: object
+  domain.ChatResponseDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  domain.ContextSnapshot:
+    properties:
+      cached_title:
+        type: string
+      document_id:
+        type: string
+      type:
+        description: '"pdf", "book", etc.'
+        type: string
+    type: object
+  domain.FileResponseDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      size:
+        type: integer
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  domain.GenerateQuizRequest:
     properties:
       endPage:
         type: integer
@@ -200,75 +119,71 @@ definitions:
     - fileId
     - quizName
     type: object
-  app_quiz.GenerateQuizResponse:
+  domain.GenerateQuizResponse:
     properties:
       quizId:
         type: string
     type: object
-  app_quiz.GetAttemptByIdResponse:
-    properties:
-      answers:
-        items:
-          $ref: '#/definitions/app_quiz.AttemptAnswerDetail'
-        type: array
-      completed_at:
-        type: string
-      id:
-        type: string
-      percentage:
-        type: number
-      quiz_id:
-        type: string
-      quiz_title:
-        type: string
-      score:
-        type: integer
-      total_questions:
-        type: integer
-    type: object
-  app_quiz.GetQuizAttemptsResponse:
+  domain.GetAttemptsResponse:
     properties:
       attempts:
         items:
-          $ref: '#/definitions/app_quiz.QuizAttemptDetail'
+          $ref: '#/definitions/domain.QuizAttemptDetail'
         type: array
-      total_count:
+      count:
         type: integer
     type: object
-  app_quiz.GetQuizByIdResponse:
+  domain.GetQuizByIdResponse:
     properties:
+      documentId:
+        type: string
       id:
         type: string
       questions:
         items:
-          $ref: '#/definitions/app_quiz.Question'
+          $ref: '#/definitions/domain.QuizQuestion'
         type: array
       title:
         type: string
+      userId:
+        type: string
     type: object
-  app_quiz.Option:
+  domain.MessageDTO:
     properties:
+      attachments:
+        items:
+          $ref: '#/definitions/domain.Attachment'
+        type: array
+      content:
+        type: string
+      context_snapshot:
+        $ref: '#/definitions/domain.ContextSnapshot'
+      is_user:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  domain.NotificationPreferences:
+    properties:
+      motivation:
+        type: boolean
+      reminders:
+        type: boolean
+      updates:
+        type: boolean
+    type: object
+  domain.Option:
+    properties:
+      isCorrect:
+        type: boolean
       label:
-        type: string
-      text:
-        type: string
-    type: object
-  app_quiz.Question:
-    properties:
-      correct_option:
-        type: string
-      explanation:
         type: string
       "no":
         type: integer
-      options:
-        items:
-          $ref: '#/definitions/app_quiz.Option'
-        type: array
       text:
         type: string
     type: object
-  app_quiz.QuizAttemptDetail:
+  domain.QuizAttemptDetail:
     properties:
       completed_at:
         type: string
@@ -285,20 +200,62 @@ definitions:
       total_questions:
         type: integer
     type: object
-  app_quiz.QuizSummary:
+  domain.QuizQuestion:
+    properties:
+      correctOptionLabel:
+        type: string
+      explanation:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/domain.Option'
+        type: array
+      questionText:
+        type: string
+    type: object
+  domain.QuizResponseDTO:
     properties:
       createdAt:
         type: string
-      quizId:
+      id:
         type: string
       title:
         type: string
+      totalQuestions:
+        type: integer
     type: object
-  app_quiz.SolveQuizRequest:
+  domain.SendMessageRequest:
+    properties:
+      chat_id:
+        type: string
+      content:
+        minLength: 1
+        type: string
+      image_url:
+        type: string
+      pdf_id:
+        type: string
+    required:
+    - content
+    type: object
+  domain.SendMessageResponse:
+    properties:
+      ai_message_id:
+        type: string
+      ai_response:
+        type: string
+      chat_id:
+        type: string
+      title:
+        type: string
+      user_message_id:
+        type: string
+    type: object
+  domain.SolveQuizRequest:
     properties:
       answers:
         items:
-          $ref: '#/definitions/app_quiz.Answer'
+          $ref: '#/definitions/domain.Answer'
         type: array
       id:
         type: string
@@ -306,12 +263,11 @@ definitions:
     - answers
     - id
     type: object
-  app_quiz.SolveQuizResponse:
+  domain.SolveQuizResponse:
     properties:
       answers:
-        description: Detaylı cevap bilgisi
         items:
-          $ref: '#/definitions/app_quiz.AnswerFeedback'
+          $ref: '#/definitions/domain.AnswerFeedback'
         type: array
       attempt_id:
         type: string
@@ -322,7 +278,98 @@ definitions:
       total_questions:
         type: integer
     type: object
-  app_user.ChangePasswordRequest:
+  domain.UpdateChatRequest:
+    properties:
+      title:
+        type: string
+    type: object
+  domain.UploadFileRequest:
+    properties:
+      file:
+        $ref: '#/definitions/multipart.FileHeader'
+    type: object
+  domain.UploadFileResponse:
+    properties:
+      url:
+        type: string
+    type: object
+  domain.UserPreferences:
+    properties:
+      notifications:
+        $ref: '#/definitions/domain.NotificationPreferences'
+      theme:
+        type: string
+    type: object
+  handlers_auth.ExchangeRequest:
+    properties:
+      session:
+        type: string
+    type: object
+  handlers_auth.ExchangeResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  handlers_auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers_auth.LoginResponse:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
+  handlers_auth.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  handlers_auth.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
+  handlers_auth.SignupRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  handlers_auth.SignupResponse:
+    type: object
+  handlers_system.VersionResponse:
+    properties:
+      force_update:
+        type: boolean
+      latest_version:
+        type: string
+      message:
+        type: string
+      min_version:
+        type: string
+      store_url_android:
+        type: string
+      store_url_ios:
+        type: string
+    type: object
+  handlers_user.ChangePasswordRequest:
     properties:
       new_password:
         type: string
@@ -332,14 +379,14 @@ definitions:
     - new_password
     - old_password
     type: object
-  app_user.ForgotPasswordRequest:
+  handlers_user.ForgotPasswordRequest:
     properties:
       email:
         type: string
     required:
     - email
     type: object
-  app_user.GetCurrentUserResponse:
+  handlers_user.GetCurrentUserResponse:
     properties:
       createdAt:
         type: string
@@ -349,59 +396,61 @@ definitions:
         type: string
       isEmailVerified:
         type: boolean
+      preferences:
+        $ref: '#/definitions/domain.UserPreferences'
       username:
         type: string
     type: object
-  app_user.ResetPasswordRequest:
+  handlers_user.GetStreakResponse:
     properties:
-      password:
-        minLength: 8
+      current_streak:
+        type: integer
+      has_played_today:
+        type: boolean
+      max_streak:
+        type: integer
+      recent_active_dates:
+        items:
+          type: string
+        type: array
+    type: object
+  handlers_user.ResetPasswordRequest:
+    properties:
+      newPassword:
         type: string
       token:
         type: string
     required:
-    - password
+    - newPassword
     - token
     type: object
-  app_user.UpdateUsernameRequest:
+  handlers_user.UpdateFCMTokenRequest:
     properties:
-      address:
+      fcm_token:
         type: string
+    required:
+    - fcm_token
+    type: object
+  handlers_user.UpdatePreferencesRequest:
+    properties:
+      notifications:
+        properties:
+          motivation:
+            type: boolean
+          reminders:
+            type: boolean
+          updates:
+            type: boolean
+        type: object
+      theme:
+        type: string
+    type: object
+  handlers_user.UpdateUsernameRequest:
+    properties:
       username:
         type: string
     required:
-    - address
     - username
-    type: object
-  app_user.VerifiyEmailRequest:
-    properties:
-      token:
-        type: string
-    required:
-    - token
-    type: object
-  domain.Attachment:
-    properties:
-      type:
-        description: '"image"'
-        type: string
-      url:
-        type: string
-    type: object
-  domain.ContextSnapshot:
-    properties:
-      cached_title:
-        type: string
-      document_id:
-        type: string
-      type:
-        description: '"pdf", "book", etc.'
-        type: string
-    type: object
-  domain.UpdateChatRequest:
-    properties:
-      title:
-        type: string
     type: object
   infrastructure_oauth.MobileLoginRequest:
     properties:
@@ -496,34 +545,6 @@ info:
   title: MedAIist-Backend API
   version: "1.0"
 paths:
-  /admin/users:
-    post:
-      consumes:
-      - application/json
-      description: Retrieve a list of all users
-      parameters:
-      - description: Get Users request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/app_admin.GetUsersRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/app_admin.UserInfo'
-            type: array
-        "400":
-          description: Bad Request
-        "500":
-          description: Internal Server Error
-      summary: Get Users
-      tags:
-      - Admin
   /api/auth/exchange:
     post:
       consumes:
@@ -534,14 +555,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_auth.ExchangeRequest'
+          $ref: '#/definitions/handlers_auth.ExchangeRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_auth.ExchangeResponse'
+            $ref: '#/definitions/handlers_auth.ExchangeResponse'
         "400":
           description: Bad Request
         "500":
@@ -586,14 +607,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_auth.LoginRequest'
+          $ref: '#/definitions/handlers_auth.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_auth.LoginResponse'
+            $ref: '#/definitions/handlers_auth.LoginResponse'
         "400":
           description: Bad Request
         "401":
@@ -633,14 +654,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_auth.RefreshTokenRequest'
+          $ref: '#/definitions/handlers_auth.RefreshTokenRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_auth.RefreshTokenResponse'
+            $ref: '#/definitions/handlers_auth.RefreshTokenResponse'
         "401":
           description: Unauthorized
         "500":
@@ -659,14 +680,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_auth.SignupRequest'
+          $ref: '#/definitions/handlers_auth.SignupRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_auth.SignupResponse'
+            $ref: '#/definitions/handlers_auth.SignupResponse'
         "400":
           description: Bad Request
         "409":
@@ -688,7 +709,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/app_chat.Chat'
+              $ref: '#/definitions/domain.ChatResponseDTO'
             type: array
         "500":
           description: Internal Server Error
@@ -739,7 +760,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/app_chat.Message'
+              $ref: '#/definitions/domain.MessageDTO'
             type: array
         "404":
           description: Not Found
@@ -753,8 +774,22 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Updates the title of a chat by its ID.
+      - application/json
+      description: |-
+        Updates the title of a chat by its ID.
+        Updates the title of a chat by its ID.
       parameters:
+      - description: Chat ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: New Title
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateChatRequest'
       - description: Chat ID
         in: path
         name: id
@@ -768,6 +803,7 @@ paths:
           $ref: '#/definitions/domain.UpdateChatRequest'
       produces:
       - application/json
+      - application/json
       responses:
         "204":
           description: No Content
@@ -779,8 +815,10 @@ paths:
           description: Internal Server Error
       security:
       - BearerAuth: []
+      - BearerAuth: []
       summary: Update Chat Title
       tags:
+      - Chats
       - Chats
   /files:
     get:
@@ -794,7 +832,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/app_file.File'
+              $ref: '#/definitions/domain.FileResponseDTO'
             type: array
         "500":
           description: Internal Server Error
@@ -871,14 +909,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_file.UploadFileRequest'
+          $ref: '#/definitions/domain.UploadFileRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_file.UploadFileResponse'
+            $ref: '#/definitions/domain.UploadFileResponse'
         "400":
           description: Bad Request
         "500":
@@ -914,14 +952,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_message.SendMessageRequest'
+          $ref: '#/definitions/domain.SendMessageRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_message.SendMessageResponse'
+            $ref: '#/definitions/domain.SendMessageResponse'
         "400":
           description: Bad Request
         "500":
@@ -933,9 +971,7 @@ paths:
       - Message
   /quizzes:
     get:
-      consumes:
-      - application/json
-      description: Retrieve a list of quizzes for the authenticated user
+      description: Get all quizzes for the current user
       produces:
       - application/json
       responses:
@@ -943,7 +979,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/app_quiz.QuizSummary'
+              $ref: '#/definitions/domain.QuizResponseDTO'
             type: array
         "500":
           description: Internal Server Error
@@ -960,14 +996,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_quiz.GenerateQuizRequest'
+          $ref: '#/definitions/domain.GenerateQuizRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_quiz.GenerateQuizResponse'
+            $ref: '#/definitions/domain.GenerateQuizResponse'
         "400":
           description: Bad Request
         "500":
@@ -977,9 +1013,7 @@ paths:
       - Quiz
   /quizzes/{id}:
     get:
-      consumes:
-      - application/json
-      description: Retrieve a quiz by its ID for the authenticated user
+      description: Get a specific quiz by its ID
       parameters:
       - description: Quiz ID
         in: path
@@ -992,9 +1026,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_quiz.GetQuizByIdResponse'
+            $ref: '#/definitions/domain.GetQuizByIdResponse'
+        "400":
+          description: Bad Request
         "404":
           description: Not Found
+        "500":
+          description: Internal Server Error
       summary: Get Quiz by ID
       tags:
       - Quiz
@@ -1014,14 +1052,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_quiz.SolveQuizRequest'
+          $ref: '#/definitions/domain.SolveQuizRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_quiz.SolveQuizResponse'
+            $ref: '#/definitions/domain.SolveQuizResponse'
         "400":
           description: Bad Request
         "404":
@@ -1033,17 +1071,13 @@ paths:
       - Quiz
   /quizzes/attempts:
     get:
-      consumes:
-      - application/json
-      description: Get all quiz attempts for the current user
+      description: Get paginated quiz attempts for the current user
       parameters:
-      - default: 10
-        description: Limit
+      - description: Page size (default 10, max 50)
         in: query
         name: limit
         type: integer
-      - default: 0
-        description: Offset
+      - description: Offset (default 0)
         in: query
         name: offset
         type: integer
@@ -1053,9 +1087,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_quiz.GetQuizAttemptsResponse'
-        "401":
-          description: Unauthorized
+            $ref: '#/definitions/domain.GetAttemptsResponse'
         "500":
           description: Internal Server Error
       summary: Get Quiz Attempts
@@ -1063,10 +1095,7 @@ paths:
       - Quiz
   /quizzes/attempts/{id}:
     get:
-      consumes:
-      - application/json
-      description: Retrieve a specific quiz attempt by its ID for the authenticated
-        user
+      description: Get full details of a specific quiz attempt
       parameters:
       - description: Attempt ID
         in: path
@@ -1079,12 +1108,33 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_quiz.GetAttemptByIdResponse'
+            $ref: '#/definitions/domain.AttemptDetailResponse'
+        "400":
+          description: Bad Request
         "404":
           description: Not Found
-      summary: Get Quiz Attempt by ID
+        "500":
+          description: Internal Server Error
+      summary: Get Attempt Details
       tags:
       - Quiz
+  /system/config:
+    get:
+      consumes:
+      - application/json
+      description: Get system configuration like app version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers_system.VersionResponse'
+        "500":
+          description: Internal Server Error
+      summary: System Config
+      tags:
+      - System
   /users/account:
     delete:
       description: Delete a user's account
@@ -1112,7 +1162,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_user.UpdateUsernameRequest'
+          $ref: '#/definitions/handlers_user.UpdateUsernameRequest'
       produces:
       - application/json
       responses:
@@ -1129,6 +1179,34 @@ paths:
       summary: Update User Account
       tags:
       - User
+  /users/fcm-token:
+    patch:
+      consumes:
+      - application/json
+      description: Register or update the user's FCM push notification token
+      parameters:
+      - description: FCM Token Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers_user.UpdateFCMTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update FCM Token
+      tags:
+      - User
   /users/forgot-password:
     post:
       consumes:
@@ -1140,7 +1218,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_user.ForgotPasswordRequest'
+          $ref: '#/definitions/handlers_user.ForgotPasswordRequest'
       produces:
       - application/json
       responses:
@@ -1166,7 +1244,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_user.ChangePasswordRequest'
+          $ref: '#/definitions/handlers_user.ChangePasswordRequest'
       produces:
       - application/json
       responses:
@@ -1187,6 +1265,34 @@ paths:
       summary: Change User Password
       tags:
       - User
+  /users/preferences:
+    patch:
+      consumes:
+      - application/json
+      description: Update the current user's preferences (theme and notification settings)
+      parameters:
+      - description: Update Preferences Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers_user.UpdatePreferencesRequest'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Update User Preferences
+      tags:
+      - User
   /users/profile:
     get:
       consumes:
@@ -1198,7 +1304,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app_user.GetCurrentUserResponse'
+            $ref: '#/definitions/handlers_user.GetCurrentUserResponse'
         "400":
           description: Bad Request
         "401":
@@ -1214,14 +1320,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: It resets a user's password using a token.
+      description: Resets the password completely for the specific user
       parameters:
       - description: Reset Password Request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/app_user.ResetPasswordRequest'
+          $ref: '#/definitions/handlers_user.ResetPasswordRequest'
       produces:
       - application/json
       responses:
@@ -1236,30 +1342,25 @@ paths:
       summary: Reset Password
       tags:
       - User
-  /users/verify-email:
-    post:
+  /users/usage-stats:
+    get:
       consumes:
       - application/json
-      description: Verifies a user's email address using a token
-      parameters:
-      - description: Verify Email Request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/app_user.VerifiyEmailRequest'
+      description: Get the current user's streak and usage statistics
       produces:
       - application/json
       responses:
-        "204":
-          description: No Content
-        "400":
-          description: Bad Request
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers_user.GetStreakResponse'
         "401":
           description: Unauthorized
         "500":
           description: Internal Server Error
-      summary: Verify user email
+      security:
+      - BearerAuth: []
+      summary: Get Usage Stats (Streak)
       tags:
       - User
 securityDefinitions:

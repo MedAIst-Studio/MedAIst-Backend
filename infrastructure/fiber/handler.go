@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 
 	"github.com/gofiber/fiber/v2"
@@ -97,7 +96,7 @@ func Handle[R Request, Res Response](handler HandlerInterface[R, Res], logger do
 			return c.SendStatus(code)
 		}
 
-		if getFileRes, ok := any(res).(*file.GetFileResponse); ok {
+		if getFileRes, ok := any(res).(*domain.GetFileResponse); ok {
 			c.Set("Content-Type", "application/pdf")
 			return c.Send(getFileRes.FileBytes)
 		}

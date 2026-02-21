@@ -64,23 +64,36 @@
 package fiber
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/oauth"
+	"github.com/MedAIst-Studio/MedAIist-Backend/jobs"
+	"github.com/MedAIst-Studio/MedAIist-Backend/services"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/chat"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/quiz"
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/auth"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/chat"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/file"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/healthcheck"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/message"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/quiz"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/system"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/user"
 
 	fiberSwagger "github.com/swaggo/fiber-swagger"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+type handlerAdapter[R Request, Res Response] struct {
+	f func(context.Context, *R) (*Res, int, error)
+}
+
+func (h handlerAdapter[R, Res]) Handle(ctx context.Context, req *R) (*Res, int, error) {
+	return h.f(ctx, req)
+}
 
 func SetupRoutes(app *fiber.App) {
 	dc := NewAuthDependencyContainer()
@@ -88,27 +101,18 @@ func SetupRoutes(app *fiber.App) {
 	middlewareManager := NewMiddlewareManager(dc.jweTokenService, dc.slogLogger)
 
 	healthcheckHandler := healthcheck.NewHealthcheckHandler()
+	systemConfigHandler := system.NewSystemConfigHandler()
 
 	if !domain.IsProdEnv() {
 		domain.CookieSecure = false
 	}
 
-	signupHandler := auth.NewSignupHandler(&auth.SignupConfig{
-		Repo:         dc.Repo,
-		TokenService: dc.jweTokenService,
-		EmailService: dc.mailerSender,
-		Validator:    dc.Validator,
-		Logger:       dc.slogLogger,
+	authService := services.NewAuthService(dc.Repo, dc.jweTokenService, dc.mailerSender, dc.inMemoryClient)
+	authHandler := auth.NewAuthHandler(&auth.AuthConfig{
+		AuthService: authService,
+		Validator:   dc.Validator,
+		Logger:      dc.slogLogger,
 	})
-
-	loginHandler := auth.NewLoginHandler(&auth.LoginConfig{
-		Repo:         dc.Repo,
-		TokenService: dc.jweTokenService,
-		Validator:    dc.Validator,
-		Logger:       dc.slogLogger,
-	})
-
-	exchangeHandler := auth.NewExchangeHandler(dc.inMemoryClient)
 
 	googleOAuthService := NewGoogleOAuthService(dc)
 	facebookOAuthService := NewFacebookOAuthService(dc)
@@ -120,56 +124,62 @@ func SetupRoutes(app *fiber.App) {
 	}
 	mobileOAuthHandler := oauth.NewMobileOAuthHandler(oauthService, verifiers, dc.slogLogger)
 
-	logoutHandler := auth.NewLogoutHandler(dc.Repo)
-	refreshTokenHandler := auth.NewRefreshTokenHandler(dc.Repo, dc.jweTokenService)
-	deleteAccountHandler := user.NewDeleteAccountHandler(dc.Repo, dc.slogLogger, dc.FileStorage, dc.VectorDB)
-	updateUsernameHandler := user.NewUpdateUsernameHandler(dc.Repo, dc.Validator)
-	getCurrentUserHandler := user.NewGetCurrentUserHandler(dc.Repo)
-	updatePasswordHandler := user.NewChangePasswordHandler(dc.Repo, dc.Validator)
-	forgotPasswordHandler := user.NewForgotPasswordHandler(dc.Repo, dc.mailerSender, dc.jweTokenService, dc.slogLogger, dc.Validator)
-	resetPasswordHandler := user.NewResetPasswordHandler(dc.Repo, dc.jweTokenService, dc.slogLogger, dc.Validator)
+	streakService := services.NewStreakService(dc.Repo)
 
-	getChatsHandler := chat.NewGetChatsHandler(dc.Repo)
-	getChatByIDHandler := chat.NewGetChatByIDHandler(dc.Repo)
-	deleteChatHandler := chat.NewDeleteChatHandler(dc.Repo)
-	updateChatHandler := chat.NewUpdateChatHandler(dc.Repo)
+	userService := services.NewUserService(dc.Repo, dc.FileStorage, dc.VectorDB, dc.mailerSender, dc.jweTokenService, dc.slogLogger)
+	userHandler := user.NewUserHandler(userService, streakService, dc.Validator)
 
-	pdfProcessor := file.NewPdfProcessor(dc.Repo, dc.FileStorage, dc.VectorDB, dc.Embedding, dc.Chunker, 48, true)
-	imageProcessor := file.NewImageProcessor()
-	fileProcessorFactory := file.NewFileProcessorFactory(pdfProcessor, imageProcessor)
-
-	uploadFileHandler := file.NewUploadFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB, fileProcessorFactory)
-	getFilesHandler := file.NewGetFilesHandler(dc.Repo)
-	deleteFileByIdHandler := file.NewDeleteFileHandler(dc.Repo, dc.FileStorage, dc.VectorDB)
-	getFileHandler := file.NewGetFileHandler(dc.Repo, dc.FileStorage)
-
-	sendMessageHandler := message.NewSendMessageHandler(message.Config{
-		PastMessagesLimit: 5,
-		Stream:            false,
-		Repo:              dc.Repo,
-		Ems:               dc.Embedding,
-		Vb:                dc.VectorDB,
-		ChatSvc:           dc.AIService,
-		FileService:       dc.FileStorage,
+	chatService := services.NewChatService(dc.Repo)
+	chatHandler := chat.NewChatHandler(&chat.ChatConfig{
+		ChatService: chatService,
 	})
 
-	generateQuizHandler := quiz.NewGenerateQuizHandler(dc.AIService, dc.Repo, dc.VectorDB)
-	getQuizzesHandler := quiz.NewGetQuizzesHandler(dc.Repo)
-	getQuizByIdHandler := quiz.NewGetQuizByIdHandler(dc.Repo)
-	solveQuizHandler := quiz.NewSolveQuizHandler(dc.Repo)
-	getQuizAttemptsHandler := quiz.NewGetQuizAttemptsHandler(dc.Repo)
-	getQuizAttemptByIdHandler := quiz.NewGetAttemptByIdHandler(dc.Repo)
+	fileService := services.NewFileService(
+		dc.Repo,
+		dc.FileStorage,
+		dc.VectorDB,
+		streakService,
+		services.NewFileProcessorFactory(
+			services.NewPdfProcessor(dc.Repo, dc.FileStorage, dc.VectorDB, dc.Embedding, dc.Chunker, 48, true),
+			services.NewImageProcessor(),
+		),
+	)
+
+	fileHandler := file.NewFileHandler(&file.FileConfig{
+		FileService: fileService,
+	})
+
+	messageService := services.NewMessageService(
+		5,
+		false,
+		dc.Repo,
+		dc.VectorDB,
+		dc.Embedding,
+		dc.AIService,
+		dc.FileStorage,
+		streakService,
+	)
+	messageHandler := message.NewMessageHandler(&message.MessageConfig{
+		MessageService: messageService,
+	})
+
+	quizService := services.NewQuizService(dc.AIService, dc.Repo, dc.Chunker, streakService)
+	quizHandler := quiz.NewQuizHandler(&quiz.QuizConfig{
+		QuizService: quizService,
+	})
 
 	sl := dc.slogLogger
+
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
+	app.Get("/system/config", Handle(systemConfigHandler, sl))
 	app.Use(contextMiddleware)
 
 	authApp := app.Group("/auth")
-	authApp.Post("/signup", Handle(signupHandler, sl))
-	authApp.Post("/login", Handle(loginHandler, sl))
-	authApp.Post("/logout", Handle(logoutHandler, sl))
-	authApp.Post("/refresh", Handle(refreshTokenHandler, sl))
-	authApp.Post("/exchange", Handle(exchangeHandler, sl))
+	authApp.Post("/signup", Handle(handlerAdapter[auth.SignupRequest, auth.SignupResponse]{authHandler.HandleSignup}, sl))
+	authApp.Post("/login", Handle(handlerAdapter[auth.LoginRequest, auth.LoginResponse]{authHandler.HandleLogin}, sl))
+	authApp.Post("/logout", Handle(handlerAdapter[auth.LogoutRequest, auth.LogoutResponse]{authHandler.HandleLogout}, sl))
+	authApp.Post("/refresh", Handle(handlerAdapter[auth.RefreshTokenRequest, auth.RefreshTokenResponse]{authHandler.HandleRefreshToken}, sl))
+	authApp.Post("/exchange", Handle(handlerAdapter[auth.ExchangeRequest, auth.ExchangeResponse]{authHandler.HandleExchange}, sl))
 	authApp.Get("/google", googleOAuthService.RedirectHandler)
 	authApp.Get("/facebook", facebookOAuthService.RedirectHandler)
 
@@ -179,37 +189,40 @@ func SetupRoutes(app *fiber.App) {
 	app.Post("/api/auth/oauth/mobile", mobileOAuthHandler.Handle)
 
 	usersPublicApp := app.Group("/users")
-	usersPublicApp.Post("/forgot-password", Handle(forgotPasswordHandler, sl))
-	usersPublicApp.Post("/reset-password", Handle(resetPasswordHandler, sl))
+	usersPublicApp.Post("/forgot-password", Handle(handlerAdapter[user.ForgotPasswordRequest, user.ForgotPasswordResponse]{userHandler.HandleForgotPassword}, sl))
+	usersPublicApp.Post("/reset-password", Handle(handlerAdapter[user.ResetPasswordRequest, user.ResetPasswordResponse]{userHandler.HandleResetPassword}, sl))
 
 	usersApp := app.Group("/users", middlewareManager.AuthMiddleware)
-	usersApp.Get("/profile", Handle(getCurrentUserHandler, sl))
-	usersApp.Delete("/account", Handle(deleteAccountHandler, sl))
-	usersApp.Patch("/account", Handle(updateUsernameHandler, sl))
-	usersApp.Patch("/password", Handle(updatePasswordHandler, sl))
+	usersApp.Get("/profile", Handle(handlerAdapter[user.GetCurrentUserRequest, user.GetCurrentUserResponse]{userHandler.HandleGetCurrentUser}, sl))
+	usersApp.Delete("/account", Handle(handlerAdapter[user.DeleteAccountRequest, user.DeleteAccountResponse]{userHandler.HandleDeleteAccount}, sl))
+	usersApp.Patch("/account", Handle(handlerAdapter[user.UpdateUsernameRequest, user.UpdateUsernameResponse]{userHandler.HandleUpdateUsername}, sl))
+	usersApp.Patch("/password", Handle(handlerAdapter[user.ChangePasswordRequest, user.ChangePasswordResponse]{userHandler.HandleChangePassword}, sl))
+	usersApp.Patch("/preferences", Handle(handlerAdapter[user.UpdatePreferencesRequest, user.UpdatePreferencesResponse]{userHandler.HandleUpdatePreferences}, sl))
+	usersApp.Patch("/fcm-token", Handle(handlerAdapter[user.UpdateFCMTokenRequest, user.UpdateFCMTokenResponse]{userHandler.HandleUpdateFCMToken}, sl))
+	usersApp.Get("/usage-stats", Handle(handlerAdapter[user.GetStreakRequest, user.GetStreakResponse]{userHandler.HandleGetStreak}, sl))
 
 	chatsApp := app.Group("/chats", middlewareManager.AuthMiddleware)
-	chatsApp.Get("/", Handle(getChatsHandler, sl))
-	chatsApp.Get("/:id", Handle(getChatByIDHandler, sl))
-	chatsApp.Delete("/:id", Handle(deleteChatHandler, sl))
-	chatsApp.Patch("/:id", Handle(updateChatHandler, sl))
+	chatsApp.Get("/", Handle(handlerAdapter[domain.GetChatsRequest, domain.GetChatsResponse]{chatHandler.HandleGetChats}, sl))
+	chatsApp.Get("/:id", Handle(handlerAdapter[domain.GetChatByIDRequest, domain.GetChatByIDResponse]{chatHandler.HandleGetChatByID}, sl))
+	chatsApp.Delete("/:id", Handle(handlerAdapter[domain.DeleteChatRequest, domain.DeleteChatResponse]{chatHandler.HandleDeleteChat}, sl))
+	chatsApp.Patch("/:id", Handle(handlerAdapter[domain.UpdateChatDTO, domain.UpdateChatResponse]{chatHandler.HandleUpdateChat}, sl))
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
-	filesApp.Post("/upload", Handle(uploadFileHandler, sl))
-	filesApp.Get("/", Handle(getFilesHandler, sl))
-	filesApp.Delete("/:id", Handle(deleteFileByIdHandler, sl))
-	filesApp.Get("/:id", Handle(getFileHandler, sl))
+	filesApp.Post("/upload", Handle(handlerAdapter[domain.UploadFileRequest, domain.UploadFileResponse]{fileHandler.HandleUploadFile}, sl))
+	filesApp.Get("/", Handle(handlerAdapter[domain.GetFilesRequest, domain.GetFilesResponse]{fileHandler.HandleGetFiles}, sl))
+	filesApp.Delete("/:id", Handle(handlerAdapter[domain.DeleteFileRequest, domain.DeleteFileResponse]{fileHandler.HandleDeleteFile}, sl))
+	filesApp.Get("/:id", Handle(handlerAdapter[domain.GetFileRequest, domain.GetFileResponse]{fileHandler.HandleGetFile}, sl))
 
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
-	messagesApp.Post("/", Handle(sendMessageHandler, sl))
+	messagesApp.Post("/", Handle(handlerAdapter[domain.SendMessageRequest, domain.SendMessageResponse]{messageHandler.HandleSendMessage}, sl))
 
 	quizApp := app.Group("/quizzes", middlewareManager.AuthMiddleware)
-	quizApp.Post("/", Handle(generateQuizHandler, sl))
-	quizApp.Get("/", Handle(getQuizzesHandler, sl))
-	quizApp.Get("/attempts", Handle(getQuizAttemptsHandler, sl))
-	quizApp.Get("/attempts/:id", Handle(getQuizAttemptByIdHandler, sl))
-	quizApp.Post("/:id/solve", Handle(solveQuizHandler, sl))
-	quizApp.Get("/:id", Handle(getQuizByIdHandler, sl))
+	quizApp.Post("/", Handle(handlerAdapter[domain.GenerateQuizRequest, domain.GenerateQuizResponse]{quizHandler.HandleGenerateQuiz}, sl))
+	quizApp.Get("/", Handle(handlerAdapter[domain.GetQuizzesRequest, domain.GetQuizzesResponse]{quizHandler.HandleGetQuizzes}, sl))
+	quizApp.Get("/attempts", Handle(handlerAdapter[domain.GetAttemptsRequest, domain.GetAttemptsResponse]{quizHandler.HandleGetAttempts}, sl))
+	quizApp.Get("/attempts/:id", Handle(handlerAdapter[domain.GetAttemptByIdRequest, domain.AttemptDetailResponse]{quizHandler.HandleGetAttemptById}, sl))
+	quizApp.Post("/:id/solve", Handle(handlerAdapter[domain.SolveQuizRequest, domain.SolveQuizResponse]{quizHandler.HandleSolveQuiz}, sl))
+	quizApp.Get("/:id", Handle(handlerAdapter[domain.GetQuizByIdRequest, domain.GetQuizByIdResponse]{quizHandler.HandleGetQuizById}, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)
@@ -228,4 +241,22 @@ func SetupRoutes(app *fiber.App) {
 			Code:    http.StatusNotFound,
 		})
 	})
+
+	if dc.Notification != nil {
+		c, err := jobs.SetupCronJobs(dc.Repo, dc.Notification)
+		if err != nil {
+			fmt.Printf("Warning: Failed to setup cron jobs: %v\n", err)
+		} else {
+			c.Start()
+			fmt.Println("Cron jobs started")
+
+			app.Hooks().OnShutdown(func() error {
+				fmt.Println("Shutting down cron jobs...")
+				c.Stop()
+				return nil
+			})
+		}
+	} else {
+		fmt.Println("Warning: Notification service is nil, skipping cron jobs startup.")
+	}
 }

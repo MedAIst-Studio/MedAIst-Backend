@@ -21,7 +21,7 @@ func SetupServer() *fiber.App {
 		WriteTimeout: 60 * time.Second,
 		Concurrency:  256 * 1024,
 		BodyLimit:    15 * 1024 * 1024,
-		AppName:      "YKSAI-Backend API",
+		AppName:      "Scope-Backend API",
 	})
 
 	registerMiddlewares(app)

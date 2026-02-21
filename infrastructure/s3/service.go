@@ -159,3 +159,27 @@ func (s *S3Service) DeleteFiles(ctx context.Context, filePaths []string) error {
 
 	return nil
 }
+
+func (s *S3Service) GetFiles(ctx context.Context, filePaths []string) ([]string, error) {
+	if len(filePaths) == 0 {
+		return nil, nil
+	}
+
+	var urls []string
+	for _, path := range filePaths {
+		var fileUrl string
+		if s.PublicDomain != "" {
+			baseUrl := strings.TrimRight(s.PublicDomain, "/")
+			if !strings.Contains(baseUrl, "storage/v1/object/public") {
+				fileUrl = fmt.Sprintf("%s/storage/v1/object/public/%s/%s", baseUrl, s.BucketName, path)
+			} else {
+				fileUrl = fmt.Sprintf("%s/%s/%s", baseUrl, s.BucketName, path)
+			}
+		} else {
+			fileUrl = fmt.Sprintf("%s/%s", s.BucketName, path)
+		}
+		urls = append(urls, fileUrl)
+	}
+
+	return urls, nil
+}

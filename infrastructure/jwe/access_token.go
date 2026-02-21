@@ -3,7 +3,6 @@ package jwe
 import (
 	"time"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 )
 
@@ -16,7 +15,7 @@ func (s *Service) GenerateAuthAccessToken(userID string) (string, error) {
 	return encryptClaims(s.accessTokenEncrypter, claims)
 }
 
-func (s *Service) ValidateAuthAccessToken(tokenString string) (*auth.TokenPayload, error) {
+func (s *Service) ValidateAuthAccessToken(tokenString string) (*domain.TokenPayload, error) {
 	var claims AuthClaims
 	if err := decryptClaims(tokenString, s.accessTokenEncryptionKey, &claims); err != nil {
 		return nil, err
@@ -24,7 +23,7 @@ func (s *Service) ValidateAuthAccessToken(tokenString string) (*auth.TokenPayloa
 	if isExpired(claims.Exp) {
 		return nil, domain.ErrExpiredToken
 	}
-	return &auth.TokenPayload{
+	return &domain.TokenPayload{
 		UserID: claims.UserID,
 	}, nil
 }
