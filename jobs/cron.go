@@ -3,16 +3,22 @@ package jobs
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/robfig/cron/v3"
 )
 
 func SetupCronJobs(repo domain.NotificationRepository, notifService domain.NotificationService) (*cron.Cron, error) {
-	c := cron.New()
+	loc, err := time.LoadLocation("Europe/Istanbul")
+	if err != nil {
+		return nil, err
+	}
+
+	c := cron.New(cron.WithLocation(loc))
 
 	// Morning Motivation at 09:00
-	_, err := c.AddFunc("0 9 * * *", func() {
+	_, err = c.AddFunc("0 9 * * *", func() {
 		ctx := context.Background()
 		userIDs, err := repo.GetUsersForMorningMotivation(ctx)
 		if err != nil {
