@@ -322,6 +322,21 @@ definitions:
       total_questions:
         type: integer
     type: object
+  app_system.VersionResponse:
+    properties:
+      force_update:
+        type: boolean
+      latest_version:
+        type: string
+      message:
+        type: string
+      min_version:
+        type: string
+      store_url_android:
+        type: string
+      store_url_ios:
+        type: string
+    type: object
   app_user.ChangePasswordRequest:
     properties:
       new_password:
@@ -1134,6 +1149,23 @@ paths:
       summary: Get Quiz Attempt by ID
       tags:
       - Quiz
+  /system/config:
+    get:
+      consumes:
+      - application/json
+      description: Get system configuration like app version
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app_system.VersionResponse'
+        "500":
+          description: Internal Server Error
+      summary: System Config
+      tags:
+      - System
   /users/account:
     delete:
       description: Delete a user's account

@@ -921,6 +921,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/system/config": {
+            "get": {
+                "description": "Get system configuration like app version",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "System Config",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app_system.VersionResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/account": {
             "delete": {
                 "security": [
@@ -1815,6 +1841,29 @@ const docTemplate = `{
                 },
                 "total_questions": {
                     "type": "integer"
+                }
+            }
+        },
+        "app_system.VersionResponse": {
+            "type": "object",
+            "properties": {
+                "force_update": {
+                    "type": "boolean"
+                },
+                "latest_version": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "min_version": {
+                    "type": "string"
+                },
+                "store_url_android": {
+                    "type": "string"
+                },
+                "store_url_ios": {
+                    "type": "string"
                 }
             }
         },

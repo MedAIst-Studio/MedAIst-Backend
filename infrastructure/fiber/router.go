@@ -76,6 +76,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/quiz"
+	"github.com/MedAIst-Studio/MedAIist-Backend/app/system"
 	"github.com/MedAIst-Studio/MedAIist-Backend/app/user"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 
@@ -90,6 +91,7 @@ func SetupRoutes(app *fiber.App) {
 	middlewareManager := NewMiddlewareManager(dc.jweTokenService, dc.slogLogger)
 
 	healthcheckHandler := healthcheck.NewHealthcheckHandler()
+	systemConfigHandler := system.NewSystemConfigHandler()
 
 	if !domain.IsProdEnv() {
 		domain.CookieSecure = false
@@ -167,7 +169,9 @@ func SetupRoutes(app *fiber.App) {
 	getQuizAttemptByIdHandler := quiz.NewGetAttemptByIdHandler(dc.Repo)
 
 	sl := dc.slogLogger
+
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
+	app.Get("/system/config", Handle(systemConfigHandler, sl))
 	app.Use(contextMiddleware)
 
 	authApp := app.Group("/auth")
