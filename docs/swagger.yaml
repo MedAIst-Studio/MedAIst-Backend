@@ -285,7 +285,7 @@ definitions:
     type: object
   domain.UploadFileRequest:
     properties:
-      file:
+      file_data:
         $ref: '#/definitions/multipart.FileHeader'
     type: object
   domain.UploadFileResponse:

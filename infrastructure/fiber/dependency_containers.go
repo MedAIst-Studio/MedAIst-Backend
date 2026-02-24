@@ -122,7 +122,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	return &DependencyContainer{
 		Repo:            repo,
 		Chunker:         chunker,
-		Embedding:       openRouter, // Using OpenRouter for embeddings
+		Embedding:       openRouter,
 		VectorDB:        vectorDB,
 		FileStorage:     s3Service,
 		jweTokenService: jweTokenService,

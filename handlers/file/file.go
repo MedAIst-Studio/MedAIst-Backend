@@ -2,6 +2,7 @@ package file
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
@@ -37,6 +38,10 @@ func NewFileHandler(config *FileConfig) *FileHandler {
 //	@Router			/files/upload [post]
 func (h *FileHandler) HandleUploadFile(ctx context.Context, req *domain.UploadFileRequest) (*domain.UploadFileResponse, int, error) {
 	userId := domain.GetUserID(ctx)
+
+	if req.FileData == nil {
+		return nil, 400, fmt.Errorf("file is required")
+	}
 
 	// Open the multipart file
 	file, err := req.FileData.Open()

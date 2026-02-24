@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"math"
 	"path/filepath"
 	"strings"
@@ -36,12 +37,16 @@ func NewFileService(
 }
 
 func (s *FileService) UploadFile(ctx context.Context, userId uuid.UUID, fileTitle string, fileBytes []byte) (*domain.UploadFileResponse, error) {
+	ext := strings.ToLower(filepath.Ext(fileTitle))
+	newFileId := uuid.New()
+	objectPath := fmt.Sprintf("uploads/%s%s", newFileId.String(), ext)
+
 	newFile := &domain.File{
-		Id:     uuid.New(),
+		Id:     newFileId,
 		UserId: userId,
 		Name:   fileTitle,
 		Size:   int64(len(fileBytes)),
-		Path:   "",
+		Path:   objectPath,
 	}
 
 	processor, err := s.factory.GetProcessor(newFile.Name)

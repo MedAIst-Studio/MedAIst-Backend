@@ -20,7 +20,7 @@ type File struct {
 // ---------- File DTOs ----------
 
 type UploadFileRequest struct {
-	FileData *multipart.FileHeader `form:"file"`
+	FileData *multipart.FileHeader `form:"file_data"`
 }
 
 type UploadFileResponse struct {

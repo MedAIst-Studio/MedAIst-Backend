@@ -1721,7 +1721,7 @@ const docTemplate = `{
         "domain.UploadFileRequest": {
             "type": "object",
             "properties": {
-                "file": {
+                "file_data": {
                     "$ref": "#/definitions/multipart.FileHeader"
                 }
             }
