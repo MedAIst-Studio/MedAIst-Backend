@@ -7,6 +7,7 @@ import (
 	"math"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
@@ -42,11 +43,12 @@ func (s *FileService) UploadFile(ctx context.Context, userId uuid.UUID, fileTitl
 	objectPath := fmt.Sprintf("uploads/%s%s", newFileId.String(), ext)
 
 	newFile := &domain.File{
-		Id:     newFileId,
-		UserId: userId,
-		Name:   fileTitle,
-		Size:   int64(len(fileBytes)),
-		Path:   objectPath,
+		Id:        newFileId,
+		UserId:    userId,
+		Name:      fileTitle,
+		Size:      int64(len(fileBytes)),
+		Path:      objectPath,
+		CreatedAt: time.Now(),
 	}
 
 	processor, err := s.factory.GetProcessor(newFile.Name)

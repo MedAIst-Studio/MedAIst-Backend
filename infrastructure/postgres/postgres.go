@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS  files (
     title TEXT NOT NULL,
     size BIGINT NOT NULL,
     path TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- REFRESH TOKENS
