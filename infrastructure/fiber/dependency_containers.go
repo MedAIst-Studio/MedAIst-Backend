@@ -26,18 +26,19 @@ import (
 )
 
 type DependencyContainer struct {
-	Repo            *repository.Repository
-	Chunker         *chunkerInfra.PdfChunkingService
-	Embedding       *openrouter.OpenRouterService
-	VectorDB        *qdrantInfra.QdrantVectorDB
-	FileStorage     *s3Infra.S3Service
-	jweTokenService *jwe.Service
-	inMemoryClient  *inMemoryInfra.InMemoryClient
-	slogLogger      *slogInfra.SlogLogger
-	Validator       *validatorInfra.Validator
-	mailerSender    *mailersendInfra.MailerSendService
-	AIService       *MultiModelService
-	Notification    *services.NotificationService
+	Repo                *repository.Repository
+	Chunker             *chunkerInfra.PdfChunkingService
+	Embedding           *openrouter.OpenRouterService
+	VectorDB            *qdrantInfra.QdrantVectorDB
+	FileStorage         *s3Infra.S3Service
+	jweTokenService     *jwe.Service
+	inMemoryClient      *inMemoryInfra.InMemoryClient
+	slogLogger          *slogInfra.SlogLogger
+	Validator           *validatorInfra.Validator
+	mailerSender        *mailersendInfra.MailerSendService
+	AIService           *MultiModelService
+	Notification        *services.NotificationService
+	SubscriptionService *services.SubscriptionService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
@@ -119,19 +120,24 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		fmt.Printf("Warning: FCM Client initialization failed: %v\n", err)
 	}
 
+	// -- Subscription / Payment --
+	usageLimits := domain.DefaultUsageLimitsConfig()
+	subscriptionService := services.NewSubscriptionService(repo, usageLimits)
+
 	return &DependencyContainer{
-		Repo:            repo,
-		Chunker:         chunker,
-		Embedding:       openRouter,
-		VectorDB:        vectorDB,
-		FileStorage:     s3Service,
-		jweTokenService: jweTokenService,
-		inMemoryClient:  inMemoryClient,
-		Validator:       validator,
-		slogLogger:      slogLogger,
-		mailerSender:    mailersendService,
-		AIService:       aiService,
-		Notification:    notifService,
+		Repo:                repo,
+		Chunker:             chunker,
+		Embedding:           openRouter,
+		VectorDB:            vectorDB,
+		FileStorage:         s3Service,
+		jweTokenService:     jweTokenService,
+		inMemoryClient:      inMemoryClient,
+		Validator:           validator,
+		slogLogger:          slogLogger,
+		mailerSender:        mailersendService,
+		AIService:           aiService,
+		Notification:        notifService,
+		SubscriptionService: subscriptionService,
 	}
 }
 

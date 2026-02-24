@@ -9,14 +9,16 @@ import (
 )
 
 type MiddlewareManager struct {
-	tokenService domain.TokenService
-	logger       domain.Logger
+	tokenService        domain.TokenService
+	logger              domain.Logger
+	subscriptionService domain.SubscriptionService
 }
 
-func NewMiddlewareManager(tokenService domain.TokenService, logger domain.Logger) *MiddlewareManager {
+func NewMiddlewareManager(tokenService domain.TokenService, logger domain.Logger, subscriptionService domain.SubscriptionService) *MiddlewareManager {
 	return &MiddlewareManager{
-		tokenService: tokenService,
-		logger:       logger,
+		tokenService:        tokenService,
+		logger:              logger,
+		subscriptionService: subscriptionService,
 	}
 }
 

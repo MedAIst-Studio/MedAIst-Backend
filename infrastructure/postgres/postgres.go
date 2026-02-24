@@ -155,22 +155,47 @@ CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
     UNIQUE(attempt_id, question_no)
 );
 
-    
-    
+
+-- USER SUBSCRIPTIONS
+CREATE TABLE IF NOT EXISTS user_subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    plan_type TEXT NOT NULL DEFAULT 'free',
+    revenuecat_id TEXT,
+    product_id TEXT,
+    entitlement_id TEXT,
+    expires_at TIMESTAMPTZ,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    will_renew BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id)
+);
+
+-- USAGE TRACKING
+CREATE TABLE IF NOT EXISTS usage_tracking (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    action_type TEXT NOT NULL,
+    usage_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    usage_count INT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id, action_type, usage_date)
+);
+
     -- INDEXES
     CREATE INDEX IF NOT EXISTS  idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
     CREATE INDEX IF NOT EXISTS  idx_quiz_attempts_quiz_user ON quiz_attempts(quiz_id, user_id);
     CREATE INDEX IF NOT EXISTS idx_quiz_attempt_answers_attempt_id ON quiz_attempt_answers(attempt_id);
+    CREATE INDEX IF NOT EXISTS idx_usage_tracking_user_date ON usage_tracking(user_id, usage_date);
+    CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_id ON user_subscriptions(user_id);
 	`
 	_, err := db.Exec(createTableQuery)
 	if err != nil {
 		panic("Failed to create tables: " + err.Error())
 	}
 
-	migrationQuery := `
-	ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences JSONB DEFAULT '{"theme":"system","notifications":{"motivation":true,"reminders":true,"updates":true}}';
-	ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT DEFAULT NULL;
-	`
+	migrationQuery := ``
 	_, err = db.Exec(migrationQuery)
 	if err != nil {
 		panic("Failed to run migrations: " + err.Error())

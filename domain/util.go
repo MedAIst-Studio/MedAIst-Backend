@@ -19,6 +19,10 @@ func GetUserID(ctx context.Context) uuid.UUID {
 	return uuid.MustParse(userID)
 }
 
+func GetUserIDFromString(userID string) uuid.UUID {
+	return uuid.MustParse(userID)
+}
+
 func IsProdEnv() bool {
 	return os.Getenv("ENV") == "production"
 }
