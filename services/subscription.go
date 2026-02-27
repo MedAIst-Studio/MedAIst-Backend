@@ -12,15 +12,18 @@ import (
 type SubscriptionService struct {
 	repo   domain.SubscriptionRepository
 	limits domain.UsageLimitsConfig
+	logger domain.Logger
 }
 
 func NewSubscriptionService(
 	repo domain.SubscriptionRepository,
 	limits domain.UsageLimitsConfig,
+	logger domain.Logger,
 ) *SubscriptionService {
 	return &SubscriptionService{
 		repo:   repo,
 		limits: limits,
+		logger: logger,
 	}
 }
 
@@ -75,30 +78,37 @@ func (s *SubscriptionService) IncrementUsage(ctx context.Context, userID uuid.UU
 // HandleWebhookEvent processes RevenueCat webhook events.
 func (s *SubscriptionService) HandleWebhookEvent(ctx context.Context, event *domain.RevenueCatWebhookEvent) error {
 	eventData := event.Event
-	appUserID, _ := eventData["app_user_id"].(string)
-	if appUserID == "" {
+	eventType, _ := eventData["type"].(string)
+
+	appUserID, ok := eventData["app_user_id"].(string)
+	if !ok || appUserID == "" {
+		s.logger.Error("Webhook event missing app_user_id", "type", eventType)
 		return fmt.Errorf("webhook event missing app_user_id")
 	}
 
 	userID, err := uuid.Parse(appUserID)
 	if err != nil {
+		s.logger.Error("Invalid app_user_id", "app_user_id", appUserID, "err", err)
 		return fmt.Errorf("invalid app_user_id: %w", err)
 	}
 
 	now := time.Now()
 
-	switch event.Type {
+	switch eventType {
 	case "INITIAL_PURCHASE", "RENEWAL", "PRODUCT_CHANGE", "UNCANCELLATION":
 		productID, _ := eventData["product_id"].(string)
 		entitlementID := s.detectEntitlement(productID)
+		planType := s.determinePlanType(productID)
 
 		var expiresAt *time.Time
-		if expStr, ok := eventData["expiration_at_ms"].(float64); ok {
-			t := time.UnixMilli(int64(expStr))
-			expiresAt = &t
+		if expVal, ok := eventData["expiration_at_ms"]; ok {
+			if expFloat, ok := expVal.(float64); ok {
+				t := time.UnixMilli(int64(expFloat))
+				expiresAt = &t
+			} else {
+				s.logger.Error("expiration_at_ms is not float64", "value", expVal)
+			}
 		}
-
-		planType := s.determinePlanType(productID)
 
 		sub := &domain.Subscription{
 			UserID:        userID,
@@ -111,30 +121,42 @@ func (s *SubscriptionService) HandleWebhookEvent(ctx context.Context, event *dom
 			WillRenew:     true,
 		}
 
-		return s.repo.UpsertSubscription(ctx, sub)
+		if err := s.repo.UpsertSubscription(ctx, sub); err != nil {
+			s.logger.Error("Failed to upsert subscription", "userID", userID, "err", err)
+			return err
+		}
+
+		return nil
 
 	case "CANCELLATION":
-		// İptal edildi ama expires_at'e kadar aktif kalır
 		sub, err := s.repo.GetSubscription(ctx, userID)
 		if err != nil {
+			s.logger.Error("Failed to get subscription for cancellation", "userID", userID, "err", err)
 			return err
 		}
 		if sub == nil {
+			s.logger.Info("No subscription found for cancellation, skipping", "userID", userID)
 			return nil
 		}
 
 		sub.WillRenew = false
 		sub.UpdatedAt = now
 
-		return s.repo.UpsertSubscription(ctx, sub)
+		if err := s.repo.UpsertSubscription(ctx, sub); err != nil {
+			s.logger.Error("Failed to update subscription for cancellation", "userID", userID, "err", err)
+			return err
+		}
+
+		return nil
 
 	case "EXPIRATION":
-		// Süre doldu — free plana düşür
 		sub, err := s.repo.GetSubscription(ctx, userID)
 		if err != nil {
+			s.logger.Error("Failed to get subscription for expiration", "userID", userID, "err", err)
 			return err
 		}
 		if sub == nil {
+			s.logger.Info("No subscription found for expiration, skipping", "userID", userID)
 			return nil
 		}
 
@@ -143,10 +165,14 @@ func (s *SubscriptionService) HandleWebhookEvent(ctx context.Context, event *dom
 		sub.WillRenew = true
 		sub.UpdatedAt = now
 
-		return s.repo.UpsertSubscription(ctx, sub)
+		if err := s.repo.UpsertSubscription(ctx, sub); err != nil {
+			s.logger.Error("Failed to update subscription to free after expiration", "userID", userID, "err", err)
+			return err
+		}
+
+		return nil
 
 	default:
-		// "BILLING_ISSUE", "SUBSCRIBER_ALIAS", etc. — no action needed
 		return nil
 	}
 }
@@ -179,7 +205,6 @@ func (s *SubscriptionService) GetUsageStatus(ctx context.Context, userID uuid.UU
 		var count int
 		var err error
 
-		// File uploads: show total file count
 		if action == domain.ActionFileUpload {
 			count, err = s.repo.GetUserFileCount(ctx, userID)
 		} else {
@@ -197,9 +222,9 @@ func (s *SubscriptionService) GetUsageStatus(ctx context.Context, userID uuid.UU
 		}
 	}
 
-	periodLabel := "günlük"
+	periodLabel := "daily"
 	if planLimits.Period == domain.LimitMonthly {
-		periodLabel = "aylık"
+		periodLabel = "monthly"
 	}
 
 	return &domain.UsageStatusResponse{

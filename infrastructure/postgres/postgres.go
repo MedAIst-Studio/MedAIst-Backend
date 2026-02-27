@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
     action_type TEXT NOT NULL,
     usage_date DATE NOT NULL DEFAULT CURRENT_DATE,
     usage_count INT NOT NULL DEFAULT 0,
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(user_id, action_type, usage_date)
 );
 
@@ -195,7 +195,24 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
 		panic("Failed to create tables: " + err.Error())
 	}
 
-	migrationQuery := ``
+	migrationQuery := `
+	-- Backfill: free subscription for existing users without one
+	INSERT INTO user_subscriptions (user_id, plan_type, is_active, will_renew)
+	SELECT id, 'free', TRUE, TRUE FROM users u
+	WHERE NOT EXISTS (SELECT 1 FROM user_subscriptions us WHERE us.user_id = u.id)
+	ON CONFLICT (user_id) DO NOTHING;
+
+	-- Backfill: usage_tracking rows for existing users
+	INSERT INTO usage_tracking (user_id, action_type, usage_date, usage_count, updated_at)
+	SELECT u.id, a.action_type, CURRENT_DATE, 0, NOW()
+	FROM users u
+	CROSS JOIN (VALUES ('message'), ('ocr'), ('pdf_chat'), ('file_upload'), ('quiz')) AS a(action_type)
+	WHERE NOT EXISTS (
+		SELECT 1 FROM usage_tracking ut
+		WHERE ut.user_id = u.id AND ut.action_type = a.action_type AND ut.usage_date = CURRENT_DATE
+	)
+	ON CONFLICT (user_id, action_type, usage_date) DO NOTHING;
+	`
 	_, err = db.Exec(migrationQuery)
 	if err != nil {
 		panic("Failed to run migrations: " + err.Error())

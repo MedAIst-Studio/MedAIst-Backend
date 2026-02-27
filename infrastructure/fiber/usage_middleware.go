@@ -24,7 +24,7 @@ func (m *MiddlewareManager) UsageLimitMiddleware(actionType domain.ActionType) f
 
 		allowed, err := m.subscriptionService.CheckUsageLimit(c.UserContext(), uid, actionType)
 		if err != nil {
-			m.logger.Error("Kullanım limiti kontrol hatası",
+			m.logger.Error("Usage limit check error",
 				"error", err.Error(),
 				"userID", userID,
 				"action", string(actionType),
@@ -40,6 +40,7 @@ func (m *MiddlewareManager) UsageLimitMiddleware(actionType domain.ActionType) f
 			return c.Status(fiber.StatusForbidden).JSON(domain.Error{
 				Message: errMsg.Error(),
 				Code:    fiber.StatusForbidden,
+				Feature: string(actionType),
 			})
 		}
 

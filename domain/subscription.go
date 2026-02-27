@@ -82,8 +82,8 @@ func DefaultUsageLimitsConfig() UsageLimitsConfig {
 			PlanFree: {
 				Period:   LimitDaily,
 				Messages: 10,
-				OCR:      0,
-				PDFChat:  0,
+				OCR:      3,
+				PDFChat:  5,
 				MaxFiles: 3,
 				Quizzes:  0,
 			},
@@ -170,7 +170,6 @@ type UsageRecord struct {
 // ---------- Webhook Event ----------
 
 type RevenueCatWebhookEvent struct {
-	Type  string                 `json:"type"`
 	Event map[string]interface{} `json:"event"`
 }
 

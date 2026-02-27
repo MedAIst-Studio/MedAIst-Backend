@@ -5,16 +5,18 @@ import "errors"
 type Error struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
+	Feature string `json:"feature,omitempty"`
 }
 
 func (e *Error) Error() string {
 	return e.Message
 }
 
-func NewError(message string, code int) *Error {
+func NewError(message string, code int, feature string) *Error {
 	return &Error{
 		Message: message,
 		Code:    code,
+		Feature: feature,
 	}
 }
 

@@ -24,7 +24,16 @@ func NewSubscriptionHandler(config *SubscriptionConfig) *SubscriptionHandler {
 	}
 }
 
-// HandleGetUsageStatus returns the current usage status for the authenticated user.
+// @Summary		Get Usage Status
+// @Description	Returns the current user's usage limits and remaining quota for messages, OCR, PDF chat, files, and quizzes
+// @Tags			Subscription
+// @Accept			json
+// @Produce		json
+// @Security		BearerAuth
+// @Success		200	{object}	domain.UsageStatusResponse
+// @Failure		401
+// @Failure		500
+// @Router			/users/usage [get]
 func (h *SubscriptionHandler) HandleGetUsageStatus(ctx context.Context, req *domain.GetUsageStatusRequest) (*domain.UsageStatusResponse, int, error) {
 	userID := domain.GetUserID(ctx)
 
@@ -36,7 +45,17 @@ func (h *SubscriptionHandler) HandleGetUsageStatus(ctx context.Context, req *dom
 	return status, http.StatusOK, nil
 }
 
-// HandleWebhook returns a Fiber handler for RevenueCat webhook events.
+// @Summary		RevenueCat Webhook
+// @Description	Handles incoming RevenueCat webhook events (INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION, etc.)
+// @Tags			Webhook
+// @Accept			json
+// @Produce		json
+// @Param			request	body	domain.RevenueCatWebhookEvent	true	"RevenueCat Webhook Event"
+// @Success		200
+// @Failure		400
+// @Failure		401
+// @Failure		500
+// @Router			/webhooks/revenuecat [post]
 func (h *SubscriptionHandler) HandleWebhook() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		expectedSecret := os.Getenv("REVENUECAT_WEBHOOK_SECRET")

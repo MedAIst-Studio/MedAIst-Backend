@@ -122,7 +122,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 
 	// -- Subscription / Payment --
 	usageLimits := domain.DefaultUsageLimitsConfig()
-	subscriptionService := services.NewSubscriptionService(repo, usageLimits)
+	subscriptionService := services.NewSubscriptionService(repo, usageLimits, slogLogger)
 
 	return &DependencyContainer{
 		Repo:                repo,
