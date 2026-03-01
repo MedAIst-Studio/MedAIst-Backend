@@ -54,7 +54,7 @@ func (s *SubscriptionService) CheckUsageLimit(ctx context.Context, userID uuid.U
 
 	// File uploads: check total file count, not periodic usage
 	if actionType == domain.ActionFileUpload {
-		fileCount, err := s.repo.GetUserFileCount(ctx, userID)
+		fileCount, err := s.repo.GetUserPDFCount(ctx, userID)
 		if err != nil {
 			return false, err
 		}
@@ -206,7 +206,7 @@ func (s *SubscriptionService) GetUsageStatus(ctx context.Context, userID uuid.UU
 		var err error
 
 		if action == domain.ActionFileUpload {
-			count, err = s.repo.GetUserFileCount(ctx, userID)
+			count, err = s.repo.GetUserPDFCount(ctx, userID)
 		} else {
 			count, err = s.repo.GetUsageCount(ctx, userID, action, since)
 		}

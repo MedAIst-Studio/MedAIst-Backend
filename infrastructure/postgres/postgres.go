@@ -65,7 +65,9 @@ CREATE TABLE IF NOT EXISTS  files (
     title TEXT NOT NULL,
     size BIGINT NOT NULL,
     path TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP NOT NULL
+    created_at TIMESTAMP NOT NULL,
+    file_type TEXT NOT NULL DEFAULT 'pdf',
+    is_saved BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- REFRESH TOKENS
@@ -212,9 +214,29 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
 		WHERE ut.user_id = u.id AND ut.action_type = a.action_type AND ut.usage_date = CURRENT_DATE
 	)
 	ON CONFLICT (user_id, action_type, usage_date) DO NOTHING;
+
+	-- Add file_type and is_saved columns if they don't exist
+	ALTER TABLE files ADD COLUMN IF NOT EXISTS file_type TEXT NOT NULL DEFAULT 'pdf';
+	ALTER TABLE files ADD COLUMN IF NOT EXISTS is_saved BOOLEAN NOT NULL DEFAULT FALSE;
+
+	-- Backfill: classify existing files by extension
+	UPDATE files SET file_type = 'image'
+	WHERE file_type = 'pdf'
+	  AND (LOWER(title) LIKE '%.jpg' OR LOWER(title) LIKE '%.jpeg'
+	    OR LOWER(title) LIKE '%.png' OR LOWER(title) LIKE '%.webp');
 	`
 	_, err = db.Exec(migrationQuery)
 	if err != nil {
 		panic("Failed to run migrations: " + err.Error())
+	}
+
+	// Create index for cleaning up old unsaved image files after columns exist
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_files_image_cleanup
+		ON files(file_type, is_saved, created_at)
+		WHERE file_type = 'image' AND is_saved = FALSE;
+	`)
+	if err != nil {
+		panic("Failed to create index idx_files_image_cleanup: " + err.Error())
 	}
 }

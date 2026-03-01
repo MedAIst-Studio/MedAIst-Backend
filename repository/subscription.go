@@ -131,15 +131,3 @@ func nullTime(t *time.Time) sql.NullTime {
 	}
 	return sql.NullTime{Time: *t, Valid: true}
 }
-
-// GetUserFileCount returns the total number of files a user has.
-func (r *Repository) GetUserFileCount(ctx context.Context, userID uuid.UUID) (int, error) {
-	query := `SELECT COUNT(*) FROM files WHERE user_id = $1`
-
-	var count int
-	err := r.db.QueryRowContext(ctx, query, userID).Scan(&count)
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
-}

@@ -139,3 +139,36 @@ func (h *FileHandler) HandleDeleteFile(ctx context.Context, req *domain.DeleteFi
 	}
 	return nil, 204, nil
 }
+
+// Handle godoc
+//
+//	@Summary		Toggle file saved status
+//	@Description	Toggle the is_saved flag of an image file. Saved images are excluded from auto-cleanup.
+//	@Tags			Files
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		string	true	"File ID"
+//	@Success		200	{object}	domain.ToggleFileSavedResponse
+//	@Failure		400
+//	@Failure		403
+//	@Failure		404
+//	@Failure		500
+//	@Security		BearerAuth
+//	@Router			/files/{id}/save [patch]
+func (h *FileHandler) HandleToggleFileSaved(ctx context.Context, req *domain.ToggleFileSavedRequest) (*domain.ToggleFileSavedResponse, int, error) {
+	userId := domain.GetUserID(ctx)
+	res, err := h.fileService.ToggleFileSaved(ctx, userId, req.Id)
+	if err != nil {
+		if err == domain.ErrFileNotFound {
+			return nil, 404, err
+		}
+		if err == domain.ErrForbidden {
+			return nil, 403, err
+		}
+		if err == domain.ErrInvalidRequest {
+			return nil, 400, err
+		}
+		return nil, 500, err
+	}
+	return res, 200, nil
+}

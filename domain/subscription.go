@@ -197,7 +197,7 @@ type SubscriptionRepository interface {
 	EnsureFreeSubscription(ctx context.Context, userID uuid.UUID) error
 	GetUsageCount(ctx context.Context, userID uuid.UUID, actionType ActionType, since time.Time) (int, error)
 	IncrementUsage(ctx context.Context, userID uuid.UUID, actionType ActionType) error
-	GetUserFileCount(ctx context.Context, userID uuid.UUID) (int, error)
+	GetUserPDFCount(ctx context.Context, userID uuid.UUID) (int, error)
 }
 
 // ---------- Service Interface ----------

@@ -6,10 +6,16 @@ import (
 	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
+	"github.com/google/uuid"
 	"github.com/robfig/cron/v3"
 )
 
-func SetupCronJobs(repo domain.NotificationRepository, notifService domain.NotificationService) (*cron.Cron, error) {
+func SetupCronJobs(
+	notifRepo domain.NotificationRepository,
+	notifService domain.NotificationService,
+	fileRepo domain.FileRepository,
+	fileStorage domain.FileStorageService,
+) (*cron.Cron, error) {
 	loc, err := time.LoadLocation("Europe/Istanbul")
 	if err != nil {
 		return nil, err
@@ -20,7 +26,7 @@ func SetupCronJobs(repo domain.NotificationRepository, notifService domain.Notif
 	// Morning Motivation at 09:00
 	_, err = c.AddFunc("0 9 * * *", func() {
 		ctx := context.Background()
-		userIDs, err := repo.GetUsersForMorningMotivation(ctx)
+		userIDs, err := notifRepo.GetUsersForMorningMotivation(ctx)
 		if err != nil {
 			log.Printf("Cron: failed to get users for morning motivation: %v", err)
 			return
@@ -47,7 +53,7 @@ func SetupCronJobs(repo domain.NotificationRepository, notifService domain.Notif
 	// Evening lazy reminder at 21:00
 	_, err = c.AddFunc("0 21 * * *", func() {
 		ctx := context.Background()
-		userIDs, err := repo.GetLazyUsersForEveningReminder(ctx)
+		userIDs, err := notifRepo.GetLazyUsersForEveningReminder(ctx)
 		if err != nil {
 			log.Printf("Cron: failed to get users for evening reminder: %v", err)
 			return
@@ -71,5 +77,54 @@ func SetupCronJobs(repo domain.NotificationRepository, notifService domain.Notif
 		return nil, err
 	}
 
+	// Image cleanup at 03:00 — delete unsaved images older than 7 days
+	_, err = c.AddFunc("0 3 * * *", func() {
+		cleanupExpiredImages(fileRepo, fileStorage)
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	return c, nil
+}
+
+// cleanupExpiredImages deletes unsaved image files that are older than 7 days.
+func cleanupExpiredImages(fileRepo domain.FileRepository, fileStorage domain.FileStorageService) {
+	ctx := context.Background()
+	cutoff := time.Now().AddDate(0, 0, -7)
+
+	files, err := fileRepo.GetExpiredUnsavedImages(ctx, cutoff)
+	if err != nil {
+		log.Printf("Cron: failed to get expired unsaved images: %v", err)
+		return
+	}
+
+	if len(files) == 0 {
+		log.Println("Cron: No expired unsaved images to clean up")
+		return
+	}
+
+	log.Printf("Cron: Cleaning up %d expired unsaved images", len(files))
+
+	// Collect paths and IDs
+	paths := make([]string, 0, len(files))
+	ids := make([]uuid.UUID, 0, len(files))
+	for _, f := range files {
+		paths = append(paths, f.Path)
+		ids = append(ids, f.Id)
+	}
+
+	// Delete from storage
+	if err := fileStorage.DeleteFiles(ctx, paths); err != nil {
+		log.Printf("Cron: failed to delete files from storage: %v", err)
+		// Continue with DB cleanup even if storage deletion partially fails
+	}
+
+	// Delete from database
+	if err := fileRepo.DeleteFilesByIDs(ctx, ids); err != nil {
+		log.Printf("Cron: failed to delete expired images from database: %v", err)
+		return
+	}
+
+	log.Printf("Cron: Successfully cleaned up %d expired unsaved images", len(files))
 }
