@@ -85,7 +85,7 @@ func DefaultUsageLimitsConfig() UsageLimitsConfig {
 				OCR:      3,
 				PDFChat:  5,
 				MaxFiles: 3,
-				Quizzes:  0,
+				Quizzes:  3,
 			},
 			PlanProMonthly: {
 				Period:   LimitMonthly,
