@@ -600,6 +600,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/files/{id}/save": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Toggle the is_saved flag of an image file. Saved images are excluded from auto-cleanup.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Toggle file saved status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ToggleFileSavedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "Check the health of the service",
@@ -1505,8 +1554,14 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "file_type": {
+                    "$ref": "#/definitions/domain.FileType"
+                },
                 "id": {
                     "type": "string"
+                },
+                "is_saved": {
+                    "type": "boolean"
                 },
                 "size": {
                     "type": "integer"
@@ -1518,6 +1573,17 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "domain.FileType": {
+            "type": "string",
+            "enum": [
+                "pdf",
+                "image"
+            ],
+            "x-enum-varnames": [
+                "FileTypePDF",
+                "FileTypeImage"
+            ]
         },
         "domain.GenerateQuizRequest": {
             "type": "object",
@@ -1807,6 +1873,14 @@ const docTemplate = `{
                 },
                 "total_questions": {
                     "type": "integer"
+                }
+            }
+        },
+        "domain.ToggleFileSavedResponse": {
+            "type": "object",
+            "properties": {
+                "is_saved": {
+                    "type": "boolean"
                 }
             }
         },

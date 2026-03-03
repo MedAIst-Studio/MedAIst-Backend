@@ -252,7 +252,7 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	if dc.Notification != nil {
-		c, err := jobs.SetupCronJobs(dc.Repo, dc.Notification)
+		c, err := jobs.SetupCronJobs(dc.Repo, dc.Notification, dc.Repo, dc.FileStorage)
 		if err != nil {
 			fmt.Printf("Warning: Failed to setup cron jobs: %v\n", err)
 		} else {

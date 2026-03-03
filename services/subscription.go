@@ -92,7 +92,12 @@ func (s *SubscriptionService) HandleWebhookEvent(ctx context.Context, event *dom
 		return fmt.Errorf("invalid app_user_id: %w", err)
 	}
 
-	now := time.Now()
+	var now time.Time
+	if tsVal, ok := eventData["event_timestamp_ms"].(float64); ok {
+		now = time.UnixMilli(int64(tsVal))
+	} else {
+		now = time.Now()
+	}
 
 	switch eventType {
 	case "INITIAL_PURCHASE", "RENEWAL", "PRODUCT_CHANGE", "UNCANCELLATION":
@@ -225,6 +230,12 @@ func (s *SubscriptionService) GetUsageStatus(ctx context.Context, userID uuid.UU
 	periodLabel := "daily"
 	if planLimits.Period == domain.LimitMonthly {
 		periodLabel = "monthly"
+	}
+
+	if sub.PlanType == domain.PlanProSemester || sub.ProductID == domain.ProductProSemester || sub.ProductID == domain.ProductUltraSemester {
+		periodLabel = "semester"
+	} else if sub.PlanType == domain.PlanProYearly || sub.ProductID == domain.ProductProAnnual || sub.ProductID == domain.ProductUltraAnnual {
+		periodLabel = "yearly"
 	}
 
 	return &domain.UsageStatusResponse{
