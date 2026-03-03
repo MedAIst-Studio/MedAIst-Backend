@@ -81,9 +81,9 @@ func DefaultUsageLimitsConfig() UsageLimitsConfig {
 		Plans: map[PlanType]PlanLimits{
 			PlanFree: {
 				Period:   LimitDaily,
-				Messages: 10,
+				Messages: 5,
 				OCR:      3,
-				PDFChat:  5,
+				PDFChat:  3,
 				MaxFiles: 3,
 				Quizzes:  1,
 			},

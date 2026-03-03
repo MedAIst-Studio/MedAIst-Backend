@@ -164,7 +164,7 @@ func SetupRoutes(app *fiber.App) {
 		MessageService: messageService,
 	})
 
-	quizService := services.NewQuizService(dc.AIService, dc.Repo, dc.Chunker, streakService)
+	quizService := services.NewQuizService(dc.AIService, dc.Repo, dc.VectorDB, streakService)
 	quizHandler := quiz.NewQuizHandler(&quiz.QuizConfig{
 		QuizService: quizService,
 	})
