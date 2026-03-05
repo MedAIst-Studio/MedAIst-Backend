@@ -1754,6 +1754,9 @@ const docTemplate = `{
                 "correctOptionLabel": {
                     "type": "string"
                 },
+                "difficulty": {
+                    "type": "string"
+                },
                 "explanation": {
                     "type": "string"
                 },
@@ -1764,6 +1767,9 @@ const docTemplate = `{
                     }
                 },
                 "questionText": {
+                    "type": "string"
+                },
+                "topic": {
                     "type": "string"
                 }
             }

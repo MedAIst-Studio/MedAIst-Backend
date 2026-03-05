@@ -230,6 +230,8 @@ definitions:
     properties:
       correctOptionLabel:
         type: string
+      difficulty:
+        type: string
       explanation:
         type: string
       options:
@@ -237,6 +239,8 @@ definitions:
           $ref: '#/definitions/domain.Option'
         type: array
       questionText:
+        type: string
+      topic:
         type: string
     type: object
   domain.QuizResponseDTO:

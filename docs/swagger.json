@@ -1746,6 +1746,9 @@
                 "correctOptionLabel": {
                     "type": "string"
                 },
+                "difficulty": {
+                    "type": "string"
+                },
                 "explanation": {
                     "type": "string"
                 },
@@ -1756,6 +1759,9 @@
                     }
                 },
                 "questionText": {
+                    "type": "string"
+                },
+                "topic": {
                     "type": "string"
                 }
             }
