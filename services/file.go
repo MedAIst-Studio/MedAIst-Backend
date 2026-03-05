@@ -149,6 +149,24 @@ func (s *FileService) DeleteFile(ctx context.Context, fileId uuid.UUID) error {
 	return nil
 }
 
+func (s *FileService) ToggleFileSaved(ctx context.Context, userId uuid.UUID, fileId uuid.UUID) (*domain.ToggleFileSavedResponse, error) {
+	hasFile, err := s.repo.DoesUserHaveFile(ctx, userId, fileId)
+	if err != nil {
+		return nil, err
+	}
+
+	if !hasFile {
+		return nil, domain.ErrForbidden
+	}
+
+	isSaved, err := s.repo.ToggleFileSaved(ctx, fileId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.ToggleFileSavedResponse{IsSaved: isSaved}, nil
+}
+
 func (s *FileService) recover(ctx context.Context, fileId uuid.UUID, filePath string) {
 	s.repo.DeleteFileById(ctx, fileId)
 	s.fl.DeleteFile(ctx, filePath)

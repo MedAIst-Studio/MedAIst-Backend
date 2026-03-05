@@ -96,8 +96,12 @@ definitions:
     properties:
       created_at:
         type: string
+      file_type:
+        $ref: '#/definitions/domain.FileType'
       id:
         type: string
+      is_saved:
+        type: boolean
       size:
         type: integer
       title:
@@ -105,6 +109,14 @@ definitions:
       url:
         type: string
     type: object
+  domain.FileType:
+    enum:
+    - pdf
+    - image
+    type: string
+    x-enum-varnames:
+    - FileTypePDF
+    - FileTypeImage
   domain.GenerateQuizRequest:
     properties:
       endPage:
@@ -183,6 +195,20 @@ definitions:
       text:
         type: string
     type: object
+  domain.PlanType:
+    enum:
+    - free
+    - pro_monthly
+    - pro_semester
+    - pro_yearly
+    - ultra
+    type: string
+    x-enum-varnames:
+    - PlanFree
+    - PlanProMonthly
+    - PlanProSemester
+    - PlanProYearly
+    - PlanUltra
   domain.QuizAttemptDetail:
     properties:
       completed_at:
@@ -204,6 +230,8 @@ definitions:
     properties:
       correctOptionLabel:
         type: string
+      difficulty:
+        type: string
       explanation:
         type: string
       options:
@@ -211,6 +239,8 @@ definitions:
           $ref: '#/definitions/domain.Option'
         type: array
       questionText:
+        type: string
+      topic:
         type: string
     type: object
   domain.QuizResponseDTO:
@@ -223,6 +253,12 @@ definitions:
         type: string
       totalQuestions:
         type: integer
+    type: object
+  domain.RevenueCatWebhookEvent:
+    properties:
+      event:
+        additionalProperties: true
+        type: object
     type: object
   domain.SendMessageRequest:
     properties:
@@ -278,6 +314,11 @@ definitions:
       total_questions:
         type: integer
     type: object
+  domain.ToggleFileSavedResponse:
+    properties:
+      is_saved:
+        type: boolean
+    type: object
   domain.UpdateChatRequest:
     properties:
       title:
@@ -292,6 +333,26 @@ definitions:
     properties:
       url:
         type: string
+    type: object
+  domain.UsageDetail:
+    properties:
+      limit:
+        type: integer
+      unlimited:
+        type: boolean
+      used:
+        type: integer
+    type: object
+  domain.UsageStatusResponse:
+    properties:
+      period:
+        type: string
+      plan:
+        $ref: '#/definitions/domain.PlanType'
+      usage:
+        additionalProperties:
+          $ref: '#/definitions/domain.UsageDetail'
+        type: object
     type: object
   domain.UserPreferences:
     properties:
@@ -896,6 +957,38 @@ paths:
       summary: Get File
       tags:
       - files
+  /files/{id}/save:
+    patch:
+      consumes:
+      - application/json
+      description: Toggle the is_saved flag of an image file. Saved images are excluded
+        from auto-cleanup.
+      parameters:
+      - description: File ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ToggleFileSavedResponse'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Toggle file saved status
+      tags:
+      - Files
   /files/upload:
     post:
       consumes:
@@ -1342,6 +1435,28 @@ paths:
       summary: Reset Password
       tags:
       - User
+  /users/usage:
+    get:
+      consumes:
+      - application/json
+      description: Returns the current user's usage limits and remaining quota for
+        messages, OCR, PDF chat, files, and quizzes
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.UsageStatusResponse'
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      summary: Get Usage Status
+      tags:
+      - Subscription
   /users/usage-stats:
     get:
       consumes:
@@ -1363,6 +1478,33 @@ paths:
       summary: Get Usage Stats (Streak)
       tags:
       - User
+  /webhooks/revenuecat:
+    post:
+      consumes:
+      - application/json
+      description: Handles incoming RevenueCat webhook events (INITIAL_PURCHASE, RENEWAL,
+        CANCELLATION, EXPIRATION, etc.)
+      parameters:
+      - description: RevenueCat Webhook Event
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RevenueCatWebhookEvent'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      summary: RevenueCat Webhook
+      tags:
+      - Webhook
 securityDefinitions:
   BearerAuth:
     description: Enter your Bearer token in the format **Bearer &lt;token&gt;**

@@ -107,17 +107,313 @@ type EmbeddingResponse struct {
 	Usage  interface{}     `json:"usage"`
 }
 
+// ----------------------------------------------------------------------
+// DYNAMIC PROMPT SYSTEM - Subject-specific quiz generation
+// ----------------------------------------------------------------------
+
+type SubjectPromptConfig struct {
+	SubjectName       string
+	SystemPromptExtra string // Subject-specific additions to the base system prompt
+	DistractorRules   string // Subject-specific distractor crafting rules
+	FewShotExample    string // One high-quality YKS example per subject
+}
+
+var subjectPrompts = map[string]SubjectPromptConfig{
+	"biyoloji": {
+		SubjectName:       "Biyoloji",
+		SystemPromptExtra: `Bu bir BİYOLOJİ sorusudur. Hücre yapıları, organeller, genetik, ekosistem, sınıflandırma, fizyoloji gibi biyoloji alt dallarına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde benzer biyolojik terimleri kullan (ör: mitoz/mayoz, DNA/RNA, osmoz/difüzyon)
+- Süreç sıralama sorularında adımları karıştır
+- Organellerin işlevlerini birbiriyle değiştir
+- Bitki/hayvan hücresi karıştırmaları yap`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Ökaryot hücrelerde protein sentezinin başladığı organel aşağıdakilerden hangisidir?",
+  "difficulty": "orta",
+  "topic": "Hücre Biyolojisi - Organeller",
+  "options": [
+    {"no": 1, "label": "A", "text": "Ribozom", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Golgi cisimciği", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Endoplazmik retikulum", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Lizozom", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Mitokondri", "isCorrect": false}
+  ],
+  "explanation": "Protein sentezi ribozomlarda başlar. Golgi cisimciği proteinleri paketler, ER taşıma sağlar, lizozom sindirim yapar, mitokondri enerji üretir."
+}`,
+	},
+	"matematik": {
+		SubjectName:       "Matematik",
+		SystemPromptExtra: `Bu bir MATEMATİK sorusudur. Sayılar, cebir, fonksiyonlar, geometri, olasılık, türev-integral gibi matematik alt dallarına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde yaygın hesaplama hatalarının sonuçlarını kullan
+- İşlem önceliği hatası yapıldığında çıkacak sonuçları şık olarak koy
+- Formülü yanlış uygulama sonuçlarını kullan
+- Negatif/pozitif işaret hatalarının sonuçlarını ekle`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "f(x) = 2x² - 8x + 6 fonksiyonunun tepe noktasının y koordinatı kaçtır?",
+  "difficulty": "orta",
+  "topic": "İkinci Derece Fonksiyonlar",
+  "options": [
+    {"no": 1, "label": "A", "text": "-2", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "2", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "6", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "-6", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "0", "isCorrect": false}
+  ],
+  "explanation": "Tepe noktası x = -b/2a = 8/4 = 2. f(2) = 2(4) - 16 + 6 = -2. Diğer şıklar yaygın işaret ve hesap hatalarıdır."
+}`,
+	},
+	"fizik": {
+		SubjectName:       "Fizik",
+		SystemPromptExtra: `Bu bir FİZİK sorusudur. Mekanik, termodinamik, elektrik, optik, dalgalar, modern fizik gibi fizik alt dallarına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde birim dönüşüm hataları kullan
+- Yanlış formül uygulanırsa çıkacak sonuçları ekle
+- Vektörel/skaler büyüklük karıştırmalarını kullan
+- Newton yasalarının yanlış uygulanması sonuçlarını ekle`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Kütlesi 2 kg olan bir cisim sürtünmesiz yatay düzlemde 10 N sabit kuvvetle itilmektedir. Cismin ivmesi kaç m/s² dir?",
+  "difficulty": "kolay",
+  "topic": "Dinamik - Newton'un Hareket Yasaları",
+  "options": [
+    {"no": 1, "label": "A", "text": "5", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "10", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "20", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "2", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "0,5", "isCorrect": false}
+  ],
+  "explanation": "F = m.a → a = F/m = 10/2 = 5 m/s². B şıkkı F değerini, C F×m hatasını, D m değerini, E m/F hatasını temsil eder."
+}`,
+	},
+	"kimya": {
+		SubjectName:       "Kimya",
+		SystemPromptExtra: `Bu bir KİMYA sorusudur. Atom yapısı, periyodik tablo, kimyasal bağlar, reaksiyonlar, çözeltiler, organik kimya gibi kimya alt dallarına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde periyodik tabloda komşu elementlerin özelliklerini kullan
+- Benzer kimyasal formülleri/bileşikleri karıştır
+- Denklem denkleştirme hatalarını kullan
+- Mol hesabı hatalarının sonuçlarını ekle`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Aşağıdaki bileşiklerden hangisi iyonik bağ içerir?",
+  "difficulty": "orta",
+  "topic": "Kimyasal Bağlar",
+  "options": [
+    {"no": 1, "label": "A", "text": "NaCl", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "H₂O", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "CO₂", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "CH₄", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "NH₃", "isCorrect": false}
+  ],
+  "explanation": "NaCl metal (Na) ve ametal (Cl) arasında oluşan iyonik bağ içerir. Diğerleri ametal-ametal arası kovalent bağlı bileşiklerdir."
+}`,
+	},
+	"tarih": {
+		SubjectName:       "Tarih",
+		SystemPromptExtra: `Bu bir TARİH sorusudur. Türk tarihi, dünya tarihi, inkılap tarihi, uygarlık tarihi gibi alt dallara hakimsin.`,
+		DistractorRules: `- Çeldiricilerde kronolojik olarak yakın dönemlerdeki olayları kullan
+- Benzer reformları/antlaşmaları karıştır
+- Farklı devletlerin benzer uygulamalarını kullan
+- Neden-sonuç ilişkisini ters çeviren seçenekler ekle`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Osmanlı Devleti'nde ilk anayasal düzenleme aşağıdakilerden hangisidir?",
+  "difficulty": "orta",
+  "topic": "Osmanlı Modernleşmesi",
+  "options": [
+    {"no": 1, "label": "A", "text": "Kanun-i Esasi (1876)", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Tanzimat Fermanı (1839)", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Islahat Fermanı (1856)", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Sened-i İttifak (1808)", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "II. Meşrutiyet (1908)", "isCorrect": false}
+  ],
+  "explanation": "Kanun-i Esasi 1876'da ilan edilen ilk Osmanlı anayasasıdır. Diğerleri önemli belgeler olmakla birlikte anayasa niteliği taşımazlar."
+}`,
+	},
+	"edebiyat": {
+		SubjectName:       "Türk Dili ve Edebiyatı",
+		SystemPromptExtra: `Bu bir EDEBİYAT sorusudur. Türk edebiyatı dönemleri, edebi akımlar, eser-yazar eşleştirmesi, nazım biçimleri, edebi sanatlar gibi alt dallara hakimsin.`,
+		DistractorRules: `- Çeldiricilerde aynı dönemin farklı yazarlarını/eserlerini kullan
+- Farklı edebi akımların benzer özelliklerini karıştır
+- Nazım biçimlerinin benzer özelliklerini kullan
+- Edebi sanatları birbirine yakın olanlarla karıştır`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "'Safahat' adlı eser aşağıdaki yazarlardan hangisine aittir?",
+  "difficulty": "kolay",
+  "topic": "Milli Edebiyat Dönemi",
+  "options": [
+    {"no": 1, "label": "A", "text": "Mehmet Akif Ersoy", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Yahya Kemal Beyatlı", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Tevfik Fikret", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Ziya Gökalp", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Namık Kemal", "isCorrect": false}
+  ],
+  "explanation": "Safahat, Mehmet Akif Ersoy'un yedi bölümden oluşan manzum eseridir. Diğer seçenekler aynı veya yakın dönemin önemli şairleridir."
+}`,
+	},
+	"cografya": {
+		SubjectName:       "Coğrafya",
+		SystemPromptExtra: `Bu bir COĞRAFYA sorusudur. Fiziki coğrafya, beşeri coğrafya, Türkiye coğrafyası, iklim, nüfus, ekonomi gibi alt dallara hakimsin.`,
+		DistractorRules: `- Çeldiricilerde komşu bölgelerin/ülkelerin özelliklerini kullan
+- Benzer iklim tiplerini karıştır
+- Nüfus ve ekonomi verilerinde yakın değerleri kullan
+- Yer şekillerinin benzer özelliklerini karıştır`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Türkiye'de en fazla yağış alan bölge aşağıdakilerden hangisidir?",
+  "difficulty": "kolay",
+  "topic": "Türkiye İklimi",
+  "options": [
+    {"no": 1, "label": "A", "text": "Karadeniz Bölgesi", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Marmara Bölgesi", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Akdeniz Bölgesi", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Ege Bölgesi", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Doğu Anadolu Bölgesi", "isCorrect": false}
+  ],
+  "explanation": "Karadeniz Bölgesi okyanusal iklim etkisiyle Türkiye'nin en çok yağış alan bölgesidir. Her mevsim yağışlıdır."
+}`,
+	},
+	"genel": {
+		SubjectName:       "Genel",
+		SystemPromptExtra: `Konuyu metnin içeriğinden belirle ve o alana uygun bir soru üret.`,
+		DistractorRules: `- Çeldiriciler sorunun konusuyla aynı alandan olmalıdır
+- Her çeldirici mantıklı ama yanlış olmalıdır
+- Çeldiriciler birbirine yakın kavramlardan seçilmelidir`,
+		FewShotExample: "",
+	},
+}
+
+// subjectKeywords maps keywords to subject identifiers for zero-cost classification
+var subjectKeywords = map[string][]string{
+	"biyoloji": {"hücre", "mitoz", "mayoz", "dna", "rna", "gen", "protein", "enzim", "organel", "mitokondri",
+		"ribozom", "kloroplast", "fotosentez", "solunum", "sinir", "hormon", "endokrin", "sindirim",
+		"dolaşım", "boşaltım", "üreme", "kalıtım", "mutasyon", "evrim", "ekosistem", "popülasyon",
+		"biyoloji", "organizma", "canlı", "bitki", "hayvan", "bakteri", "virüs", "mantarlar",
+		"kromozom", "allel", "fenotip", "genotip", "biyoteknoloji", "ekoloji"},
+	"matematik": {"denklem", "fonksiyon", "türev", "integral", "limit", "matris", "determinant",
+		"logaritma", "üstel", "polinom", "geometri", "trigonometri", "olasılık", "istatistik",
+		"permütasyon", "kombinasyon", "asal", "faktöriyel", "binom", "oran", "orantı",
+		"dizi", "seri", "aritmetik", "parabol", "hiperbol", "elips", "çember", "doğru",
+		"açı", "üçgen", "kare", "dikdörtgen", "prizma", "küre", "silindir", "koni"},
+	"fizik": {"kuvvet", "ivme", "hız", "momentum", "enerji", "iş", "güç", "newton",
+		"elektrik", "manyetik", "akım", "gerilim", "direnç", "kapasitör", "indüksiyon",
+		"dalga", "frekans", "periyot", "ses", "ışık", "kırılma", "yansıma", "optik",
+		"termodinamik", "sıcaklık", "basınç", "hacim", "atom", "çekirdek", "radyoaktif",
+		"fizik", "hareket", "sürtünme", "yerçekimi", "potansiyel", "kinetik"},
+	"kimya": {"element", "bileşik", "karışım", "atom", "molekül", "iyon", "katyon", "anyon",
+		"periyodik", "orbital", "bağ", "kovalent", "iyonik", "metalik", "asit", "baz",
+		"tuz", "oksit", "redoks", "elektroliz", "mol", "avogadro", "çözelti", "derişim",
+		"organik", "hidrokarbon", "alkan", "alken", "alkin", "alkol", "aldehit", "keton",
+		"kimya", "reaksiyon", "denge", "hız", "termodinamik", "kaynama", "erime"},
+	"tarih": {"osmanlı", "selçuklu", "cumhuriyet", "atatürk", "inkılap", "savaş", "antlaşma",
+		"padişah", "sultan", "sadrazam", "vilayet", "eyalet", "ferman", "kanun",
+		"meşrutiyet", "tanzimat", "devrim", "reform", "bağımsızlık", "milli", "mücadele",
+		"tarih", "uygarlık", "medeniyet", "imparatorluk", "halifelik", "fetih", "kuruluş",
+		"yıkılış", "isyan", "ayaklanma", "kongre", "meclis", "anayasa"},
+	"edebiyat": {"şiir", "roman", "hikaye", "tiyatro", "deneme", "makale", "eleştiri",
+		"nazım", "nesir", "beyit", "dörtlük", "bent", "aruz", "hece", "kafiye",
+		"edebiyat", "edebi", "akım", "divan", "tanzimat", "servet", "fünun", "fecr",
+		"milli", "cumhuriyet", "yazar", "şair", "eser", "kahraman", "anlatıcı",
+		"mecaz", "benzetme", "istiare", "kinaye", "teşbih", "metonimi"},
+	"cografya": {"iklim", "sıcaklık", "yağış", "rüzgar", "basınç", "bölge", "nüfus",
+		"göç", "yerleşme", "şehir", "kır", "tarım", "hayvancılık", "sanayi", "ticaret",
+		"coğrafya", "dağ", "ova", "plato", "akarsu", "göl", "deniz", "okyanus",
+		"kıta", "ülke", "harita", "enlem", "boylam", "meridyen", "paralel",
+		"karadeniz", "akdeniz", "ege", "marmara", "anadolu", "trakya", "deprem", "volkan"},
+}
+
+func classifySubject(chunk string) string {
+	lowerChunk := strings.ToLower(chunk)
+
+	scores := make(map[string]int)
+	for subject, keywords := range subjectKeywords {
+		for _, keyword := range keywords {
+			count := strings.Count(lowerChunk, keyword)
+			if count > 0 {
+				scores[subject] += count
+			}
+		}
+	}
+
+	bestSubject := "genel"
+	bestScore := 0
+	for subject, score := range scores {
+		if score > bestScore {
+			bestScore = score
+			bestSubject = subject
+		}
+	}
+
+	// Minimum eşik: en az 3 keyword match olmalı
+	if bestScore < 3 {
+		return "genel"
+	}
+
+	return bestSubject
+}
+
+func buildSubjectSystemPrompt(subject string) string {
+	config, exists := subjectPrompts[subject]
+	if !exists {
+		config = subjectPrompts["genel"]
+	}
+
+	basePrompt := fmt.Sprintf(`Sen 20 yıllık deneyime sahip, kıdemli bir ÖSYM soru hazırlayıcısısın.
+Uzmanlık alanın: %s
+
+%s
+
+TEMEL GÖREVİN: Verilen metne dayalı, YKS standardında yüksek kaliteli çoktan seçmeli sorular üretmek.
+
+KRİTİK KURALLAR:
+1. SORU KÖKÜ: Net, anlaşılır ve tek başına okunduğunda ne sorulduğu anlaşılacak şekilde yaz. 20-40 kelime arasında olmalı.
+2. TUTARLILIK: Her şık (A-E), soru köküyle dilbilgisel ve anlamsal olarak uyumlu olmalıdır. Soru kökünü oku, ardından her şıkkı soru köküne ekleyerek oku — cümle doğal ve anlamlı olmalı.
+3. KONU BİRLİĞİ: Tüm şıklar aynı konu alanından olmalıdır. Şıklar birbiriyle karşılaştırılabilir nitelikte olmalıdır.
+4. ÇELDİRİCİ KALİTESİ:
+   - Yanlış şıklar "neredeyse doğru" olmalı — tamamen alakasız veya saçma OLMAMALI.
+   - İyi bir çeldirici, konuyu yüzeysel bilen öğrenciyi yanıltabilmeli.
+   - Tüm şıklar benzer uzunlukta ve aynı dil yapısında olmalıdır.
+   - Bir öğrenci şıklara baktığında hepsinin makul bir cevap olabileceğini düşünmeli.
+%s
+
+❌ KÖTÜ ÇELDİRİCİ ÖRNEKLERİ (BUNLARI YAPMA):
+- Soruyla tamamen alakasız şıklar (ör: biyoloji sorusunda tarih terimi)
+- Açıkça saçma veya mantıksız seçenekler
+- Aynı şıkkın farklı kelimelerle tekrarlanması
+- Şıklar arasında belirgin uzunluk farkı (doğru cevap çok uzun, diğerleri kısa)
+
+5. ZORLUK: Sorunun zorluk seviyesini belirle (kolay/orta/zor). Orta-zor seviyeyi hedefle.
+6. KONU: Sorunun hangi konuyla ilgili olduğunu kısaca belirt.
+7. Sadece verilen JSON şemasına uygun çıktı üret.
+8. Türkçe yaz.`, config.SubjectName, config.SystemPromptExtra, config.DistractorRules)
+
+	if config.FewShotExample != "" {
+		basePrompt += "\n\n" + config.FewShotExample
+	}
+
+	return basePrompt
+}
+
 var (
 	quizQuestionSchema = map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
 			"questionText": map[string]interface{}{
 				"type":        "string",
-				"description": "The quiz question text (20-40 words)",
+				"description": "Soru kökü metni (20-40 kelime)",
+			},
+			"difficulty": map[string]interface{}{
+				"type":        "string",
+				"description": "Sorunun zorluk seviyesi",
+				"enum":        []string{"kolay", "orta", "zor"},
+			},
+			"topic": map[string]interface{}{
+				"type":        "string",
+				"description": "Sorunun ilgili olduğu konu (ör: Hücre Biyolojisi, Newton Hareket Yasaları)",
 			},
 			"explanation": map[string]interface{}{
 				"type":        "string",
-				"description": "Explanation for the correct answer",
+				"description": "Doğru cevabın açıklaması ve diğer şıkların neden yanlış olduğu",
 			},
 			"options": map[string]interface{}{
 				"type": "array",
@@ -126,33 +422,33 @@ var (
 					"properties": map[string]interface{}{
 						"no": map[string]interface{}{
 							"type":        "integer",
-							"description": "Option number (1-5)",
+							"description": "Şık numarası (1-5)",
 							"minimum":     1,
 							"maximum":     5,
 						},
 						"label": map[string]interface{}{
 							"type":        "string",
-							"description": "Option label (A-E)",
+							"description": "Şık etiketi (A-E)",
 							"enum":        []string{"A", "B", "C", "D", "E"},
 						},
 						"text": map[string]interface{}{
 							"type":        "string",
-							"description": "Option text",
+							"description": "Şık metni",
 						},
 						"isCorrect": map[string]interface{}{
 							"type":        "boolean",
-							"description": "Whether this option is correct",
+							"description": "Bu şıkkın doğru olup olmadığı",
 						},
 					},
 					"required":             []string{"no", "label", "text", "isCorrect"},
 					"additionalProperties": false,
 				},
-				"description": "List of exactly 5 options",
+				"description": "Tam olarak 5 seçenek listesi",
 				"minItems":    5,
 				"maxItems":    5,
 			},
 		},
-		"required":             []string{"questionText", "explanation", "options"},
+		"required":             []string{"questionText", "difficulty", "topic", "explanation", "options"},
 		"additionalProperties": false,
 	}
 )
@@ -354,28 +650,34 @@ func (s *OpenRouterService) ExpandQuery(ctx context.Context, content string) ([]
 // ----------------------------------------------------------------------
 
 func (s *OpenRouterService) GenerateQuizQuestion(ctx context.Context, chunk string) (*domain.QuizQuestion, error) {
+	// Auto-detect subject from chunk content (zero-cost, keyword-based)
+	subject := classifySubject(chunk)
+	systemPrompt := buildSubjectSystemPrompt(subject)
+
 	prompt := fmt.Sprintf(`Aşağıdaki metin parçasını dikkatlice oku ve bu metne dayalı bir çoktan seçmeli soru üret.
 
 --- METİN BAŞLANGIÇ ---
 %s
 --- METİN BİTİŞ ---
 
-SORU ÜRETME ADIMLARI (Sırasıyla uygula):
+SORU ÜRETME ADIMLARI (Sırasıyla uygula, her adımı düşün):
 
-1. METİN ANALİZİ: Metindeki en önemli kavramı, ilişkiyi veya bilgiyi belirle.
-2. SORU KÖKÜ YAZIMI: Bu kavramı ölçen, net ve anlaşılır bir soru kökü yaz (20-40 kelime). Soru kökü tek başına okunduğunda ne sorulduğu anlaşılmalı.
-3. DOĞRU ŞIK: Metne dayalı olarak doğru cevabı yaz.
-4. ÇELDİRİCİ ŞIKLAR: Kalan 4 şıkkı oluştururken şu kriterlere MUTLAKA uy:
+1. METİN ANALİZİ: Metindeki en önemli kavramı, ilişkiyi veya bilgiyi belirle. Konuyu "topic" alanına yaz.
+2. ZORLUK BELİRLE: Sorunun zorluk seviyesini belirle ve "difficulty" alanına yaz.
+3. SORU KÖKÜ YAZIMI: Bu kavramı ölçen, net ve anlaşılır bir soru kökü yaz (20-40 kelime).
+   - Soru kökü tek başına okunduğunda ne sorulduğu anlaşılmalı.
+   - ÖSYM/YKS tarzında olmalı.
+4. DOĞRU ŞIK: Metne dayalı olarak doğru cevabı yaz.
+5. ÇELDİRİCİ ŞIKLAR: Kalan 4 şıkkı oluştururken:
    a) Her çeldirici, soru kökünü doğal şekilde tamamlamalı veya cevaplamalıdır.
    b) Çeldiriciler, sorunun konusuyla AYNI konu alanından olmalıdır.
    c) Çeldiriciler mantıklı ama yanlış olmalıdır — rastgele veya alakasız bilgi YAZMA.
    d) Tüm şıklar benzer uzunlukta ve dil yapısında olmalıdır.
    e) Bir öğrenci şıklara baktığında hepsinin makul bir cevap olabileceğini düşünmeli.
-5. AÇIKLAMA: Doğru cevabın neden doğru olduğunu kısaca açıkla.
+6. KENDİ KENDİNİ KONTROL ET: Soru kökünü oku, sonra her şıkkı soru köküne ekleyerek oku. Cümle doğal mı? Şıklar aynı kategoriden mi? Alakasız şık var mı?
+7. AÇIKLAMA: Doğru cevabın neden doğru olduğunu VE diğer şıkların neden yanlış olduğunu kısaca açıkla.
 
 FORMAT KURALLARI:
-- ÖSYM/YKS standardında ol.
-- Zorluk: Orta-zor (öğrenciyi düşündüren).
 - Tam 5 şık (A-E), sadece 1 tanesi doğru.
 - Türkçe yaz.
 - SADECE JSON çıktısı ver, başka metin yazma.`, chunk)
@@ -389,16 +691,8 @@ FORMAT KURALLARI:
 		Model: s.GenerateQuestionModel,
 		Messages: []ChatCompletionMessage{
 			{
-				Role: "system",
-				Content: `Sen 20 yıllık deneyime sahip, kıdemli bir ÖSYM soru hazırlayıcısısın.
-
-TEMEL GÖREVİN: Verilen metne dayalı, yüksek kaliteli çoktan seçmeli sorular üretmek.
-
-KRİTİK KURALLAR:
-1. TUTARLILIK: Ürettiğin her şık (A-E), soru köküyle dilbilgisel ve anlamsal olarak uyumlu olmalıdır. Soru kökünü oku, ardından her şıkkı soru köküne ekleyerek oku — cümle doğal ve anlamlı olmalı.
-2. KONU BİRLİĞİ: Tüm şıklar aynı konu alanından olmalıdır. Örneğin soru hücre bölünmesi hakkındaysa, şıkların hepsi biyoloji/hücre biyolojisi alanından olmalı.
-3. ÇELDİRİCİ KALİTESİ: Yanlış şıklar, "neredeyse doğru" olmalı — tamamen alakasız veya saçma olmamalı. İyi bir çeldirici, konuyu yüzeysel bilen öğrenciyi yanıltabilmelidir.
-4. Sadece verilen JSON şemasına uygun çıktı üret.`,
+				Role:    "system",
+				Content: systemPrompt,
 			},
 			{
 				Role:    "user",
@@ -413,9 +707,23 @@ KRİTİK KURALLAR:
 				Strict: true,
 			},
 		},
-		Temperature: 0.3,
+		Temperature: 0.4,
 	}
 
+	question, err := s.executeQuizRequest(ctx, apiReq)
+	if err != nil {
+		// Retry once on failure
+		question, err = s.executeQuizRequest(ctx, apiReq)
+		if err != nil {
+			return nil, fmt.Errorf("quiz generation failed after retry: %w", err)
+		}
+	}
+
+	return question, nil
+}
+
+// executeQuizRequest sends the API request and validates the response
+func (s *OpenRouterService) executeQuizRequest(ctx context.Context, apiReq ChatCompletionRequest) (*domain.QuizQuestion, error) {
 	var apiResp ChatCompletionResponse
 	if err := s.makeRequest(ctx, "POST", "/chat/completions", apiReq, &apiResp); err != nil {
 		return nil, fmt.Errorf("quiz generation failed: %w", err)
@@ -432,13 +740,15 @@ KRİTİK KURALLAR:
 		return nil, fmt.Errorf("invalid quiz JSON: %w (content: %s)", err, content)
 	}
 
-	// Validate
+	// Structural validation
 	if question.QuestionText == "" {
 		return nil, fmt.Errorf("question text is empty")
 	}
 	if len(question.Options) != 5 {
 		return nil, fmt.Errorf("options count incorrect: %d", len(question.Options))
 	}
+
+	// Validate exactly 1 correct option
 	correctCount := 0
 	for _, o := range question.Options {
 		if o.IsCorrect {
@@ -448,6 +758,25 @@ KRİTİK KURALLAR:
 	}
 	if correctCount != 1 {
 		return nil, fmt.Errorf("expected exactly 1 correct option, got %d", correctCount)
+	}
+
+	// Quality validation: check option length consistency
+	var totalLen int
+	for _, o := range question.Options {
+		totalLen += len(o.Text)
+	}
+	avgLen := totalLen / 5
+	for _, o := range question.Options {
+		optLen := len(o.Text)
+		// If any option is 5x longer or shorter than average, flag it
+		if avgLen > 0 && (optLen > avgLen*5 || optLen < avgLen/5) {
+			return nil, fmt.Errorf("option length inconsistency detected (option %s: %d chars, avg: %d chars)", o.Label, optLen, avgLen)
+		}
+	}
+
+	// Quality validation: check minimum question length
+	if len(question.QuestionText) < 20 {
+		return nil, fmt.Errorf("question text too short: %d chars", len(question.QuestionText))
 	}
 
 	return &question, nil

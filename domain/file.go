@@ -3,10 +3,34 @@ package domain
 import (
 	"context"
 	"mime/multipart"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 )
+
+// ---------- File Type Constants ----------
+
+type FileType string
+
+const (
+	FileTypePDF   FileType = "pdf"
+	FileTypeImage FileType = "image"
+)
+
+// DetectFileType returns the file type based on the file extension.
+func DetectFileType(filename string) FileType {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".jpg", ".jpeg", ".png", ".webp":
+		return FileTypeImage
+	default:
+		return FileTypePDF
+	}
+}
+
+// ---------- File Model ----------
 
 type File struct {
 	Id        uuid.UUID
@@ -15,6 +39,8 @@ type File struct {
 	Size      int64
 	Path      string
 	CreatedAt time.Time
+	FileType  FileType
+	IsSaved   bool
 }
 
 // ---------- File DTOs ----------
@@ -37,6 +63,8 @@ type FileResponseDTO struct {
 	Size      int64     `json:"size"`
 	Url       string    `json:"url"`
 	CreatedAt time.Time `json:"created_at"`
+	FileType  FileType  `json:"file_type"`
+	IsSaved   bool      `json:"is_saved"`
 }
 
 type GetFileRequest struct {
@@ -53,6 +81,14 @@ type DeleteFileRequest struct {
 
 type DeleteFileResponse struct{}
 
+type ToggleFileSavedRequest struct {
+	Id uuid.UUID `params:"id"`
+}
+
+type ToggleFileSavedResponse struct {
+	IsSaved bool `json:"is_saved"`
+}
+
 // ---------- File Interfaces ----------
 
 type FileRepository interface {
@@ -61,6 +97,10 @@ type FileRepository interface {
 	DeleteFileById(ctx context.Context, id uuid.UUID) error
 	DoesUserHaveFile(ctx context.Context, userId uuid.UUID, fileId uuid.UUID) (bool, error)
 	GetFileMetadata(ctx context.Context, fileId uuid.UUID) (*File, error)
+	ToggleFileSaved(ctx context.Context, fileId uuid.UUID) (bool, error)
+	GetExpiredUnsavedImages(ctx context.Context, olderThan time.Time) ([]File, error)
+	DeleteFilesByIDs(ctx context.Context, ids []uuid.UUID) error
+	GetUserPDFCount(ctx context.Context, userID uuid.UUID) (int, error)
 }
 
 type FileStorageService interface {
@@ -76,6 +116,7 @@ type FileService interface {
 	GetFilesByUserID(ctx context.Context, userId uuid.UUID) (*GetFilesResponse, error)
 	GetFile(ctx context.Context, userId uuid.UUID, fileId uuid.UUID) (*GetFileResponse, error)
 	DeleteFile(ctx context.Context, fileId uuid.UUID) error
+	ToggleFileSaved(ctx context.Context, userId uuid.UUID, fileId uuid.UUID) (*ToggleFileSavedResponse, error)
 }
 
 // ---------- Embedding & Chunker Interfaces and Models ----------

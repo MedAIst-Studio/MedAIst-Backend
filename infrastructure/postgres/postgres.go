@@ -65,7 +65,9 @@ CREATE TABLE IF NOT EXISTS  files (
     title TEXT NOT NULL,
     size BIGINT NOT NULL,
     path TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMP NOT NULL,
+    file_type TEXT NOT NULL DEFAULT 'pdf',
+    is_saved BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- REFRESH TOKENS
@@ -155,12 +157,40 @@ CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
     UNIQUE(attempt_id, question_no)
 );
 
-    
-    
+
+-- USER SUBSCRIPTIONS
+CREATE TABLE IF NOT EXISTS user_subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    plan_type TEXT NOT NULL DEFAULT 'free',
+    revenuecat_id TEXT,
+    product_id TEXT,
+    entitlement_id TEXT,
+    expires_at TIMESTAMPTZ,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    will_renew BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id)
+);
+
+-- USAGE TRACKING
+CREATE TABLE IF NOT EXISTS usage_tracking (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    action_type TEXT NOT NULL,
+    usage_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    usage_count INT NOT NULL DEFAULT 0,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id, action_type, usage_date)
+);
+
     -- INDEXES
     CREATE INDEX IF NOT EXISTS  idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
     CREATE INDEX IF NOT EXISTS  idx_quiz_attempts_quiz_user ON quiz_attempts(quiz_id, user_id);
     CREATE INDEX IF NOT EXISTS idx_quiz_attempt_answers_attempt_id ON quiz_attempt_answers(attempt_id);
+    CREATE INDEX IF NOT EXISTS idx_usage_tracking_user_date ON usage_tracking(user_id, usage_date);
+    CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_id ON user_subscriptions(user_id);
 	`
 	_, err := db.Exec(createTableQuery)
 	if err != nil {
@@ -168,11 +198,45 @@ CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
 	}
 
 	migrationQuery := `
-	ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences JSONB DEFAULT '{"theme":"system","notifications":{"motivation":true,"reminders":true,"updates":true}}';
-	ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT DEFAULT NULL;
+	-- Backfill: free subscription for existing users without one
+	INSERT INTO user_subscriptions (user_id, plan_type, is_active, will_renew)
+	SELECT id, 'free', TRUE, TRUE FROM users u
+	WHERE NOT EXISTS (SELECT 1 FROM user_subscriptions us WHERE us.user_id = u.id)
+	ON CONFLICT (user_id) DO NOTHING;
+
+	-- Backfill: usage_tracking rows for existing users
+	INSERT INTO usage_tracking (user_id, action_type, usage_date, usage_count, updated_at)
+	SELECT u.id, a.action_type, CURRENT_DATE, 0, NOW()
+	FROM users u
+	CROSS JOIN (VALUES ('message'), ('ocr'), ('pdf_chat'), ('file_upload'), ('quiz')) AS a(action_type)
+	WHERE NOT EXISTS (
+		SELECT 1 FROM usage_tracking ut
+		WHERE ut.user_id = u.id AND ut.action_type = a.action_type AND ut.usage_date = CURRENT_DATE
+	)
+	ON CONFLICT (user_id, action_type, usage_date) DO NOTHING;
+
+	-- Add file_type and is_saved columns if they don't exist
+	ALTER TABLE files ADD COLUMN IF NOT EXISTS file_type TEXT NOT NULL DEFAULT 'pdf';
+	ALTER TABLE files ADD COLUMN IF NOT EXISTS is_saved BOOLEAN NOT NULL DEFAULT FALSE;
+
+	-- Backfill: classify existing files by extension
+	UPDATE files SET file_type = 'image'
+	WHERE file_type = 'pdf'
+	  AND (LOWER(title) LIKE '%.jpg' OR LOWER(title) LIKE '%.jpeg'
+	    OR LOWER(title) LIKE '%.png' OR LOWER(title) LIKE '%.webp');
 	`
 	_, err = db.Exec(migrationQuery)
 	if err != nil {
 		panic("Failed to run migrations: " + err.Error())
+	}
+
+	// Create index for cleaning up old unsaved image files after columns exist
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_files_image_cleanup
+		ON files(file_type, is_saved, created_at)
+		WHERE file_type = 'image' AND is_saved = FALSE;
+	`)
+	if err != nil {
+		panic("Failed to create index idx_files_image_cleanup: " + err.Error())
 	}
 }

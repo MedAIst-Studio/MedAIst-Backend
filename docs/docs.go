@@ -600,6 +600,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/files/{id}/save": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Toggle the is_saved flag of an image file. Saved images are excluded from auto-cleanup.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Toggle file saved status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ToggleFileSavedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "Check the health of the service",
@@ -1250,6 +1299,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/usage": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the current user's usage limits and remaining quota for messages, OCR, PDF chat, files, and quizzes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Get Usage Status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.UsageStatusResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/users/usage-stats": {
             "get": {
                 "security": [
@@ -1274,6 +1357,46 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/handlers_user.GetStreakResponse"
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/webhooks/revenuecat": {
+            "post": {
+                "description": "Handles incoming RevenueCat webhook events (INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION, etc.)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhook"
+                ],
+                "summary": "RevenueCat Webhook",
+                "parameters": [
+                    {
+                        "description": "RevenueCat Webhook Event",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.RevenueCatWebhookEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -1431,8 +1554,14 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "file_type": {
+                    "$ref": "#/definitions/domain.FileType"
+                },
                 "id": {
                     "type": "string"
+                },
+                "is_saved": {
+                    "type": "boolean"
                 },
                 "size": {
                     "type": "integer"
@@ -1444,6 +1573,17 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "domain.FileType": {
+            "type": "string",
+            "enum": [
+                "pdf",
+                "image"
+            ],
+            "x-enum-varnames": [
+                "FileTypePDF",
+                "FileTypeImage"
+            ]
         },
         "domain.GenerateQuizRequest": {
             "type": "object",
@@ -1565,6 +1705,23 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.PlanType": {
+            "type": "string",
+            "enum": [
+                "free",
+                "pro_monthly",
+                "pro_semester",
+                "pro_yearly",
+                "ultra"
+            ],
+            "x-enum-varnames": [
+                "PlanFree",
+                "PlanProMonthly",
+                "PlanProSemester",
+                "PlanProYearly",
+                "PlanUltra"
+            ]
+        },
         "domain.QuizAttemptDetail": {
             "type": "object",
             "properties": {
@@ -1597,6 +1754,9 @@ const docTemplate = `{
                 "correctOptionLabel": {
                     "type": "string"
                 },
+                "difficulty": {
+                    "type": "string"
+                },
                 "explanation": {
                     "type": "string"
                 },
@@ -1607,6 +1767,9 @@ const docTemplate = `{
                     }
                 },
                 "questionText": {
+                    "type": "string"
+                },
+                "topic": {
                     "type": "string"
                 }
             }
@@ -1625,6 +1788,15 @@ const docTemplate = `{
                 },
                 "totalQuestions": {
                     "type": "integer"
+                }
+            }
+        },
+        "domain.RevenueCatWebhookEvent": {
+            "type": "object",
+            "properties": {
+                "event": {
+                    "type": "object",
+                    "additionalProperties": true
                 }
             }
         },
@@ -1710,6 +1882,14 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.ToggleFileSavedResponse": {
+            "type": "object",
+            "properties": {
+                "is_saved": {
+                    "type": "boolean"
+                }
+            }
+        },
         "domain.UpdateChatRequest": {
             "type": "object",
             "properties": {
@@ -1731,6 +1911,37 @@ const docTemplate = `{
             "properties": {
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "domain.UsageDetail": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "unlimited": {
+                    "type": "boolean"
+                },
+                "used": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.UsageStatusResponse": {
+            "type": "object",
+            "properties": {
+                "period": {
+                    "type": "string"
+                },
+                "plan": {
+                    "$ref": "#/definitions/domain.PlanType"
+                },
+                "usage": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.UsageDetail"
+                    }
                 }
             }
         },

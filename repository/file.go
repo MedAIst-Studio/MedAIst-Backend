@@ -3,14 +3,17 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"strings"
+	"time"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 )
 
 func (r *Repository) SaveFileInformation(ctx context.Context, file *domain.File) error {
-	query := `INSERT INTO files (id, user_id, title, size, path, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.ExecContext(ctx, query, file.Id, file.UserId, file.Name, file.Size, file.Path, file.CreatedAt)
+	query := `INSERT INTO files (id, user_id, title, size, path, created_at, file_type, is_saved) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	_, err := r.db.ExecContext(ctx, query, file.Id, file.UserId, file.Name, file.Size, file.Path, file.CreatedAt, file.FileType, file.IsSaved)
 	if err != nil {
 		return domain.ErrInternalServer
 	}
@@ -18,7 +21,7 @@ func (r *Repository) SaveFileInformation(ctx context.Context, file *domain.File)
 }
 
 func (r *Repository) GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]domain.FileResponseDTO, error) {
-	query := `SELECT id, title, size, path, created_at FROM files WHERE user_id = $1`
+	query := `SELECT id, title, size, path, created_at, file_type, is_saved FROM files WHERE user_id = $1`
 	rows, err := r.db.QueryContext(ctx, query, userId)
 	if err != nil {
 		return nil, domain.ErrInternalServer
@@ -29,7 +32,7 @@ func (r *Repository) GetFilesByUserID(ctx context.Context, userId uuid.UUID) ([]
 	for rows.Next() {
 		var f domain.FileResponseDTO
 		var path string
-		if err := rows.Scan(&f.Id, &f.Title, &f.Size, &path, &f.CreatedAt); err != nil {
+		if err := rows.Scan(&f.Id, &f.Title, &f.Size, &path, &f.CreatedAt, &f.FileType, &f.IsSaved); err != nil {
 			return nil, domain.ErrInternalServer
 		}
 		f.Url = path
@@ -62,9 +65,9 @@ func (r *Repository) DoesUserHaveFile(ctx context.Context, userId uuid.UUID, fil
 }
 
 func (r *Repository) GetFileMetadata(ctx context.Context, fileId uuid.UUID) (*domain.File, error) {
-	query := `SELECT id, user_id, title, size, path, created_at FROM files WHERE id = $1`
+	query := `SELECT id, user_id, title, size, path, created_at, file_type, is_saved FROM files WHERE id = $1`
 	var f domain.File
-	err := r.db.QueryRowContext(ctx, query, fileId).Scan(&f.Id, &f.UserId, &f.Name, &f.Size, &f.Path, &f.CreatedAt)
+	err := r.db.QueryRowContext(ctx, query, fileId).Scan(&f.Id, &f.UserId, &f.Name, &f.Size, &f.Path, &f.CreatedAt, &f.FileType, &f.IsSaved)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, domain.ErrFileNotFound
@@ -72,4 +75,72 @@ func (r *Repository) GetFileMetadata(ctx context.Context, fileId uuid.UUID) (*do
 		return nil, domain.ErrInternalServer
 	}
 	return &f, nil
+}
+
+// ToggleFileSaved toggles the is_saved flag for a file and returns the new value.
+func (r *Repository) ToggleFileSaved(ctx context.Context, fileId uuid.UUID) (bool, error) {
+	query := `UPDATE files SET is_saved = NOT is_saved WHERE id = $1 RETURNING is_saved`
+	var isSaved bool
+	err := r.db.QueryRowContext(ctx, query, fileId).Scan(&isSaved)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, domain.ErrFileNotFound
+		}
+		return false, domain.ErrInternalServer
+	}
+	return isSaved, nil
+}
+
+// GetExpiredUnsavedImages returns image files that are unsaved and older than the given time.
+func (r *Repository) GetExpiredUnsavedImages(ctx context.Context, olderThan time.Time) ([]domain.File, error) {
+	query := `
+		SELECT id, user_id, title, size, path, created_at, file_type, is_saved
+		FROM files
+		WHERE file_type = 'image' AND is_saved = FALSE AND created_at < $1
+	`
+	rows, err := r.db.QueryContext(ctx, query, olderThan)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var files []domain.File
+	for rows.Next() {
+		var f domain.File
+		if err := rows.Scan(&f.Id, &f.UserId, &f.Name, &f.Size, &f.Path, &f.CreatedAt, &f.FileType, &f.IsSaved); err != nil {
+			return nil, err
+		}
+		files = append(files, f)
+	}
+	return files, nil
+}
+
+// DeleteFilesByIDs deletes multiple files by their IDs in a single query.
+func (r *Repository) DeleteFilesByIDs(ctx context.Context, ids []uuid.UUID) error {
+	if len(ids) == 0 {
+		return nil
+	}
+
+	placeholders := make([]string, len(ids))
+	args := make([]interface{}, len(ids))
+	for i, id := range ids {
+		placeholders[i] = fmt.Sprintf("$%d", i+1)
+		args[i] = id
+	}
+
+	query := fmt.Sprintf("DELETE FROM files WHERE id IN (%s)", strings.Join(placeholders, ","))
+	_, err := r.db.ExecContext(ctx, query, args...)
+	return err
+}
+
+// GetUserPDFCount returns the total number of PDF files a user has.
+func (r *Repository) GetUserPDFCount(ctx context.Context, userID uuid.UUID) (int, error) {
+	query := `SELECT COUNT(*) FROM files WHERE user_id = $1 AND file_type = 'pdf'`
+
+	var count int
+	err := r.db.QueryRowContext(ctx, query, userID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

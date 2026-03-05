@@ -2,6 +2,9 @@ package services
 
 import (
 	"context"
+	"fmt"
+	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -36,6 +39,26 @@ type questionResult struct {
 	err      error
 }
 
+// mergeChunks combines adjacent chunks in pairs to provide richer context for question generation.
+// For example, [A, B, C, D, E] becomes ["A\n\nB", "C\n\nD", "E"]
+func mergeChunks(chunks []string, groupSize int) []string {
+	if groupSize <= 1 || len(chunks) <= 1 {
+		return chunks
+	}
+
+	var merged []string
+	for i := 0; i < len(chunks); i += groupSize {
+		end := i + groupSize
+		if end > len(chunks) {
+			end = len(chunks)
+		}
+		group := chunks[i:end]
+		merged = append(merged, strings.Join(group, "\n\n"))
+	}
+
+	return merged
+}
+
 func (s *QuizService) GenerateQuiz(ctx context.Context, userId uuid.UUID, req *domain.GenerateQuizRequest) (*domain.GenerateQuizResponse, error) {
 	quiz := domain.NewQuiz(userId, req.FileId, req.QuizName)
 	var chunks []string
@@ -66,15 +89,22 @@ func (s *QuizService) GenerateQuiz(ctx context.Context, userId uuid.UUID, req *d
 		return nil, domain.ErrNoContentToGenerateQuiz
 	}
 
-	var wg sync.WaitGroup
-	resultChan := make(chan questionResult, len(chunks))
+	// Merge adjacent chunks in pairs for richer context
+	mergedChunks := mergeChunks(chunks, 2)
+	log.Printf("[QuizService] Generating quiz: %d raw chunks → %d merged chunks", len(chunks), len(mergedChunks))
 
-	for i, chunk := range chunks {
+	var wg sync.WaitGroup
+	resultChan := make(chan questionResult, len(mergedChunks))
+
+	for i, chunk := range mergedChunks {
 		wg.Add(1)
 		go func(idx int, c string) {
 			defer wg.Done()
 
 			question, err := s.aiService.GenerateQuizQuestion(ctx, c)
+			if err != nil {
+				log.Printf("[QuizService] Question %d generation failed: %v", idx+1, err)
+			}
 			resultChan <- questionResult{
 				question: question,
 				index:    idx,
@@ -88,16 +118,29 @@ func (s *QuizService) GenerateQuiz(ctx context.Context, userId uuid.UUID, req *d
 		close(resultChan)
 	}()
 
-	results := make([]questionResult, len(chunks))
+	results := make([]questionResult, len(mergedChunks))
 	for result := range resultChan {
 		results[result.index] = result
 	}
 
+	// Collect successful questions, skip failures (retry is handled in AI service)
+	var failedCount int
 	for _, result := range results {
 		if result.err != nil {
-			return nil, result.err
+			failedCount++
+			continue
 		}
 		quiz.AddQuestion(result.question)
+	}
+
+	// If all questions failed, return error
+	if len(quiz.Questions) == 0 {
+		return nil, fmt.Errorf("all %d question generations failed", len(mergedChunks))
+	}
+
+	if failedCount > 0 {
+		log.Printf("[QuizService] Quiz generated with %d/%d questions (skipped %d failures)",
+			len(quiz.Questions), len(mergedChunks), failedCount)
 	}
 
 	err = s.repository.SaveQuiz(ctx, quiz)

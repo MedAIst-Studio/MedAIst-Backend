@@ -5,16 +5,18 @@ import "errors"
 type Error struct {
 	Message string `json:"message"`
 	Code    int    `json:"code"`
+	Feature string `json:"feature,omitempty"`
 }
 
 func (e *Error) Error() string {
 	return e.Message
 }
 
-func NewError(message string, code int) *Error {
+func NewError(message string, code int, feature string) *Error {
 	return &Error{
 		Message: message,
 		Code:    code,
+		Feature: feature,
 	}
 }
 
@@ -69,4 +71,13 @@ var (
 	ErrChatNotFound            = errors.New("Sohbet mevcut değil")
 	ErrFileNotFound            = errors.New("Dosya mevcut değil")
 	ErrInternalServer          = errors.New("Sunucu hatası")
+
+	ErrUsageLimitExceeded      = errors.New("Kullanım limitinize ulaştınız. Daha fazla kullanım için planınızı yükseltin")
+	ErrMessageLimitExceeded    = errors.New("Mesaj limitinize ulaştınız. Daha fazla mesaj göndermek için planınızı yükseltin")
+	ErrOCRLimitExceeded        = errors.New("Görüntü tarama limitinize ulaştınız. Daha fazla görüntü taramak için planınızı yükseltin")
+	ErrPDFChatLimitExceeded    = errors.New("PDF sohbet limitinize ulaştınız. Daha fazla PDF sohbeti için planınızı yükseltin")
+	ErrFileUploadLimitExceeded = errors.New("Dosya yükleme limitinize ulaştınız. Daha fazla dosya yüklemek için planınızı yükseltin")
+	ErrQuizLimitExceeded       = errors.New("Quiz oluşturma limitinize ulaştınız. Daha fazla quiz oluşturmak için planınızı yükseltin")
+	ErrInvalidWebhookSecret    = errors.New("Geçersiz webhook doğrulama anahtarı")
+	ErrSubscriptionNotFound    = errors.New("Abonelik bilgisi bulunamadı")
 )

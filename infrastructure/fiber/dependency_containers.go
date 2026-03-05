@@ -26,18 +26,19 @@ import (
 )
 
 type DependencyContainer struct {
-	Repo            *repository.Repository
-	Chunker         *chunkerInfra.PdfChunkingService
-	Embedding       *openrouter.OpenRouterService
-	VectorDB        *qdrantInfra.QdrantVectorDB
-	FileStorage     *s3Infra.S3Service
-	jweTokenService *jwe.Service
-	inMemoryClient  *inMemoryInfra.InMemoryClient
-	slogLogger      *slogInfra.SlogLogger
-	Validator       *validatorInfra.Validator
-	mailerSender    *mailersendInfra.MailerSendService
-	AIService       *MultiModelService
-	Notification    *services.NotificationService
+	Repo                *repository.Repository
+	Chunker             *chunkerInfra.PdfChunkingService
+	Embedding           *openrouter.OpenRouterService
+	VectorDB            *qdrantInfra.QdrantVectorDB
+	FileStorage         *s3Infra.S3Service
+	jweTokenService     *jwe.Service
+	inMemoryClient      *inMemoryInfra.InMemoryClient
+	slogLogger          *slogInfra.SlogLogger
+	Validator           *validatorInfra.Validator
+	mailerSender        *mailersendInfra.MailerSendService
+	AIService           *MultiModelService
+	Notification        *services.NotificationService
+	SubscriptionService *services.SubscriptionService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
@@ -86,7 +87,7 @@ func NewAuthDependencyContainer() *DependencyContainer {
 	openRouter := openrouter.NewOpenRouterService(openrouter.Config{
 		ApiKey:                 getEnv("OPENROUTER_API_KEY", ""),
 		ChatModel:              getEnv("OPENROUTER_CHAT_MODEL", "google/gemini-3-flash-preview"),
-		GenerateQuestionModel:  getEnv("OPENROUTER_QUESTION_MODEL", "openai/gpt-4o-mini"),
+		GenerateQuestionModel:  getEnv("OPENROUTER_QUESTION_MODEL", "google/gemini-3-flash-preview"),
 		ExpandQuestionModel:    getEnv("OPENROUTER_EXPAND_MODEL", "openai/gpt-4o-mini"),
 		GenerateChatTitleModel: getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
 		ReasoningModel:         getEnv("OPENROUTER_REASONING_MODEL", "google/gemini-3-flash-preview"),
@@ -119,19 +120,24 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		fmt.Printf("Warning: FCM Client initialization failed: %v\n", err)
 	}
 
+	// -- Subscription / Payment --
+	usageLimits := domain.DefaultUsageLimitsConfig()
+	subscriptionService := services.NewSubscriptionService(repo, usageLimits, slogLogger)
+
 	return &DependencyContainer{
-		Repo:            repo,
-		Chunker:         chunker,
-		Embedding:       openRouter,
-		VectorDB:        vectorDB,
-		FileStorage:     s3Service,
-		jweTokenService: jweTokenService,
-		inMemoryClient:  inMemoryClient,
-		Validator:       validator,
-		slogLogger:      slogLogger,
-		mailerSender:    mailersendService,
-		AIService:       aiService,
-		Notification:    notifService,
+		Repo:                repo,
+		Chunker:             chunker,
+		Embedding:           openRouter,
+		VectorDB:            vectorDB,
+		FileStorage:         s3Service,
+		jweTokenService:     jweTokenService,
+		inMemoryClient:      inMemoryClient,
+		Validator:           validator,
+		slogLogger:          slogLogger,
+		mailerSender:        mailersendService,
+		AIService:           aiService,
+		Notification:        notifService,
+		SubscriptionService: subscriptionService,
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
@@ -22,6 +23,10 @@ func (r *Repository) CreateUser(ctx context.Context, signupData *domain.SignupDa
 	}
 
 	if err := r.createRefreshToken(tx, signupData.RefreshToken); err != nil {
+		return err
+	}
+
+	if err := r.initializeUserDefaults(tx, signupData.User.Id); err != nil {
 		return err
 	}
 
@@ -56,6 +61,10 @@ func (r *Repository) CreateUserByOAuth(ctx context.Context, signupData *domain.O
 		return err
 	}
 
+	if err := r.initializeUserDefaults(tx, signupData.OAuthUser.Id); err != nil {
+		return err
+	}
+
 	return tx.Commit()
 }
 
@@ -81,6 +90,41 @@ func (r *Repository) createRefreshToken(tx *sql.Tx, record *domain.RefreshToken)
 		"INSERT INTO refresh_tokens (id, user_id, token, expires_at, created_at) VALUES ($1, $2, $3, $4, $5)",
 		record.Id, record.UserID, record.Token, record.ExpiresAt, record.CreatedAt)
 	return err
+}
+
+// initializeUserDefaults creates the free subscription and initial usage tracking rows for a new user.
+func (r *Repository) initializeUserDefaults(tx *sql.Tx, userID uuid.UUID) error {
+	// Create free subscription
+	_, err := tx.ExecContext(context.Background(),
+		`INSERT INTO user_subscriptions (user_id, plan_type, is_active, will_renew)
+		 VALUES ($1, 'free', TRUE, TRUE)
+		 ON CONFLICT (user_id) DO NOTHING`,
+		userID)
+	if err != nil {
+		return fmt.Errorf("failed to create free subscription: %w", err)
+	}
+
+	// Create initial usage tracking rows for all action types
+	actions := []domain.ActionType{
+		domain.ActionMessage,
+		domain.ActionOCR,
+		domain.ActionPDFChat,
+		domain.ActionFileUpload,
+		domain.ActionQuiz,
+	}
+
+	for _, action := range actions {
+		_, err := tx.ExecContext(context.Background(),
+			`INSERT INTO usage_tracking (user_id, action_type, usage_date, usage_count, updated_at)
+			 VALUES ($1, $2, CURRENT_DATE, 0, NOW())
+			 ON CONFLICT (user_id, action_type, usage_date) DO NOTHING`,
+			userID, string(action))
+		if err != nil {
+			return fmt.Errorf("failed to create usage tracking for %s: %w", action, err)
+		}
+	}
+
+	return nil
 }
 
 func (r *Repository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {

@@ -79,6 +79,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/quiz"
+	subscriptionHandler "github.com/MedAIst-Studio/MedAIist-Backend/handlers/subscription"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/system"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/user"
 
@@ -98,7 +99,7 @@ func (h handlerAdapter[R, Res]) Handle(ctx context.Context, req *R) (*Res, int, 
 func SetupRoutes(app *fiber.App) {
 	dc := NewAuthDependencyContainer()
 
-	middlewareManager := NewMiddlewareManager(dc.jweTokenService, dc.slogLogger)
+	middlewareManager := NewMiddlewareManager(dc.jweTokenService, dc.slogLogger, dc.SubscriptionService)
 
 	healthcheckHandler := healthcheck.NewHealthcheckHandler()
 	systemConfigHandler := system.NewSystemConfigHandler()
@@ -163,7 +164,7 @@ func SetupRoutes(app *fiber.App) {
 		MessageService: messageService,
 	})
 
-	quizService := services.NewQuizService(dc.AIService, dc.Repo, dc.Chunker, streakService)
+	quizService := services.NewQuizService(dc.AIService, dc.Repo, dc.VectorDB, streakService)
 	quizHandler := quiz.NewQuizHandler(&quiz.QuizConfig{
 		QuizService: quizService,
 	})
@@ -199,7 +200,12 @@ func SetupRoutes(app *fiber.App) {
 	usersApp.Patch("/password", Handle(handlerAdapter[user.ChangePasswordRequest, user.ChangePasswordResponse]{userHandler.HandleChangePassword}, sl))
 	usersApp.Patch("/preferences", Handle(handlerAdapter[user.UpdatePreferencesRequest, user.UpdatePreferencesResponse]{userHandler.HandleUpdatePreferences}, sl))
 	usersApp.Patch("/fcm-token", Handle(handlerAdapter[user.UpdateFCMTokenRequest, user.UpdateFCMTokenResponse]{userHandler.HandleUpdateFCMToken}, sl))
+	subscriptionH := subscriptionHandler.NewSubscriptionHandler(&subscriptionHandler.SubscriptionConfig{
+		SubscriptionService: dc.SubscriptionService,
+	})
+
 	usersApp.Get("/usage-stats", Handle(handlerAdapter[user.GetStreakRequest, user.GetStreakResponse]{userHandler.HandleGetStreak}, sl))
+	usersApp.Get("/usage", Handle(handlerAdapter[domain.GetUsageStatusRequest, domain.UsageStatusResponse]{subscriptionH.HandleGetUsageStatus}, sl))
 
 	chatsApp := app.Group("/chats", middlewareManager.AuthMiddleware)
 	chatsApp.Get("/", Handle(handlerAdapter[domain.GetChatsRequest, domain.GetChatsResponse]{chatHandler.HandleGetChats}, sl))
@@ -208,16 +214,16 @@ func SetupRoutes(app *fiber.App) {
 	chatsApp.Patch("/:id", Handle(handlerAdapter[domain.UpdateChatDTO, domain.UpdateChatResponse]{chatHandler.HandleUpdateChat}, sl))
 
 	filesApp := app.Group("/files", middlewareManager.AuthMiddleware)
-	filesApp.Post("/upload", Handle(handlerAdapter[domain.UploadFileRequest, domain.UploadFileResponse]{fileHandler.HandleUploadFile}, sl))
+	filesApp.Post("/upload", middlewareManager.UsageLimitMiddleware(domain.ActionFileUpload), Handle(handlerAdapter[domain.UploadFileRequest, domain.UploadFileResponse]{fileHandler.HandleUploadFile}, sl))
 	filesApp.Get("/", Handle(handlerAdapter[domain.GetFilesRequest, domain.GetFilesResponse]{fileHandler.HandleGetFiles}, sl))
 	filesApp.Delete("/:id", Handle(handlerAdapter[domain.DeleteFileRequest, domain.DeleteFileResponse]{fileHandler.HandleDeleteFile}, sl))
 	filesApp.Get("/:id", Handle(handlerAdapter[domain.GetFileRequest, domain.GetFileResponse]{fileHandler.HandleGetFile}, sl))
 
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
-	messagesApp.Post("/", Handle(handlerAdapter[domain.SendMessageRequest, domain.SendMessageResponse]{messageHandler.HandleSendMessage}, sl))
+	messagesApp.Post("/", middlewareManager.MessageUsageLimitMiddleware(), Handle(handlerAdapter[domain.SendMessageRequest, domain.SendMessageResponse]{messageHandler.HandleSendMessage}, sl))
 
 	quizApp := app.Group("/quizzes", middlewareManager.AuthMiddleware)
-	quizApp.Post("/", Handle(handlerAdapter[domain.GenerateQuizRequest, domain.GenerateQuizResponse]{quizHandler.HandleGenerateQuiz}, sl))
+	quizApp.Post("/", middlewareManager.UsageLimitMiddleware(domain.ActionQuiz), Handle(handlerAdapter[domain.GenerateQuizRequest, domain.GenerateQuizResponse]{quizHandler.HandleGenerateQuiz}, sl))
 	quizApp.Get("/", Handle(handlerAdapter[domain.GetQuizzesRequest, domain.GetQuizzesResponse]{quizHandler.HandleGetQuizzes}, sl))
 	quizApp.Get("/attempts", Handle(handlerAdapter[domain.GetAttemptsRequest, domain.GetAttemptsResponse]{quizHandler.HandleGetAttempts}, sl))
 	quizApp.Get("/attempts/:id", Handle(handlerAdapter[domain.GetAttemptByIdRequest, domain.AttemptDetailResponse]{quizHandler.HandleGetAttemptById}, sl))
@@ -228,9 +234,12 @@ func SetupRoutes(app *fiber.App) {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)
 	}
 
+	// -- RevenueCat Webhook --
+	app.Post("/webhooks/revenuecat", subscriptionH.HandleWebhook())
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"message": "Welcome to MedAIist-Backend API",
+			"message": "Welcome to Scope-Backend API",
 			"code":    http.StatusOK,
 		})
 	})
@@ -243,7 +252,7 @@ func SetupRoutes(app *fiber.App) {
 	})
 
 	if dc.Notification != nil {
-		c, err := jobs.SetupCronJobs(dc.Repo, dc.Notification)
+		c, err := jobs.SetupCronJobs(dc.Repo, dc.Notification, dc.Repo, dc.FileStorage)
 		if err != nil {
 			fmt.Printf("Warning: Failed to setup cron jobs: %v\n", err)
 		} else {

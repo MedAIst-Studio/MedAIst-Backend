@@ -20,6 +20,8 @@ type QuizQuestion struct {
 	Options            []Option `json:"options"`
 	CorrectOptionLabel string   `json:"correctOptionLabel"`
 	Explanation        string   `json:"explanation,omitempty"`
+	Difficulty         string   `json:"difficulty,omitempty"`
+	Topic              string   `json:"topic,omitempty"`
 }
 
 type Option struct {
