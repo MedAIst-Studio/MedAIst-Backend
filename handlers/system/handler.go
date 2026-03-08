@@ -34,8 +34,8 @@ func NewSystemConfigHandler() *SystemConfigHandler {
 
 func (h *SystemConfigHandler) Handle(ctx context.Context, req *SystemConfigRequest) (*VersionResponse, int, error) {
 	config := &VersionResponse{
-		MinVersion:      "1.0.5",
-		LatestVersion:   "1.0.5",
+		MinVersion:      "1.1.3",
+		LatestVersion:   "1.1.3",
 		ForceUpdate:     false,
 		StoreUrlAndroid: "market://details?id=com.kuarulabs.scope",
 		StoreUrlIOS:     "https://apps.apple.com/app/idSENIN_APP_ID",
