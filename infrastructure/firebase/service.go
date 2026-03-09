@@ -16,7 +16,7 @@ func NewFCMClient(ctx context.Context) (*messaging.Client, error) {
 
 	firebaseCredFile := "firebase-dev.json"
 	if domain.IsProdEnv() {
-		firebaseCredFile = "/secrets/FIREBASE_PROD_JSON"
+		firebaseCredFile = "/secrets/firebase-prod.json"
 	}
 
 	if _, err := os.Stat(firebaseCredFile); err == nil {
