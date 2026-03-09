@@ -17,6 +17,10 @@ func NewStreakService(repo domain.StreakRepository) *StreakService {
 }
 
 func (s *StreakService) GetStreak(ctx context.Context, userID uuid.UUID) (*domain.StreakResponse, error) {
+	if err := s.repo.EnsureUsageStats(ctx, userID); err != nil {
+		return nil, err
+	}
+
 	stats, err := s.repo.GetUsageStats(ctx, userID)
 	if err != nil {
 		return nil, err
