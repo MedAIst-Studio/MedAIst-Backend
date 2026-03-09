@@ -218,7 +218,7 @@ func SetupRoutes(app *fiber.App) {
 	filesApp.Get("/", Handle(handlerAdapter[domain.GetFilesRequest, domain.GetFilesResponse]{fileHandler.HandleGetFiles}, sl))
 	filesApp.Delete("/:id", Handle(handlerAdapter[domain.DeleteFileRequest, domain.DeleteFileResponse]{fileHandler.HandleDeleteFile}, sl))
 	filesApp.Get("/:id", Handle(handlerAdapter[domain.GetFileRequest, domain.GetFileResponse]{fileHandler.HandleGetFile}, sl))
-
+	filesApp.Patch("/:id/save", Handle(handlerAdapter[domain.ToggleFileSavedRequest, domain.ToggleFileSavedResponse]{fileHandler.HandleToggleFileSaved}, sl))
 	messagesApp := app.Group("/messages", middlewareManager.AuthMiddleware)
 	messagesApp.Post("/", middlewareManager.MessageUsageLimitMiddleware(), Handle(handlerAdapter[domain.SendMessageRequest, domain.SendMessageResponse]{messageHandler.HandleSendMessage}, sl))
 
