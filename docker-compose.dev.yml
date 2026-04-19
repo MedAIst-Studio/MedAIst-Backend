@@ -4,13 +4,12 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password123
-      POSTGRES_DB: medaiist_db
+      POSTGRES_DB: medaist_db
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql/data
     restart: unless-stopped
-
 
   minio:
     image: minio/minio:latest
@@ -46,6 +45,9 @@ services:
 
   api:
     image: golang:1.24.5-alpine3.22
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     working_dir: /app
     volumes:
       - .:/app

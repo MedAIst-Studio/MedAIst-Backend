@@ -3,6 +3,8 @@ name: Build and Push Docker Image
 on:
   push:
     branches: ["main", "dev"]
+  pull_request:
+    branches: ["main", "dev"]
   workflow_dispatch:
 
 env:
@@ -10,7 +12,31 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Verify dependencies
+        run: go mod verify
+
+      - name: Run build test
+        run: go build -v ./...
+
+      # - name: golangci-lint
+      #   uses: golangci/golangci-lint-action@v6
+      #   with:
+      #     version: v1.64
+      #     args: --timeout=5m
+
   build-and-push:
+    needs: lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,15 +59,34 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Downcase IMAGE_NAME
+        id: format_image_name
+        run: |
+          echo "IMAGE_NAME=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Determine Image Name and Tag
         id: config
         run: |
-          if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "SUFFIX=-prod" >> $GITHUB_OUTPUT
-            echo "TAG=latest" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Build for PRs without overwriting prod/dev latest tags
+            # We will use the target branch's suffix to denote what it is targeting
+            if [ "${{ github.base_ref }}" = "main" ]; then
+              echo "SUFFIX=-prod" >> $GITHUB_OUTPUT
+            else
+              echo "SUFFIX=-dev" >> $GITHUB_OUTPUT
+            fi
+            echo "TAG=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "PUSH_IMAGE=true" >> $GITHUB_OUTPUT
           else
-            echo "SUFFIX=-dev" >> $GITHUB_OUTPUT
-            echo "TAG=dev" >> $GITHUB_OUTPUT
+            # It's a push or workflow_dispatch on a branch
+            if [ "${{ github.ref_name }}" = "main" ]; then
+              echo "SUFFIX=-prod" >> $GITHUB_OUTPUT
+              echo "TAG=latest" >> $GITHUB_OUTPUT
+            else
+              echo "SUFFIX=-dev" >> $GITHUB_OUTPUT
+              echo "TAG=dev" >> $GITHUB_OUTPUT
+            fi
+            echo "PUSH_IMAGE=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Extract metadata (tags, labels) for Docker
@@ -50,7 +95,7 @@ jobs:
         with:
           # Appends the suffix (-prod or -dev) to the image name
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}${{ steps.config.outputs.SUFFIX }}
-          # Sets the tag to specific value (latest or dev)
+          # Sets the tag to specific value (latest or pr-X)
           tags: |
             type=raw,value=${{ steps.config.outputs.TAG }}
 
@@ -58,14 +103,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          push: ${{ steps.config.outputs.PUSH_IMAGE == 'true' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
       - name: Deploy Application
-        if: success()
+        if: github.event_name == 'push' && success()
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             APPLICATION_ID="${{ secrets.PROD_APP_ID }}"
