@@ -1,3 +1,5 @@
+SWAG=$(HOME)/go/bin/swag
+
 swagger: 
 	swag fmt
 	swag init -g ./infrastructure/fiber/router.go

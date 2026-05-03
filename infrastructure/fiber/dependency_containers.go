@@ -1,42 +1,49 @@
 package fiber
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
+	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	chunkerInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/chunker"
-	embeddingInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/embedding"
+	firebaseInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/firebase"
 	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jina"
+	"github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openrouter"
+	"github.com/MedAIst-Studio/MedAIist-Backend/services"
 
 	inMemoryInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/in-memory"
 	jwe "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/jwe"
 	mailersendInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/mailersend"
-	minioInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/minio"
-	openaiInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/openai"
+	s3Infra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/s3"
+
 	postgresInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/postgres"
 	qdrantInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/qdrant"
 	slogInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/slog"
 	validatorInfra "github.com/MedAIst-Studio/MedAIist-Backend/infrastructure/validator"
+	"github.com/MedAIst-Studio/MedAIist-Backend/repository"
 )
 
 type DependencyContainer struct {
-	Repo            *postgresInfra.Repository
-	Chunker         *chunkerInfra.PdfChunkingService
-	Embedding       *embeddingInfra.EmbeddingService
-	VectorDB        *qdrantInfra.QdrantVectorDB
-	FileStorage     *minioInfra.MinioService
-	jweTokenService *jwe.Service
-	inMemoryClient  *inMemoryInfra.InMemoryClient
-	slogLogger      *slogInfra.SlogLogger
-	Validator       *validatorInfra.Validator
-	mailerSender    *mailersendInfra.MailerSendService
-	AIService       *MultiModelService
+	Repo                *repository.Repository
+	Chunker             *chunkerInfra.PdfChunkingService
+	Embedding           *openrouter.OpenRouterService
+	VectorDB            *qdrantInfra.QdrantVectorDB
+	FileStorage         *s3Infra.S3Service
+	jweTokenService     *jwe.Service
+	inMemoryClient      *inMemoryInfra.InMemoryClient
+	slogLogger          *slogInfra.SlogLogger
+	Validator           *validatorInfra.Validator
+	mailerSender        *mailersendInfra.MailerSendService
+	AIService           *MultiModelService
+	Notification        *services.NotificationService
+	SubscriptionService *services.SubscriptionService
 }
 
 func NewAuthDependencyContainer() *DependencyContainer {
-	postgresRepo := postgresInfra.NewRepository(os.Getenv("DATABASE_URL"))
+	postgresDB := postgresInfra.NewDB(os.Getenv("DATABASE_URL"))
+	repo := repository.NewRepository(postgresDB)
 	fmt.Println("Connected to database")
 
 	jweTokenService := jwe.NewJWETokenService(&jwe.Config{
@@ -50,26 +57,26 @@ func NewAuthDependencyContainer() *DependencyContainer {
 
 	mailersendService := mailersendInfra.NewMailerSendService(os.Getenv("MAILERSEND_API_KEY"), os.Getenv("MAILERSEND_SENDER_EMAIL"), os.Getenv("MAILERSEND_SENDER_NAME"))
 
-	minioInfraService := minioInfra.NewMinioService(&minioInfra.MinioConfig{
-		Endpoint:        os.Getenv("MINIO_ENDPOINT"),
-		AccessKeyID:     os.Getenv("MINIO_ACCESS_KEY"),
-		SecretAccessKey: os.Getenv("MINIO_SECRET_KEY"),
-		UseSSL:          os.Getenv("MINIO_USE_SSL") == "true",
-		BucketName:      os.Getenv("MINIO_BUCKET_NAME"),
-		Location:        "us-east-1",
+	s3Service := s3Infra.NewS3Service(&s3Infra.S3Config{
+		Endpoint:        os.Getenv("S3_ENDPOINT"),
+		AccessKeyID:     os.Getenv("S3_ACCESS_KEY"),
+		SecretAccessKey: os.Getenv("S3_SECRET_KEY"),
+		UseSSL:          os.Getenv("S3_USE_SSL") == "true",
+		BucketName:      os.Getenv("S3_BUCKET_NAME"),
+		Location:        os.Getenv("S3_REGION"),
+		PublicDomain:    os.Getenv("S3_PUBLIC_URL"),
 	})
-	fmt.Println("Connected to MinIO at", os.Getenv("MINIO_ENDPOINT"))
+	fmt.Println("Connected to S3 Storage at", os.Getenv("S3_ENDPOINT"))
 
-	chunker := chunkerInfra.NewChunkingService(&file.ChunkOptions{
+	chunker := chunkerInfra.NewChunkingService(&domain.ChunkOptions{
 		MaxChunkSize:    1024,
 		OverlapSize:     128,
 		PreserveContext: true,
 	})
 
-	embeddingService := embeddingInfra.NewEmbeddingService(os.Getenv("OPENAI_API_KEY"))
-
 	vectorDB := qdrantInfra.NewQdrantVectorDB(qdrantInfra.Config{
-		Addr:           os.Getenv("QDRANT_URL"),
+		Host:           os.Getenv("QDRANT_HOST"),
+		Port:           6334,
 		CollectionName: os.Getenv("QDRANT_COLLECTION_NAME"),
 		ApiKey:         os.Getenv("QDRANT_API_KEY"),
 		MinScore:       0.3,
@@ -77,20 +84,22 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		ChunkLimit:     10,
 	})
 
-	openai := openaiInfra.NewOpenAIService(openaiInfra.OpenAIConfig{
-		ApiKey:                 os.Getenv("OPENAI_API_KEY"),
-		ChatModel:              "gpt-4o",
-		GenerateQuestionModel:  "gpt-4o",
-		ExpandQuestionModel:    "gpt-4o-mini",
-		CheckUserQueryModel:    "gpt-4o-mini",
-		GenerateChatTitleModel: "gpt-4o-mini",
+	openRouter := openrouter.NewOpenRouterService(openrouter.Config{
+		ApiKey:                 getEnv("OPENROUTER_API_KEY", ""),
+		ChatModel:              getEnv("OPENROUTER_CHAT_MODEL", "google/gemini-3-flash-preview"),
+		GenerateQuestionModel:  getEnv("OPENROUTER_QUESTION_MODEL", "google/gemini-3-flash-preview"),
+		ExpandQuestionModel:    getEnv("OPENROUTER_EXPAND_MODEL", "openai/gpt-4o-mini"),
+		GenerateChatTitleModel: getEnv("OPENROUTER_TITLE_MODEL", "openai/gpt-4o-mini"),
+		ReasoningModel:         getEnv("OPENROUTER_REASONING_MODEL", "google/gemini-3-flash-preview"),
+		VisionModel:            getEnv("OPENROUTER_VISION_MODEL", "google/gemini-3-flash-preview"),
+		EmbeddingModel:         getEnv("OPENROUTER_EMBEDDING_MODEL", "openai/text-embedding-3-small"),
 	})
 
 	jina := jina.NewService(os.Getenv("JINA_API_KEY"))
 
 	aiService := &MultiModelService{
-		openai,
-		jina,
+		OpenRouterService: openRouter,
+		Service:           jina,
 	}
 
 	slogLogger := slogInfra.NewLogger()
@@ -101,22 +110,49 @@ func NewAuthDependencyContainer() *DependencyContainer {
 		OAuthSessionTTL: time.Minute * 15,
 	})
 
+	var notifService *services.NotificationService
+	fcmCtx := context.Background()
+
+	messagingClient, err := firebaseInfra.NewFCMClient(fcmCtx)
+	if err == nil {
+		notifService = services.NewNotificationService(messagingClient, repo)
+	} else {
+		fmt.Printf("Warning: FCM Client initialization failed: %v\n", err)
+	}
+
+	// -- Subscription / Payment --
+	usageLimits := domain.DefaultUsageLimitsConfig()
+	subscriptionService := services.NewSubscriptionService(repo, usageLimits, slogLogger)
+
 	return &DependencyContainer{
-		Repo:            postgresRepo,
-		Chunker:         chunker,
-		Embedding:       embeddingService,
-		VectorDB:        vectorDB,
-		FileStorage:     minioInfraService,
-		jweTokenService: jweTokenService,
-		inMemoryClient:  inMemoryClient,
-		Validator:       validator,
-		slogLogger:      slogLogger,
-		mailerSender:    mailersendService,
-		AIService:       aiService,
+		Repo:                repo,
+		Chunker:             chunker,
+		Embedding:           openRouter,
+		VectorDB:            vectorDB,
+		FileStorage:         s3Service,
+		jweTokenService:     jweTokenService,
+		inMemoryClient:      inMemoryClient,
+		Validator:           validator,
+		slogLogger:          slogLogger,
+		mailerSender:        mailersendService,
+		AIService:           aiService,
+		Notification:        notifService,
+		SubscriptionService: subscriptionService,
 	}
 }
 
 type MultiModelService struct {
-	*openaiInfra.OpenAIService
+	*openrouter.OpenRouterService
 	*jina.Service
+}
+
+func (s *MultiModelService) ExtractTextFromImage(ctx context.Context, imageUrl string) (string, error) {
+	return s.OpenRouterService.ExtractTextFromImage(ctx, imageUrl)
+}
+
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }

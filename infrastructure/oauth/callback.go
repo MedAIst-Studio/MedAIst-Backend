@@ -8,10 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 	"golang.org/x/oauth2"
 )
 
@@ -42,7 +40,7 @@ func (h *OAuthProvider) Callback(ctx *fiber.Ctx) error {
 		return h.redirectToFrontendWithError(ctx, "user_info_failed")
 	}
 
-	tokens, err := h.handleUser(ctx, cloudUserInfo)
+	tokens, err := h.Service.HandleOAuthUser(ctx.Context(), cloudUserInfo, h.Provider)
 	if err != nil {
 		h.Logger.Error("failed to handle user: ", err)
 		return h.redirectToFrontendWithError(ctx, "user_handling_failed")
@@ -78,50 +76,6 @@ func (h *OAuthProvider) getCloudUserInfo(token *oauth2.Token) (*domain.OAuthClou
 	return &info, nil
 }
 
-type Tokens struct {
-	Refresh string
-	Access  string
-}
-
-func (h *OAuthProvider) handleUser(ctx *fiber.Ctx, oauthCloudUser *domain.OAuthCloudUserInfo) (*Tokens, error) {
-	oauthUser, err := h.Repository.GetOAuthUser(ctx.Context(), oauthCloudUser.Email)
-	if err != nil {
-		return nil, err
-	}
-
-	newOAuthDomainUser := domain.NewOAuthUser(oauthCloudUser.Name, oauthCloudUser.Email, oauthCloudUser.ID, h.Provider)
-	if oauthUser.IsExistingUser() {
-		newOAuthDomainUser.UpdateUserId(oauthUser.Id)
-	}
-
-	tokens, err := h.generateTokens(newOAuthDomainUser.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	if oauthUser.IsNewUser() {
-		if err := h.Repository.CreateUserByOAuth(ctx.Context(), &auth.OAuthUserRegistrationData{
-			OAuthUser:    newOAuthDomainUser,
-			RefreshToken: domain.NewRefreshToken(newOAuthDomainUser.Id, tokens.Refresh),
-		}); err != nil {
-			return nil, err
-		}
-	} else if oauthUser.IsDifferentProvider(h.Provider) || oauthUser.HasNoProvider() {
-		if err := h.Repository.AddOAuthUser(ctx.Context(), &auth.OAuthUserRegistrationData{
-			OAuthUser:    newOAuthDomainUser,
-			RefreshToken: domain.NewRefreshToken(newOAuthDomainUser.Id, tokens.Refresh),
-		}); err != nil {
-			return nil, err
-		}
-	} else {
-		if err := h.Repository.UpsertRefreshToken(ctx.Context(), domain.NewRefreshToken(newOAuthDomainUser.Id, tokens.Refresh)); err != nil {
-			return nil, err
-		}
-	}
-
-	return tokens, nil
-}
-
 func (h *OAuthProvider) redirectToFrontendWithError(ctx *fiber.Ctx, errorCode string) error {
 	redirectURL := fmt.Sprintf("%s/login?error=%s", h.FrontendURL, errorCode)
 	return ctx.Redirect(redirectURL, fiber.StatusTemporaryRedirect)
@@ -130,23 +84,6 @@ func (h *OAuthProvider) redirectToFrontendWithError(ctx *fiber.Ctx, errorCode st
 func (h *OAuthProvider) redirectToFrontendCallback(ctx *fiber.Ctx, sessionKey string) error {
 	redirectURL := fmt.Sprintf("%s/auth/callback?session=%s", h.FrontendURL, sessionKey)
 	return ctx.Redirect(redirectURL, fiber.StatusTemporaryRedirect)
-}
-
-func (h *OAuthProvider) generateTokens(userId uuid.UUID) (*Tokens, error) {
-	accessToken, err := h.TokenService.GenerateAuthAccessToken(userId.String())
-	if err != nil {
-		return nil, err
-	}
-
-	refreshToken, err := h.TokenService.GenerateAuthRefreshToken(userId.String())
-	if err != nil {
-		return nil, err
-	}
-
-	return &Tokens{
-		Refresh: refreshToken,
-		Access:  accessToken,
-	}, nil
 }
 
 func generateSessionKey() string {

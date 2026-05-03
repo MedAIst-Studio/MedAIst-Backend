@@ -6,17 +6,14 @@ import (
 	"math/rand/v2"
 	"strconv"
 
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/file"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"github.com/google/uuid"
 	"github.com/qdrant/go-client/qdrant"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Config struct {
-	Addr           string
+	Host           string
+	Port           int
 	CollectionName string
 	ApiKey         string
 	MinScore       float32
@@ -26,34 +23,27 @@ type Config struct {
 
 type QdrantVectorDB struct {
 	Config
-	client            qdrant.PointsClient
-	collectionsClient qdrant.CollectionsClient
-	conn              *grpc.ClientConn
+	client *qdrant.Client
 }
 
 func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
-	opts := []grpc.DialOption{
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	}
-
-	if cfg.ApiKey != "" {
-		opts = append(opts, grpc.WithPerRPCCredentials(apiKeyCredentials{apiKey: cfg.ApiKey}))
-	}
-
-	conn, err := grpc.NewClient(cfg.Addr, opts...)
+	client, err := qdrant.NewClient(&qdrant.Config{
+		Host:   cfg.Host,
+		Port:   cfg.Port,
+		APIKey: cfg.ApiKey,
+		UseTLS: true,
+	})
 	if err != nil {
 		panic(fmt.Errorf("failed to connect to Qdrant DB: %w", err))
 	}
 
 	q := &QdrantVectorDB{
-		client:            qdrant.NewPointsClient(conn),
-		collectionsClient: qdrant.NewCollectionsClient(conn),
-		conn:              conn,
-		Config:            cfg,
+		client: client,
+		Config: cfg,
 	}
 
 	if err := q.ensureCollection(context.Background(), cfg.VectorSize); err != nil {
-		conn.Close()
+		client.Close()
 		fmt.Printf("Warning: failed to ensure collection: %v\n", err)
 		panic(err)
 	}
@@ -61,43 +51,42 @@ func NewQdrantVectorDB(cfg Config) *QdrantVectorDB {
 	return q
 }
 
-type apiKeyCredentials struct {
-	apiKey string
-}
-
-func (c apiKeyCredentials) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
-	return map[string]string{
-		"api-key": c.apiKey,
-	}, nil
-}
-
-func (c apiKeyCredentials) RequireTransportSecurity() bool {
-	return false
-}
-
 func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64) error {
-	_, err := q.collectionsClient.Get(ctx, &qdrant.GetCollectionInfoRequest{
-		CollectionName: q.Config.CollectionName,
-	})
-
-	if err == nil {
-		return nil
+	exists, err := q.client.CollectionExists(ctx, q.Config.CollectionName)
+	if err != nil {
+		return fmt.Errorf("failed to check collection existence: %w", err)
 	}
 
-	_, err = q.collectionsClient.Create(ctx, &qdrant.CreateCollection{
-		CollectionName: q.Config.CollectionName,
-		VectorsConfig: &qdrant.VectorsConfig{
-			Config: &qdrant.VectorsConfig_Params{
-				Params: &qdrant.VectorParams{
-					Size:     vectorSize,
-					Distance: qdrant.Distance_Cosine,
+	// Ensure collection exists (or create if not)
+	if !exists {
+		err = q.client.CreateCollection(ctx, &qdrant.CreateCollection{
+			CollectionName: q.Config.CollectionName,
+			VectorsConfig: &qdrant.VectorsConfig{
+				Config: &qdrant.VectorsConfig_Params{
+					Params: &qdrant.VectorParams{
+						Size:     vectorSize,
+						Distance: qdrant.Distance_Cosine,
+					},
 				},
 			},
-		},
-	})
+		})
 
+		if err != nil {
+			return fmt.Errorf("failed to create collection: %w", err)
+		}
+	}
+
+	// Always ensure index for file_id exists
+	fieldType := qdrant.FieldType(0)
+	_, err = q.client.CreateFieldIndex(ctx, &qdrant.CreateFieldIndexCollection{
+		CollectionName: q.Config.CollectionName,
+		FieldName:      "file_id",
+		FieldType:      &fieldType,
+	})
 	if err != nil {
-		return fmt.Errorf("failed to create collection: %w", err)
+		// Log warning but don't fail, maybe it already exists or concurrent creation
+		// In production, we might want to check if error is "already exists" specifically
+		fmt.Printf("Warning: ensure file_id index attempt: %v\n", err)
 	}
 
 	return nil
@@ -105,10 +94,10 @@ func (q *QdrantVectorDB) ensureCollection(ctx context.Context, vectorSize uint64
 
 // Graceful shutdown için
 func (q *QdrantVectorDB) Close() error {
-	return q.conn.Close()
+	return q.client.Close()
 }
 
-func (q *QdrantVectorDB) InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*file.FileMetadata) error {
+func (q *QdrantVectorDB) InsertEmbeddings(ctx context.Context, fileId uuid.UUID, docs []*domain.FileMetadata) error {
 	if len(docs) == 0 {
 		return nil
 	}
@@ -178,14 +167,15 @@ func (q *QdrantVectorDB) SearchByEmbedding(
 	fileId uuid.UUID,
 	embedding []float32,
 ) ([]string, error) {
-	searchRequest := &qdrant.SearchPoints{
+	limit := uint64(q.Config.ChunkLimit)
+	queryRequest := &qdrant.QueryPoints{
 		CollectionName: q.Config.CollectionName,
-		Vector:         embedding,
-		Limit:          q.Config.ChunkLimit,
-		ScoreThreshold: &q.Config.MinScore,
+		Query:          qdrant.NewQuery(embedding...),
+		Limit:          &limit,
 		WithPayload: &qdrant.WithPayloadSelector{
 			SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true},
 		},
+		ScoreThreshold: &q.Config.MinScore,
 		Filter: &qdrant.Filter{
 			Must: []*qdrant.Condition{
 				{
@@ -205,17 +195,17 @@ func (q *QdrantVectorDB) SearchByEmbedding(
 	}
 
 	// Qdrant sorgusunu çalıştır
-	searchResult, err := q.client.Search(ctx, searchRequest)
+	points, err := q.client.Query(ctx, queryRequest)
 	if err != nil {
 		return nil, fmt.Errorf("vector search failed: %w", err)
 	}
 
-	if len(searchResult.Result) == 0 {
+	if len(points) == 0 {
 		return nil, domain.ErrInfoNotFoundInPDF
 	}
 
 	var texts []string
-	for _, point := range searchResult.Result {
+	for _, point := range points {
 		if point.Payload == nil {
 			continue
 		}
@@ -225,12 +215,12 @@ func (q *QdrantVectorDB) SearchByEmbedding(
 			continue
 		}
 
-		text := val.GetStringValue()
-		if text == "" {
-			continue
+		if textVal, ok := val.GetKind().(*qdrant.Value_StringValue); ok {
+			text := textVal.StringValue
+			if text != "" {
+				texts = append(texts, text)
+			}
 		}
-
-		texts = append(texts, text)
 	}
 
 	if len(texts) == 0 {
@@ -329,13 +319,12 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 	allChunks := make([]string, 0, limit*2) // Capacity hint
 	var nextPageOffset *qdrant.PointId
 
-	// Pagination ile chunk'ları al
-	// Not: Random seçim için hepsini almamız gerekiyor
+	// Pagination loop
 	for {
-		scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
+		points, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
 			CollectionName: q.CollectionName,
 			Filter:         filter,
-			Limit:          pointerUint32(1000),
+			Limit:          pointerUint32(100), // Fetch 100 at a time
 			Offset:         nextPageOffset,
 			WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
 		})
@@ -343,8 +332,11 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 			return nil, fmt.Errorf("failed to scroll points: %w", err)
 		}
 
-		// Chunk'ları topla
-		for _, point := range scrollResp.Result {
+		if len(points) == 0 {
+			break
+		}
+
+		for _, point := range points {
 			if text, ok := point.Payload["text"]; ok {
 				if textVal, ok := text.GetKind().(*qdrant.Value_StringValue); ok {
 					allChunks = append(allChunks, textVal.StringValue)
@@ -352,11 +344,8 @@ func (q *QdrantVectorDB) GetChunks(ctx context.Context, fileId uuid.UUID) ([]str
 			}
 		}
 
-		// Eğer NextPageOffset nil ise, tüm sayfalar alındı
-		if scrollResp.NextPageOffset == nil {
-			break
-		}
-		nextPageOffset = scrollResp.NextPageOffset
+		// Use last point's ID as offset for next page
+		nextPageOffset = points[len(points)-1].Id
 	}
 
 	// Limit'ten az veya eşitse hepsini döndür
@@ -376,9 +365,6 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 	if len(pageRange) == 0 {
 		return []string{}, nil
 	}
-
-	fmt.Println("Pages length:", len(pageRange))
-	fmt.Println("Page numbers:", pageRange)
 
 	filter := &qdrant.Filter{
 		Must: []*qdrant.Condition{
@@ -406,12 +392,13 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 	matchingChunks := make([]string, 0)
 	var nextPageOffset *qdrant.PointId
 
-	// Pagination ile tüm chunk'ları al ve filtrele
+	// Pagination loop
 	for {
-		scrollResp, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
+		fmt.Printf("Scrolling... Offset: %v\n", nextPageOffset)
+		points, err := q.client.Scroll(ctx, &qdrant.ScrollPoints{
 			CollectionName: q.CollectionName,
 			Filter:         filter,
-			Limit:          pointerUint32(1000),
+			Limit:          pointerUint32(100),
 			Offset:         nextPageOffset,
 			WithPayload:    &qdrant.WithPayloadSelector{SelectorOptions: &qdrant.WithPayloadSelector_Enable{Enable: true}},
 		})
@@ -419,8 +406,13 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 			return nil, fmt.Errorf("failed to scroll points by pages: %w", err)
 		}
 
-		// Sadece istenen sayfalardaki chunk'ları filtrele
-		for _, point := range scrollResp.Result {
+		fmt.Printf("Scroll returned %d points\n", len(points))
+
+		if len(points) == 0 {
+			break
+		}
+
+		for _, point := range points {
 			if pageNumbers, ok := point.Payload["page_numbers"]; ok {
 				if listVal, ok := pageNumbers.GetKind().(*qdrant.Value_ListValue); ok {
 					hasMatchingPage := false
@@ -453,11 +445,13 @@ func (q *QdrantVectorDB) GetChunksByPages(ctx context.Context, fileId uuid.UUID,
 			}
 		}
 
-		// Tüm sayfalar alındı mı?
-		if scrollResp.NextPageOffset == nil {
+		// Use last point's ID as offset for next page
+		lastPoint := points[len(points)-1]
+		if nextPageOffset != nil && lastPoint.Id.String() == nextPageOffset.String() {
+			fmt.Println("Warning: Next page offset is same as current, breaking loop to prevent infinite loop")
 			break
 		}
-		nextPageOffset = scrollResp.NextPageOffset
+		nextPageOffset = lastPoint.Id
 	}
 
 	fmt.Println("Total chunks found:", len(matchingChunks))

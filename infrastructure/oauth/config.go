@@ -1,16 +1,15 @@
 package oauth
 
 import (
-	"github.com/MedAIst-Studio/MedAIist-Backend/app/auth"
 	"github.com/MedAIst-Studio/MedAIist-Backend/domain"
 	"golang.org/x/oauth2"
 )
 
 type OAuthDependenciesConfig struct {
 	Provider       string
-	Repository     auth.Repository
-	TokenService   auth.TokenService
-	Cache          auth.Cache
+	Repository     domain.AuthRepository
+	TokenService   domain.TokenService
+	Cache          domain.AuthCache
 	Logger         domain.Logger
 	ClientID       string
 	ClientSecret   string
@@ -21,7 +20,8 @@ type OAuthDependenciesConfig struct {
 
 type OAuthProvider struct {
 	OAuthDependenciesConfig
-	config *oauth2.Config
+	config  *oauth2.Config
+	Service *OAuthService
 }
 
 func NewOAuthProvider(cfg *OAuthDependenciesConfig, endpoint oauth2.Endpoint, scopes []string) *OAuthProvider {
@@ -34,5 +34,6 @@ func NewOAuthProvider(cfg *OAuthDependenciesConfig, endpoint oauth2.Endpoint, sc
 			Endpoint:     endpoint,
 			Scopes:       scopes,
 		},
+		Service: NewOAuthService(cfg.Repository, cfg.TokenService),
 	}
 }

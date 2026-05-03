@@ -58,10 +58,11 @@ services:
     restart: unless-stopped
     depends_on:
       - db
-      - minio
-      - qdrant
     env_file:
       - .env
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 volumes:
   go-mod:

@@ -23,7 +23,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.ExchangeRequest"
+                            "$ref": "#/definitions/handlers_auth.ExchangeRequest"
                         }
                     }
                 ],
@@ -31,7 +31,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.ExchangeResponse"
+                            "$ref": "#/definitions/handlers_auth.ExchangeResponse"
                         }
                     },
                     "400": {
@@ -39,6 +39,49 @@
                     },
                     "500": {
                         "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/api/auth/oauth/mobile": {
+            "post": {
+                "description": "Authenticate user via Google or Facebook mobile tokens.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Mobile OAuth Login",
+                "parameters": [
+                    {
+                        "description": "Mobile Login Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/infrastructure_oauth.MobileLoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/infrastructure_oauth.OAuthTokens"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -63,7 +106,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.LoginRequest"
+                            "$ref": "#/definitions/handlers_auth.LoginRequest"
                         }
                     }
                 ],
@@ -71,7 +114,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.LoginResponse"
+                            "$ref": "#/definitions/handlers_auth.LoginResponse"
                         }
                     },
                     "400": {
@@ -132,7 +175,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.RefreshTokenRequest"
+                            "$ref": "#/definitions/handlers_auth.RefreshTokenRequest"
                         }
                     }
                 ],
@@ -140,7 +183,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.RefreshTokenResponse"
+                            "$ref": "#/definitions/handlers_auth.RefreshTokenResponse"
                         }
                     },
                     "401": {
@@ -172,7 +215,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.SignupRequest"
+                            "$ref": "#/definitions/handlers_auth.SignupRequest"
                         }
                     }
                 ],
@@ -180,7 +223,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/auth.SignupResponse"
+                            "$ref": "#/definitions/handlers_auth.SignupResponse"
                         }
                     },
                     "400": {
@@ -219,7 +262,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/chat.Chat"
+                                "$ref": "#/definitions/domain.ChatResponseDTO"
                             }
                         }
                     },
@@ -262,7 +305,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/chat.Message"
+                                "$ref": "#/definitions/domain.MessageDTO"
                             }
                         }
                     },
@@ -311,6 +354,78 @@
                         "description": "Internal Server Error"
                     }
                 }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    },
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates the title of a chat by its ID.\nUpdates the title of a chat by its ID.",
+                "consumes": [
+                    "application/json",
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/json"
+                ],
+                "tags": [
+                    "Chats",
+                    "Chats"
+                ],
+                "summary": "Update Chat Title",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Title",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateChatRequest"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Chat ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Title",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.UpdateChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
             }
         },
         "/files": {
@@ -337,7 +452,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/file.File"
+                                "$ref": "#/definitions/domain.FileResponseDTO"
                             }
                         }
                     },
@@ -372,7 +487,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/file.UploadFileRequest"
+                            "$ref": "#/definitions/domain.UploadFileRequest"
                         }
                     }
                 ],
@@ -380,7 +495,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/file.UploadFileResponse"
+                            "$ref": "#/definitions/domain.UploadFileResponse"
                         }
                     },
                     "400": {
@@ -477,6 +592,55 @@
                 }
             }
         },
+        "/files/{id}/save": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Toggle the is_saved flag of an image file. Saved images are excluded from auto-cleanup.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Files"
+                ],
+                "summary": "Toggle file saved status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "File ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ToggleFileSavedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/healthcheck": {
             "get": {
                 "description": "Check the health of the service",
@@ -525,7 +689,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/message.SendMessageRequest"
+                            "$ref": "#/definitions/domain.SendMessageRequest"
                         }
                     }
                 ],
@@ -533,7 +697,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/message.SendMessageResponse"
+                            "$ref": "#/definitions/domain.SendMessageResponse"
                         }
                     },
                     "400": {
@@ -547,10 +711,7 @@
         },
         "/quizzes": {
             "get": {
-                "description": "Retrieve a list of quizzes for the authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get all quizzes for the current user",
                 "produces": [
                     "application/json"
                 ],
@@ -564,7 +725,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/quiz.QuizSummary"
+                                "$ref": "#/definitions/domain.QuizResponseDTO"
                             }
                         }
                     },
@@ -592,7 +753,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/quiz.GenerateQuizRequest"
+                            "$ref": "#/definitions/domain.GenerateQuizRequest"
                         }
                     }
                 ],
@@ -600,7 +761,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/quiz.GenerateQuizResponse"
+                            "$ref": "#/definitions/domain.GenerateQuizResponse"
                         }
                     },
                     "400": {
@@ -614,10 +775,7 @@
         },
         "/quizzes/attempts": {
             "get": {
-                "description": "Get all quiz attempts for the current user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get paginated quiz attempts for the current user",
                 "produces": [
                     "application/json"
                 ],
@@ -628,15 +786,13 @@
                 "parameters": [
                     {
                         "type": "integer",
-                        "default": 10,
-                        "description": "Limit",
+                        "description": "Page size (default 10, max 50)",
                         "name": "limit",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "default": 0,
-                        "description": "Offset",
+                        "description": "Offset (default 0)",
                         "name": "offset",
                         "in": "query"
                     }
@@ -645,11 +801,8 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/quiz.GetQuizAttemptsResponse"
+                            "$ref": "#/definitions/domain.GetAttemptsResponse"
                         }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -659,17 +812,14 @@
         },
         "/quizzes/attempts/{id}": {
             "get": {
-                "description": "Retrieve a specific quiz attempt by its ID for the authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get full details of a specific quiz attempt",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Quiz"
                 ],
-                "summary": "Get Quiz Attempt by ID",
+                "summary": "Get Attempt Details",
                 "parameters": [
                     {
                         "type": "string",
@@ -683,21 +833,24 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/quiz.GetAttemptByIdResponse"
+                            "$ref": "#/definitions/domain.AttemptDetailResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
         "/quizzes/{id}": {
             "get": {
-                "description": "Retrieve a quiz by its ID for the authenticated user",
-                "consumes": [
-                    "application/json"
-                ],
+                "description": "Get a specific quiz by its ID",
                 "produces": [
                     "application/json"
                 ],
@@ -718,11 +871,17 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/quiz.GetQuizByIdResponse"
+                            "$ref": "#/definitions/domain.GetQuizByIdResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
@@ -754,7 +913,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/quiz.SolveQuizRequest"
+                            "$ref": "#/definitions/domain.SolveQuizRequest"
                         }
                     }
                 ],
@@ -762,7 +921,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/quiz.SolveQuizResponse"
+                            "$ref": "#/definitions/domain.SolveQuizResponse"
                         }
                     },
                     "400": {
@@ -770,6 +929,32 @@
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/system/config": {
+            "get": {
+                "description": "Get system configuration like app version",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "System Config",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers_system.VersionResponse"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -828,7 +1013,52 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.UpdateUsernameRequest"
+                            "$ref": "#/definitions/handlers_user.UpdateUsernameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/fcm-token": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Register or update the user's FCM push notification token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update FCM Token",
+                "parameters": [
+                    {
+                        "description": "FCM Token Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers_user.UpdateFCMTokenRequest"
                         }
                     }
                 ],
@@ -868,7 +1098,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.ForgotPasswordRequest"
+                            "$ref": "#/definitions/handlers_user.ForgotPasswordRequest"
                         }
                     }
                 ],
@@ -913,7 +1143,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.ChangePasswordRequest"
+                            "$ref": "#/definitions/handlers_user.ChangePasswordRequest"
                         }
                     }
                 ],
@@ -932,6 +1162,51 @@
                     },
                     "404": {
                         "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/preferences": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update the current user's preferences (theme and notification settings)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update User Preferences",
+                "parameters": [
+                    {
+                        "description": "Update Preferences Request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers_user.UpdatePreferencesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -961,7 +1236,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/user.GetCurrentUserResponse"
+                            "$ref": "#/definitions/handlers_user.GetCurrentUserResponse"
                         }
                     },
                     "400": {
@@ -978,7 +1253,7 @@
         },
         "/users/reset-password": {
             "post": {
-                "description": "It resets a user's password using a token.",
+                "description": "Resets the password completely for the specific user",
                 "consumes": [
                     "application/json"
                 ],
@@ -996,7 +1271,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.ResetPasswordRequest"
+                            "$ref": "#/definitions/handlers_user.ResetPasswordRequest"
                         }
                     }
                 ],
@@ -1016,9 +1291,48 @@
                 }
             }
         },
-        "/users/verify-email": {
-            "post": {
-                "description": "Verifies a user's email address using a token",
+        "/users/usage": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns the current user's usage limits and remaining quota for messages, OCR, PDF chat, files, and quizzes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Subscription"
+                ],
+                "summary": "Get Usage Status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.UsageStatusResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/usage-stats": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get the current user's streak and usage statistics",
                 "consumes": [
                     "application/json"
                 ],
@@ -1028,21 +1342,50 @@
                 "tags": [
                     "User"
                 ],
-                "summary": "Verify user email",
+                "summary": "Get Usage Stats (Streak)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers_user.GetStreakResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/webhooks/revenuecat": {
+            "post": {
+                "description": "Handles incoming RevenueCat webhook events (INITIAL_PURCHASE, RENEWAL, CANCELLATION, EXPIRATION, etc.)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhook"
+                ],
+                "summary": "RevenueCat Webhook",
                 "parameters": [
                     {
-                        "description": "Verify Email Request",
+                        "description": "RevenueCat Webhook Event",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.VerifiyEmailRequest"
+                            "$ref": "#/definitions/domain.RevenueCatWebhookEvent"
                         }
                     }
                 ],
                 "responses": {
-                    "204": {
-                        "description": "No Content"
+                    "200": {
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -1058,183 +1401,7 @@
         }
     },
     "definitions": {
-        "auth.ExchangeRequest": {
-            "type": "object",
-            "properties": {
-                "session": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.ExchangeResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.LoginRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "accessToken": {
-                    "type": "string"
-                },
-                "refreshToken": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RefreshTokenRequest": {
-            "type": "object",
-            "properties": {
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.RefreshTokenResponse": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.SignupRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.SignupResponse": {
-            "type": "object"
-        },
-        "chat.Chat": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "file_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "chat.Message": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "is_user": {
-                    "type": "boolean"
-                },
-                "timestamp": {
-                    "type": "string"
-                }
-            }
-        },
-        "file.File": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "file.UploadFileRequest": {
-            "type": "object"
-        },
-        "file.UploadFileResponse": {
-            "type": "object"
-        },
-        "message.SendMessageRequest": {
-            "type": "object",
-            "required": [
-                "content",
-                "pdf_id"
-            ],
-            "properties": {
-                "chat_id": {
-                    "type": "string"
-                },
-                "content": {
-                    "type": "string",
-                    "minLength": 1
-                },
-                "pdf_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "message.SendMessageResponse": {
-            "type": "object",
-            "properties": {
-                "ai_message_id": {
-                    "type": "string"
-                },
-                "ai_response": {
-                    "type": "string"
-                },
-                "chat_id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "user_message_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "quiz.Answer": {
+        "domain.Answer": {
             "type": "object",
             "required": [
                 "question_no",
@@ -1257,14 +1424,13 @@
                 }
             }
         },
-        "quiz.AnswerFeedback": {
+        "domain.AnswerFeedback": {
             "type": "object",
             "properties": {
                 "correct_option": {
                     "type": "string"
                 },
                 "explanation": {
-                    "description": "Doğru cevap açıklaması",
                     "type": "string"
                 },
                 "is_correct": {
@@ -1278,7 +1444,19 @@
                 }
             }
         },
-        "quiz.AttemptAnswerDetail": {
+        "domain.Attachment": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"image\"",
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.AttemptAnswerDetail": {
             "type": "object",
             "properties": {
                 "correct_option": {
@@ -1301,7 +1479,105 @@
                 }
             }
         },
-        "quiz.GenerateQuizRequest": {
+        "domain.AttemptDetailResponse": {
+            "type": "object",
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.AttemptAnswerDetail"
+                    }
+                },
+                "completed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "percentage": {
+                    "type": "number"
+                },
+                "quiz_id": {
+                    "type": "string"
+                },
+                "quiz_title": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "total_questions": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.ChatResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.ContextSnapshot": {
+            "type": "object",
+            "properties": {
+                "cached_title": {
+                    "type": "string"
+                },
+                "document_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "\"pdf\", \"book\", etc.",
+                    "type": "string"
+                }
+            }
+        },
+        "domain.FileResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "file_type": {
+                    "$ref": "#/definitions/domain.FileType"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_saved": {
+                    "type": "boolean"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.FileType": {
+            "type": "string",
+            "enum": [
+                "pdf",
+                "image"
+            ],
+            "x-enum-varnames": [
+                "FileTypePDF",
+                "FileTypeImage"
+            ]
+        },
+        "domain.GenerateQuizRequest": {
             "type": "object",
             "required": [
                 "fileId",
@@ -1322,7 +1598,7 @@
                 }
             }
         },
-        "quiz.GenerateQuizResponse": {
+        "domain.GenerateQuizResponse": {
             "type": "object",
             "properties": {
                 "quizId": {
@@ -1330,104 +1606,115 @@
                 }
             }
         },
-        "quiz.GetAttemptByIdResponse": {
-            "type": "object",
-            "properties": {
-                "answers": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/quiz.AttemptAnswerDetail"
-                    }
-                },
-                "completed_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "percentage": {
-                    "type": "number"
-                },
-                "quiz_id": {
-                    "type": "string"
-                },
-                "quiz_title": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "integer"
-                },
-                "total_questions": {
-                    "type": "integer"
-                }
-            }
-        },
-        "quiz.GetQuizAttemptsResponse": {
+        "domain.GetAttemptsResponse": {
             "type": "object",
             "properties": {
                 "attempts": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/quiz.QuizAttemptDetail"
+                        "$ref": "#/definitions/domain.QuizAttemptDetail"
                     }
                 },
-                "total_count": {
+                "count": {
                     "type": "integer"
                 }
             }
         },
-        "quiz.GetQuizByIdResponse": {
+        "domain.GetQuizByIdResponse": {
             "type": "object",
             "properties": {
+                "documentId": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
                 "questions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/quiz.Question"
+                        "$ref": "#/definitions/domain.QuizQuestion"
                     }
                 },
                 "title": {
                     "type": "string"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         },
-        "quiz.Option": {
+        "domain.MessageDTO": {
             "type": "object",
             "properties": {
+                "attachments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Attachment"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "context_snapshot": {
+                    "$ref": "#/definitions/domain.ContextSnapshot"
+                },
+                "is_user": {
+                    "type": "boolean"
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.NotificationPreferences": {
+            "type": "object",
+            "properties": {
+                "motivation": {
+                    "type": "boolean"
+                },
+                "reminders": {
+                    "type": "boolean"
+                },
+                "updates": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "domain.Option": {
+            "type": "object",
+            "properties": {
+                "isCorrect": {
+                    "type": "boolean"
+                },
                 "label": {
-                    "type": "string"
-                },
-                "text": {
-                    "type": "string"
-                }
-            }
-        },
-        "quiz.Question": {
-            "type": "object",
-            "properties": {
-                "correct_option": {
-                    "type": "string"
-                },
-                "explanation": {
                     "type": "string"
                 },
                 "no": {
                     "type": "integer"
                 },
-                "options": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/quiz.Option"
-                    }
-                },
                 "text": {
                     "type": "string"
                 }
             }
         },
-        "quiz.QuizAttemptDetail": {
+        "domain.PlanType": {
+            "type": "string",
+            "enum": [
+                "free",
+                "pro_monthly",
+                "pro_semester",
+                "pro_yearly",
+                "ultra"
+            ],
+            "x-enum-varnames": [
+                "PlanFree",
+                "PlanProMonthly",
+                "PlanProSemester",
+                "PlanProYearly",
+                "PlanUltra"
+            ]
+        },
+        "domain.QuizAttemptDetail": {
             "type": "object",
             "properties": {
                 "completed_at": {
@@ -1453,21 +1740,100 @@
                 }
             }
         },
-        "quiz.QuizSummary": {
+        "domain.QuizQuestion": {
+            "type": "object",
+            "properties": {
+                "correctOptionLabel": {
+                    "type": "string"
+                },
+                "difficulty": {
+                    "type": "string"
+                },
+                "explanation": {
+                    "type": "string"
+                },
+                "options": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Option"
+                    }
+                },
+                "questionText": {
+                    "type": "string"
+                },
+                "topic": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.QuizResponseDTO": {
             "type": "object",
             "properties": {
                 "createdAt": {
                     "type": "string"
                 },
-                "quizId": {
+                "id": {
                     "type": "string"
                 },
                 "title": {
                     "type": "string"
+                },
+                "totalQuestions": {
+                    "type": "integer"
                 }
             }
         },
-        "quiz.SolveQuizRequest": {
+        "domain.RevenueCatWebhookEvent": {
+            "type": "object",
+            "properties": {
+                "event": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
+        "domain.SendMessageRequest": {
+            "type": "object",
+            "required": [
+                "content"
+            ],
+            "properties": {
+                "chat_id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "pdf_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.SendMessageResponse": {
+            "type": "object",
+            "properties": {
+                "ai_message_id": {
+                    "type": "string"
+                },
+                "ai_response": {
+                    "type": "string"
+                },
+                "chat_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "user_message_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.SolveQuizRequest": {
             "type": "object",
             "required": [
                 "answers",
@@ -1477,7 +1843,7 @@
                 "answers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/quiz.Answer"
+                        "$ref": "#/definitions/domain.Answer"
                     }
                 },
                 "id": {
@@ -1485,14 +1851,13 @@
                 }
             }
         },
-        "quiz.SolveQuizResponse": {
+        "domain.SolveQuizResponse": {
             "type": "object",
             "properties": {
                 "answers": {
-                    "description": "Detaylı cevap bilgisi",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/quiz.AnswerFeedback"
+                        "$ref": "#/definitions/domain.AnswerFeedback"
                     }
                 },
                 "attempt_id": {
@@ -1509,7 +1874,187 @@
                 }
             }
         },
-        "user.ChangePasswordRequest": {
+        "domain.ToggleFileSavedResponse": {
+            "type": "object",
+            "properties": {
+                "is_saved": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "domain.UpdateChatRequest": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UploadFileRequest": {
+            "type": "object",
+            "properties": {
+                "file_data": {
+                    "$ref": "#/definitions/multipart.FileHeader"
+                }
+            }
+        },
+        "domain.UploadFileResponse": {
+            "type": "object",
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.UsageDetail": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer"
+                },
+                "unlimited": {
+                    "type": "boolean"
+                },
+                "used": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.UsageStatusResponse": {
+            "type": "object",
+            "properties": {
+                "period": {
+                    "type": "string"
+                },
+                "plan": {
+                    "$ref": "#/definitions/domain.PlanType"
+                },
+                "usage": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/domain.UsageDetail"
+                    }
+                }
+            }
+        },
+        "domain.UserPreferences": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "$ref": "#/definitions/domain.NotificationPreferences"
+                },
+                "theme": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.ExchangeRequest": {
+            "type": "object",
+            "properties": {
+                "session": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.ExchangeResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.RefreshTokenRequest": {
+            "type": "object",
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.SignupRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_auth.SignupResponse": {
+            "type": "object"
+        },
+        "handlers_system.VersionResponse": {
+            "type": "object",
+            "properties": {
+                "force_update": {
+                    "type": "boolean"
+                },
+                "latest_version": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "min_version": {
+                    "type": "string"
+                },
+                "store_url_android": {
+                    "type": "string"
+                },
+                "store_url_ios": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_user.ChangePasswordRequest": {
             "type": "object",
             "required": [
                 "new_password",
@@ -1524,7 +2069,7 @@
                 }
             }
         },
-        "user.ForgotPasswordRequest": {
+        "handlers_user.ForgotPasswordRequest": {
             "type": "object",
             "required": [
                 "email"
@@ -1535,7 +2080,7 @@
                 }
             }
         },
-        "user.GetCurrentUserResponse": {
+        "handlers_user.GetCurrentUserResponse": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -1550,49 +2095,140 @@
                 "isEmailVerified": {
                     "type": "boolean"
                 },
+                "preferences": {
+                    "$ref": "#/definitions/domain.UserPreferences"
+                },
                 "username": {
                     "type": "string"
                 }
             }
         },
-        "user.ResetPasswordRequest": {
+        "handlers_user.GetStreakResponse": {
+            "type": "object",
+            "properties": {
+                "current_streak": {
+                    "type": "integer"
+                },
+                "has_played_today": {
+                    "type": "boolean"
+                },
+                "max_streak": {
+                    "type": "integer"
+                },
+                "recent_active_dates": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "handlers_user.ResetPasswordRequest": {
             "type": "object",
             "required": [
-                "password",
+                "newPassword",
                 "token"
             ],
             "properties": {
-                "password": {
-                    "type": "string",
-                    "minLength": 8
+                "newPassword": {
+                    "type": "string"
                 },
                 "token": {
                     "type": "string"
                 }
             }
         },
-        "user.UpdateUsernameRequest": {
+        "handlers_user.UpdateFCMTokenRequest": {
             "type": "object",
             "required": [
-                "address",
+                "fcm_token"
+            ],
+            "properties": {
+                "fcm_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_user.UpdatePreferencesRequest": {
+            "type": "object",
+            "properties": {
+                "notifications": {
+                    "type": "object",
+                    "properties": {
+                        "motivation": {
+                            "type": "boolean"
+                        },
+                        "reminders": {
+                            "type": "boolean"
+                        },
+                        "updates": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "theme": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers_user.UpdateUsernameRequest": {
+            "type": "object",
+            "required": [
                 "username"
             ],
             "properties": {
-                "address": {
-                    "type": "string"
-                },
                 "username": {
                     "type": "string"
                 }
             }
         },
-        "user.VerifiyEmailRequest": {
+        "infrastructure_oauth.MobileLoginRequest": {
             "type": "object",
-            "required": [
-                "token"
-            ],
             "properties": {
-                "token": {
+                "accessToken": {
+                    "description": "For Facebook",
+                    "type": "string"
+                },
+                "idToken": {
+                    "description": "For Google",
+                    "type": "string"
+                },
+                "provider": {
+                    "type": "string"
+                }
+            }
+        },
+        "infrastructure_oauth.OAuthTokens": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "multipart.FileHeader": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "header": {
+                    "$ref": "#/definitions/textproto.MIMEHeader"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "textproto.MIMEHeader": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "array",
+                "items": {
                     "type": "string"
                 }
             }
