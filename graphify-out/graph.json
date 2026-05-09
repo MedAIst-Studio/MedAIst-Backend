@@ -9,7 +9,7 @@
       "source_file": "jobs/cron.go",
       "source_location": "L1",
       "id": "jobs_cron_go",
-      "community": 1,
+      "community": 46,
       "norm_label": "cron.go"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "jobs/cron.go",
       "source_location": "L13",
       "id": "jobs_cron_setupcronjobs",
-      "community": 1,
+      "community": 46,
       "norm_label": "setupcronjobs()"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "jobs/cron.go",
       "source_location": "L92",
       "id": "jobs_cron_cleanupexpiredimages",
-      "community": 1,
+      "community": 46,
       "norm_label": "cleanupexpiredimages()"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "docs/docs.go",
       "source_location": "L1",
       "id": "docs_docs_go",
-      "community": 32,
+      "community": 49,
       "norm_label": "docs.go"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "docs/docs.go",
       "source_location": "L2269",
       "id": "docs_docs_init",
-      "community": 32,
+      "community": 49,
       "norm_label": "init()"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "services/notification.go",
       "source_location": "L1",
       "id": "services_notification_go",
-      "community": 2,
+      "community": 41,
       "norm_label": "notification.go"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "services/notification.go",
       "source_location": "L12",
       "id": "services_notificationservice",
-      "community": 2,
+      "community": 41,
       "norm_label": "notificationservice"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "services/notification.go",
       "source_location": "L17",
       "id": "services_notification_newnotificationservice",
-      "community": 2,
+      "community": 41,
       "norm_label": "newnotificationservice()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "services/notification.go",
       "source_location": "L24",
       "id": "services_notificationservice_sendnotification",
-      "community": 2,
+      "community": 41,
       "norm_label": ".sendnotification()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L1",
       "id": "services_subscription_go",
-      "community": 20,
+      "community": 23,
       "norm_label": "subscription.go"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L12",
       "id": "services_subscriptionservice",
-      "community": 20,
+      "community": 23,
       "norm_label": "subscriptionservice"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L18",
       "id": "services_subscription_newsubscriptionservice",
-      "community": 20,
+      "community": 23,
       "norm_label": "newsubscriptionservice()"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L32",
       "id": "services_subscriptionservice_checkusagelimit",
-      "community": 20,
+      "community": 23,
       "norm_label": ".checkusagelimit()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L74",
       "id": "services_subscriptionservice_incrementusage",
-      "community": 20,
+      "community": 23,
       "norm_label": ".incrementusage()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L79",
       "id": "services_subscriptionservice_handlewebhookevent",
-      "community": 20,
+      "community": 23,
       "norm_label": ".handlewebhookevent()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L186",
       "id": "services_subscriptionservice_getusagestatus",
-      "community": 20,
+      "community": 23,
       "norm_label": ".getusagestatus()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L249",
       "id": "services_subscriptionservice_determineplantype",
-      "community": 20,
+      "community": 23,
       "norm_label": ".determineplantype()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L265",
       "id": "services_subscriptionservice_detectentitlement",
-      "community": 20,
+      "community": 23,
       "norm_label": ".detectentitlement()"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L275",
       "id": "services_subscriptionservice_getstartofperiod",
-      "community": 20,
+      "community": 23,
       "norm_label": ".getstartofperiod()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "services/file.go",
       "source_location": "L1",
       "id": "services_file_go",
-      "community": 1,
+      "community": 27,
       "norm_label": "file.go"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "services/file.go",
       "source_location": "L16",
       "id": "services_fileservice",
-      "community": 3,
+      "community": 19,
       "norm_label": "fileservice"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "services/file.go",
       "source_location": "L24",
       "id": "services_file_newfileservice",
-      "community": 1,
+      "community": 20,
       "norm_label": "newfileservice()"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "services/file.go",
       "source_location": "L40",
       "id": "services_fileservice_uploadfile",
-      "community": 3,
+      "community": 19,
       "norm_label": ".uploadfile()"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "services/file.go",
       "source_location": "L79",
       "id": "services_fileservice_getfilesbyuserid",
-      "community": 3,
+      "community": 19,
       "norm_label": ".getfilesbyuserid()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "services/file.go",
       "source_location": "L105",
       "id": "services_fileservice_getfile",
-      "community": 3,
+      "community": 19,
       "norm_label": ".getfile()"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "services/file.go",
       "source_location": "L131",
       "id": "services_fileservice_deletefile",
-      "community": 3,
+      "community": 19,
       "norm_label": ".deletefile()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "services/file.go",
       "source_location": "L152",
       "id": "services_fileservice_togglefilesaved",
-      "community": 3,
+      "community": 19,
       "norm_label": ".togglefilesaved()"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "services/file.go",
       "source_location": "L170",
       "id": "services_fileservice_recover",
-      "community": 3,
+      "community": 19,
       "norm_label": ".recover()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "services/file.go",
       "source_location": "L178",
       "id": "services_fileprocessorfactory",
-      "community": 3,
+      "community": 19,
       "norm_label": "fileprocessorfactory"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "services/file.go",
       "source_location": "L183",
       "id": "services_file_newfileprocessorfactory",
-      "community": 1,
+      "community": 20,
       "norm_label": "newfileprocessorfactory()"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "services/file.go",
       "source_location": "L190",
       "id": "services_fileprocessorfactory_getprocessor",
-      "community": 3,
+      "community": 19,
       "norm_label": ".getprocessor()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "services/file.go",
       "source_location": "L202",
       "id": "services_pdfprocessor",
-      "community": 3,
+      "community": 19,
       "norm_label": "pdfprocessor"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "services/file.go",
       "source_location": "L212",
       "id": "services_file_newpdfprocessor",
-      "community": 1,
+      "community": 27,
       "norm_label": "newpdfprocessor()"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "services/file.go",
       "source_location": "L224",
       "id": "services_pdfprocessor_process",
-      "community": 3,
+      "community": 19,
       "norm_label": ".process()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "services/file.go",
       "source_location": "L309",
       "id": "services_pdfprocessor_recover",
-      "community": 3,
+      "community": 19,
       "norm_label": ".recover()"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "services/file.go",
       "source_location": "L315",
       "id": "services_imageprocessor",
-      "community": 1,
+      "community": 27,
       "norm_label": "imageprocessor"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "services/file.go",
       "source_location": "L317",
       "id": "services_file_newimageprocessor",
-      "community": 1,
+      "community": 27,
       "norm_label": "newimageprocessor()"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "services/file.go",
       "source_location": "L321",
       "id": "services_imageprocessor_process",
-      "community": 1,
+      "community": 27,
       "norm_label": ".process()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "services/file.go",
       "source_location": "L325",
       "id": "services_file_deduplicatechunks",
-      "community": 5,
+      "community": 3,
       "norm_label": "deduplicatechunks()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "services/file.go",
       "source_location": "L339",
       "id": "services_file_getfileextension",
-      "community": 1,
+      "community": 27,
       "norm_label": "getfileextension()"
     },
     {
@@ -369,8 +369,89 @@
       "source_file": "services/file.go",
       "source_location": "L346",
       "id": "services_file_isimagefile",
-      "community": 1,
+      "community": 27,
       "norm_label": "isimagefile()"
+    },
+    {
+      "label": "flashcard.go",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L1",
+      "id": "services_flashcard_go",
+      "community": 14,
+      "norm_label": "flashcard.go"
+    },
+    {
+      "label": "flashcardService",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L13",
+      "id": "services_flashcardservice",
+      "community": 14,
+      "norm_label": "flashcardservice"
+    },
+    {
+      "label": "NewFlashcardService()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L17",
+      "id": "services_flashcard_newflashcardservice",
+      "community": 14,
+      "norm_label": "newflashcardservice()"
+    },
+    {
+      "label": ".CreateDeck()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L23",
+      "id": "services_flashcardservice_createdeck",
+      "community": 14,
+      "norm_label": ".createdeck()"
+    },
+    {
+      "label": ".GetDecks()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L41",
+      "id": "services_flashcardservice_getdecks",
+      "community": 14,
+      "norm_label": ".getdecks()"
+    },
+    {
+      "label": ".AddCard()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L50",
+      "id": "services_flashcardservice_addcard",
+      "community": 14,
+      "norm_label": ".addcard()"
+    },
+    {
+      "label": ".GetCards()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L77",
+      "id": "services_flashcardservice_getcards",
+      "community": 14,
+      "norm_label": ".getcards()"
+    },
+    {
+      "label": ".GetDueCards()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L96",
+      "id": "services_flashcardservice_getduecards",
+      "community": 14,
+      "norm_label": ".getduecards()"
+    },
+    {
+      "label": ".ReviewCard()",
+      "file_type": "code",
+      "source_file": "services/flashcard.go",
+      "source_location": "L113",
+      "id": "services_flashcardservice_reviewcard",
+      "community": 14,
+      "norm_label": ".reviewcard()"
     },
     {
       "label": "quiz.go",
@@ -378,7 +459,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L1",
       "id": "services_quiz_go",
-      "community": 4,
+      "community": 2,
       "norm_label": "quiz.go"
     },
     {
@@ -387,7 +468,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L15",
       "id": "services_quizservice",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizservice"
     },
     {
@@ -396,7 +477,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L22",
       "id": "services_quiz_newquizservice",
-      "community": 4,
+      "community": 2,
       "norm_label": "newquizservice()"
     },
     {
@@ -405,7 +486,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L36",
       "id": "services_questionresult",
-      "community": 4,
+      "community": 2,
       "norm_label": "questionresult"
     },
     {
@@ -414,7 +495,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L44",
       "id": "services_quiz_mergechunks",
-      "community": 4,
+      "community": 2,
       "norm_label": "mergechunks()"
     },
     {
@@ -423,7 +504,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L62",
       "id": "services_quizservice_generatequiz",
-      "community": 4,
+      "community": 2,
       "norm_label": ".generatequiz()"
     },
     {
@@ -432,7 +513,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L156",
       "id": "services_quizservice_solvequiz",
-      "community": 4,
+      "community": 2,
       "norm_label": ".solvequiz()"
     },
     {
@@ -441,7 +522,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L224",
       "id": "services_quizservice_getquizzes",
-      "community": 4,
+      "community": 2,
       "norm_label": ".getquizzes()"
     },
     {
@@ -450,7 +531,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L236",
       "id": "services_quizservice_getquizbyid",
-      "community": 4,
+      "community": 2,
       "norm_label": ".getquizbyid()"
     },
     {
@@ -459,7 +540,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L240",
       "id": "services_quizservice_getattempts",
-      "community": 4,
+      "community": 2,
       "norm_label": ".getattempts()"
     },
     {
@@ -468,7 +549,7 @@
       "source_file": "services/quiz.go",
       "source_location": "L256",
       "id": "services_quizservice_getattemptbyid",
-      "community": 4,
+      "community": 2,
       "norm_label": ".getattemptbyid()"
     },
     {
@@ -477,7 +558,7 @@
       "source_file": "services/user.go",
       "source_location": "L1",
       "id": "services_user_go",
-      "community": 9,
+      "community": 6,
       "norm_label": "user.go"
     },
     {
@@ -486,7 +567,7 @@
       "source_file": "services/user.go",
       "source_location": "L10",
       "id": "services_userservice",
-      "community": 9,
+      "community": 6,
       "norm_label": "userservice"
     },
     {
@@ -495,7 +576,7 @@
       "source_file": "services/user.go",
       "source_location": "L19",
       "id": "services_user_newuserservice",
-      "community": 9,
+      "community": 6,
       "norm_label": "newuserservice()"
     },
     {
@@ -504,7 +585,7 @@
       "source_file": "services/user.go",
       "source_location": "L30",
       "id": "services_userservice_getuserbyid",
-      "community": 9,
+      "community": 6,
       "norm_label": ".getuserbyid()"
     },
     {
@@ -513,7 +594,7 @@
       "source_file": "services/user.go",
       "source_location": "L34",
       "id": "services_userservice_changepassword",
-      "community": 9,
+      "community": 6,
       "norm_label": ".changepassword()"
     },
     {
@@ -522,7 +603,7 @@
       "source_file": "services/user.go",
       "source_location": "L57",
       "id": "services_userservice_deleteaccount",
-      "community": 9,
+      "community": 6,
       "norm_label": ".deleteaccount()"
     },
     {
@@ -531,7 +612,7 @@
       "source_file": "services/user.go",
       "source_location": "L82",
       "id": "services_userservice_updateusername",
-      "community": 9,
+      "community": 6,
       "norm_label": ".updateusername()"
     },
     {
@@ -540,7 +621,7 @@
       "source_file": "services/user.go",
       "source_location": "L89",
       "id": "services_userservice_updatepreferences",
-      "community": 9,
+      "community": 6,
       "norm_label": ".updatepreferences()"
     },
     {
@@ -549,7 +630,7 @@
       "source_file": "services/user.go",
       "source_location": "L93",
       "id": "services_userservice_updatefcmtoken",
-      "community": 9,
+      "community": 6,
       "norm_label": ".updatefcmtoken()"
     },
     {
@@ -558,7 +639,7 @@
       "source_file": "services/user.go",
       "source_location": "L97",
       "id": "services_userservice_forgotpassword",
-      "community": 9,
+      "community": 6,
       "norm_label": ".forgotpassword()"
     },
     {
@@ -567,7 +648,7 @@
       "source_file": "services/user.go",
       "source_location": "L124",
       "id": "services_userservice_resetpassword",
-      "community": 9,
+      "community": 6,
       "norm_label": ".resetpassword()"
     },
     {
@@ -576,7 +657,7 @@
       "source_file": "services/chat.go",
       "source_location": "L1",
       "id": "services_chat_go",
-      "community": 22,
+      "community": 26,
       "norm_label": "chat.go"
     },
     {
@@ -585,7 +666,7 @@
       "source_file": "services/chat.go",
       "source_location": "L10",
       "id": "services_chatservice",
-      "community": 22,
+      "community": 26,
       "norm_label": "chatservice"
     },
     {
@@ -594,7 +675,7 @@
       "source_file": "services/chat.go",
       "source_location": "L14",
       "id": "services_chat_newchatservice",
-      "community": 22,
+      "community": 26,
       "norm_label": "newchatservice()"
     },
     {
@@ -603,7 +684,7 @@
       "source_file": "services/chat.go",
       "source_location": "L20",
       "id": "services_chatservice_getchatsbyuserid",
-      "community": 22,
+      "community": 26,
       "norm_label": ".getchatsbyuserid()"
     },
     {
@@ -612,7 +693,7 @@
       "source_file": "services/chat.go",
       "source_location": "L24",
       "id": "services_chatservice_getchatbyid",
-      "community": 22,
+      "community": 26,
       "norm_label": ".getchatbyid()"
     },
     {
@@ -621,7 +702,7 @@
       "source_file": "services/chat.go",
       "source_location": "L28",
       "id": "services_chatservice_updatechat",
-      "community": 22,
+      "community": 26,
       "norm_label": ".updatechat()"
     },
     {
@@ -630,7 +711,7 @@
       "source_file": "services/chat.go",
       "source_location": "L32",
       "id": "services_chatservice_deletechat",
-      "community": 22,
+      "community": 26,
       "norm_label": ".deletechat()"
     },
     {
@@ -639,7 +720,7 @@
       "source_file": "services/message.go",
       "source_location": "L1",
       "id": "services_message_go",
-      "community": 5,
+      "community": 3,
       "norm_label": "message.go"
     },
     {
@@ -648,7 +729,7 @@
       "source_file": "services/message.go",
       "source_location": "L44",
       "id": "services_chatrequestmanager",
-      "community": 5,
+      "community": 3,
       "norm_label": "chatrequestmanager"
     },
     {
@@ -657,7 +738,7 @@
       "source_file": "services/message.go",
       "source_location": "L50",
       "id": "services_message_newchatrequestmanager",
-      "community": 5,
+      "community": 3,
       "norm_label": "newchatrequestmanager()"
     },
     {
@@ -666,7 +747,7 @@
       "source_file": "services/message.go",
       "source_location": "L58",
       "id": "services_message_newchatmessage",
-      "community": 5,
+      "community": 3,
       "norm_label": "newchatmessage()"
     },
     {
@@ -675,7 +756,7 @@
       "source_file": "services/message.go",
       "source_location": "L65",
       "id": "services_message_newchatrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "newchatrequest()"
     },
     {
@@ -684,7 +765,7 @@
       "source_file": "services/message.go",
       "source_location": "L76",
       "id": "services_message_getsystemmessageforquerytype",
-      "community": 5,
+      "community": 3,
       "norm_label": "getsystemmessageforquerytype()"
     },
     {
@@ -693,7 +774,7 @@
       "source_file": "services/message.go",
       "source_location": "L89",
       "id": "services_message_newchattitlerequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "newchattitlerequest()"
     },
     {
@@ -702,7 +783,7 @@
       "source_file": "services/message.go",
       "source_location": "L101",
       "id": "services_chatrequestmanager_ispdfsearchquery",
-      "community": 5,
+      "community": 3,
       "norm_label": ".ispdfsearchquery()"
     },
     {
@@ -711,7 +792,7 @@
       "source_file": "services/message.go",
       "source_location": "L105",
       "id": "services_messageservice",
-      "community": 5,
+      "community": 3,
       "norm_label": "messageservice"
     },
     {
@@ -720,7 +801,7 @@
       "source_file": "services/message.go",
       "source_location": "L116",
       "id": "services_message_newmessageservice",
-      "community": 5,
+      "community": 3,
       "norm_label": "newmessageservice()"
     },
     {
@@ -729,7 +810,7 @@
       "source_file": "services/message.go",
       "source_location": "L138",
       "id": "services_messageservice_sendmessage",
-      "community": 5,
+      "community": 3,
       "norm_label": ".sendmessage()"
     },
     {
@@ -738,7 +819,7 @@
       "source_file": "services/message.go",
       "source_location": "L273",
       "id": "services_messageservice_handlenewchatifneeded",
-      "community": 5,
+      "community": 3,
       "norm_label": ".handlenewchatifneeded()"
     },
     {
@@ -747,7 +828,7 @@
       "source_file": "services/message.go",
       "source_location": "L292",
       "id": "services_messageservice_processquery",
-      "community": 5,
+      "community": 3,
       "norm_label": ".processquery()"
     },
     {
@@ -756,7 +837,7 @@
       "source_file": "services/message.go",
       "source_location": "L313",
       "id": "services_searchresult",
-      "community": 5,
+      "community": 3,
       "norm_label": "searchresult"
     },
     {
@@ -765,7 +846,7 @@
       "source_file": "services/message.go",
       "source_location": "L318",
       "id": "services_messageservice_addpdfcontext",
-      "community": 5,
+      "community": 3,
       "norm_label": ".addpdfcontext()"
     },
     {
@@ -774,7 +855,7 @@
       "source_file": "services/message.go",
       "source_location": "L370",
       "id": "services_messageservice_handleinfonotfound",
-      "community": 5,
+      "community": 3,
       "norm_label": ".handleinfonotfound()"
     },
     {
@@ -783,7 +864,7 @@
       "source_file": "services/message.go",
       "source_location": "L380",
       "id": "services_messageservice_buildresponse",
-      "community": 5,
+      "community": 3,
       "norm_label": ".buildresponse()"
     },
     {
@@ -792,7 +873,7 @@
       "source_file": "services/message.go",
       "source_location": "L395",
       "id": "services_message_trimtitle",
-      "community": 5,
+      "community": 3,
       "norm_label": "trimtitle()"
     },
     {
@@ -801,7 +882,7 @@
       "source_file": "services/message.go",
       "source_location": "L399",
       "id": "services_message_convertimagetobase64",
-      "community": 5,
+      "community": 3,
       "norm_label": "convertimagetobase64()"
     },
     {
@@ -810,7 +891,7 @@
       "source_file": "services/message.go",
       "source_location": "L407",
       "id": "services_message_appendmessages",
-      "community": 5,
+      "community": 3,
       "norm_label": "appendmessages()"
     },
     {
@@ -819,7 +900,7 @@
       "source_file": "services/message.go",
       "source_location": "L411",
       "id": "services_message_removeusermessagetoend",
-      "community": 5,
+      "community": 3,
       "norm_label": "removeusermessagetoend()"
     },
     {
@@ -828,7 +909,7 @@
       "source_file": "services/message.go",
       "source_location": "L420",
       "id": "services_message_addrelevantexcerpts",
-      "community": 5,
+      "community": 3,
       "norm_label": "addrelevantexcerpts()"
     },
     {
@@ -837,7 +918,7 @@
       "source_file": "services/auth.go",
       "source_location": "L1",
       "id": "services_auth_go",
-      "community": 9,
+      "community": 6,
       "norm_label": "auth.go"
     },
     {
@@ -846,7 +927,7 @@
       "source_file": "services/auth.go",
       "source_location": "L10",
       "id": "services_authservice",
-      "community": 9,
+      "community": 6,
       "norm_label": "authservice"
     },
     {
@@ -855,7 +936,7 @@
       "source_file": "services/auth.go",
       "source_location": "L17",
       "id": "services_auth_newauthservice",
-      "community": 9,
+      "community": 6,
       "norm_label": "newauthservice()"
     },
     {
@@ -864,7 +945,7 @@
       "source_file": "services/auth.go",
       "source_location": "L26",
       "id": "services_authservice_login",
-      "community": 9,
+      "community": 6,
       "norm_label": ".login()"
     },
     {
@@ -873,7 +954,7 @@
       "source_file": "services/auth.go",
       "source_location": "L62",
       "id": "services_authservice_signup",
-      "community": 9,
+      "community": 6,
       "norm_label": ".signup()"
     },
     {
@@ -882,7 +963,7 @@
       "source_file": "services/auth.go",
       "source_location": "L104",
       "id": "services_authservice_logout",
-      "community": 9,
+      "community": 6,
       "norm_label": ".logout()"
     },
     {
@@ -891,7 +972,7 @@
       "source_file": "services/auth.go",
       "source_location": "L111",
       "id": "services_authservice_refreshtoken",
-      "community": 9,
+      "community": 6,
       "norm_label": ".refreshtoken()"
     },
     {
@@ -900,7 +981,7 @@
       "source_file": "services/auth.go",
       "source_location": "L137",
       "id": "services_authservice_exchangeoauthsession",
-      "community": 9,
+      "community": 6,
       "norm_label": ".exchangeoauthsession()"
     },
     {
@@ -909,7 +990,7 @@
       "source_file": "services/streak.go",
       "source_location": "L1",
       "id": "services_streak_go",
-      "community": 23,
+      "community": 14,
       "norm_label": "streak.go"
     },
     {
@@ -918,7 +999,7 @@
       "source_file": "services/streak.go",
       "source_location": "L11",
       "id": "services_streakservice",
-      "community": 23,
+      "community": 14,
       "norm_label": "streakservice"
     },
     {
@@ -927,7 +1008,7 @@
       "source_file": "services/streak.go",
       "source_location": "L15",
       "id": "services_streak_newstreakservice",
-      "community": 23,
+      "community": 14,
       "norm_label": "newstreakservice()"
     },
     {
@@ -936,7 +1017,7 @@
       "source_file": "services/streak.go",
       "source_location": "L19",
       "id": "services_streakservice_getstreak",
-      "community": 23,
+      "community": 14,
       "norm_label": ".getstreak()"
     },
     {
@@ -945,7 +1026,7 @@
       "source_file": "services/streak.go",
       "source_location": "L44",
       "id": "services_streakservice_checkandupdatestreak",
-      "community": 23,
+      "community": 14,
       "norm_label": ".checkandupdatestreak()"
     },
     {
@@ -954,7 +1035,7 @@
       "source_file": "services/streak.go",
       "source_location": "L99",
       "id": "services_streak_appendrecentdate",
-      "community": 23,
+      "community": 14,
       "norm_label": "appendrecentdate()"
     },
     {
@@ -963,7 +1044,7 @@
       "source_file": "cmd/main.go",
       "source_location": "L1",
       "id": "cmd_main_go",
-      "community": 1,
+      "community": 28,
       "norm_label": "main.go"
     },
     {
@@ -972,7 +1053,7 @@
       "source_file": "cmd/main.go",
       "source_location": "L15",
       "id": "cmd_main_main",
-      "community": 1,
+      "community": 28,
       "norm_label": "main()"
     },
     {
@@ -981,7 +1062,7 @@
       "source_file": "cmd/main.go",
       "source_location": "L29",
       "id": "cmd_main_gracefulshutdown",
-      "community": 1,
+      "community": 28,
       "norm_label": "gracefulshutdown()"
     },
     {
@@ -990,7 +1071,7 @@
       "source_file": "cmd/main.go",
       "source_location": "L39",
       "id": "cmd_main_startserver",
-      "community": 1,
+      "community": 28,
       "norm_label": "startserver()"
     },
     {
@@ -999,7 +1080,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L1",
       "id": "repository_subscription_go",
-      "community": 28,
+      "community": 40,
       "norm_label": "subscription.go"
     },
     {
@@ -1026,7 +1107,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L54",
       "id": "repository_repository_upsertsubscription",
-      "community": 28,
+      "community": 40,
       "norm_label": ".upsertsubscription()"
     },
     {
@@ -1062,7 +1143,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L121",
       "id": "repository_subscription_nullstring",
-      "community": 28,
+      "community": 40,
       "norm_label": "nullstring()"
     },
     {
@@ -1071,7 +1152,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L128",
       "id": "repository_subscription_nulltime",
-      "community": 28,
+      "community": 40,
       "norm_label": "nulltime()"
     },
     {
@@ -1080,7 +1161,7 @@
       "source_file": "repository/file.go",
       "source_location": "L1",
       "id": "repository_file_go",
-      "community": 36,
+      "community": 53,
       "norm_label": "file.go"
     },
     {
@@ -1170,7 +1251,7 @@
       "source_file": "repository/repository.go",
       "source_location": "L1",
       "id": "repository_repository_go",
-      "community": 21,
+      "community": 25,
       "norm_label": "repository.go"
     },
     {
@@ -1179,7 +1260,7 @@
       "source_file": "repository/repository.go",
       "source_location": "L12",
       "id": "repository_repository_newrepository",
-      "community": 21,
+      "community": 25,
       "norm_label": "newrepository()"
     },
     {
@@ -1197,8 +1278,116 @@
       "source_file": "repository/repository.go",
       "source_location": "L20",
       "id": "repository_repository_rollbacktx",
-      "community": 21,
+      "community": 25,
       "norm_label": "rollbacktx()"
+    },
+    {
+      "label": "flashcard.go",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L1",
+      "id": "repository_flashcard_go",
+      "community": 54,
+      "norm_label": "flashcard.go"
+    },
+    {
+      "label": ".SaveDeck()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L14",
+      "id": "repository_repository_savedeck",
+      "community": 0,
+      "norm_label": ".savedeck()"
+    },
+    {
+      "label": ".GetDecksByUserId()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L26",
+      "id": "repository_repository_getdecksbyuserid",
+      "community": 0,
+      "norm_label": ".getdecksbyuserid()"
+    },
+    {
+      "label": ".GetDeckById()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L60",
+      "id": "repository_repository_getdeckbyid",
+      "community": 0,
+      "norm_label": ".getdeckbyid()"
+    },
+    {
+      "label": ".DeleteDeck()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L81",
+      "id": "repository_repository_deletedeck",
+      "community": 0,
+      "norm_label": ".deletedeck()"
+    },
+    {
+      "label": ".SaveCard()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L87",
+      "id": "repository_repository_savecard",
+      "community": 0,
+      "norm_label": ".savecard()"
+    },
+    {
+      "label": ".GetCardsByDeckId()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L99",
+      "id": "repository_repository_getcardsbydeckid",
+      "community": 0,
+      "norm_label": ".getcardsbydeckid()"
+    },
+    {
+      "label": ".GetCardById()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L162",
+      "id": "repository_repository_getcardbyid",
+      "community": 0,
+      "norm_label": ".getcardbyid()"
+    },
+    {
+      "label": ".DeleteCard()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L179",
+      "id": "repository_repository_deletecard",
+      "community": 0,
+      "norm_label": ".deletecard()"
+    },
+    {
+      "label": ".SaveReview()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L185",
+      "id": "repository_repository_savereview",
+      "community": 0,
+      "norm_label": ".savereview()"
+    },
+    {
+      "label": ".GetReviewByCardAndUserId()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L204",
+      "id": "repository_repository_getreviewbycardanduserid",
+      "community": 0,
+      "norm_label": ".getreviewbycardanduserid()"
+    },
+    {
+      "label": ".GetDueCardsForDeck()",
+      "file_type": "code",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L221",
+      "id": "repository_repository_getduecardsfordeck",
+      "community": 0,
+      "norm_label": ".getduecardsfordeck()"
     },
     {
       "label": "quiz.go",
@@ -1206,7 +1395,7 @@
       "source_file": "repository/quiz.go",
       "source_location": "L1",
       "id": "repository_quiz_go",
-      "community": 37,
+      "community": 55,
       "norm_label": "quiz.go"
     },
     {
@@ -1314,7 +1503,7 @@
       "source_file": "repository/user.go",
       "source_location": "L1",
       "id": "repository_user_go",
-      "community": 38,
+      "community": 56,
       "norm_label": "user.go"
     },
     {
@@ -1467,7 +1656,7 @@
       "source_file": "repository/chat.go",
       "source_location": "L1",
       "id": "repository_chat_go",
-      "community": 39,
+      "community": 57,
       "norm_label": "chat.go"
     },
     {
@@ -1521,7 +1710,7 @@
       "source_file": "repository/message.go",
       "source_location": "L1",
       "id": "repository_message_go",
-      "community": 40,
+      "community": 58,
       "norm_label": "message.go"
     },
     {
@@ -1557,7 +1746,7 @@
       "source_file": "repository/auth.go",
       "source_location": "L1",
       "id": "repository_auth_go",
-      "community": 41,
+      "community": 59,
       "norm_label": "auth.go"
     },
     {
@@ -1566,7 +1755,7 @@
       "source_file": "repository/auth.go",
       "source_location": "L14",
       "id": "repository_repository_createuser",
-      "community": 21,
+      "community": 25,
       "norm_label": ".createuser()"
     },
     {
@@ -1575,7 +1764,7 @@
       "source_file": "repository/auth.go",
       "source_location": "L49",
       "id": "repository_repository_createuserbyoauth",
-      "community": 21,
+      "community": 25,
       "norm_label": ".createuserbyoauth()"
     },
     {
@@ -1584,7 +1773,7 @@
       "source_file": "repository/auth.go",
       "source_location": "L88",
       "id": "repository_repository_createrefreshtoken",
-      "community": 21,
+      "community": 25,
       "norm_label": ".createrefreshtoken()"
     },
     {
@@ -1593,7 +1782,7 @@
       "source_file": "repository/auth.go",
       "source_location": "L96",
       "id": "repository_repository_initializeuserdefaults",
-      "community": 21,
+      "community": 25,
       "norm_label": ".initializeuserdefaults()"
     },
     {
@@ -1647,7 +1836,7 @@
       "source_file": "repository/auth.go",
       "source_location": "L202",
       "id": "repository_repository_addoauthuser",
-      "community": 21,
+      "community": 25,
       "norm_label": ".addoauthuser()"
     },
     {
@@ -1656,7 +1845,7 @@
       "source_file": "repository/streak.go",
       "source_location": "L1",
       "id": "repository_streak_go",
-      "community": 42,
+      "community": 60,
       "norm_label": "streak.go"
     },
     {
@@ -1692,7 +1881,7 @@
       "source_file": "infrastructure/jina/service.go",
       "source_location": "L1",
       "id": "infrastructure_jina_service_go",
-      "community": 2,
+      "community": 35,
       "norm_label": "service.go"
     },
     {
@@ -1701,7 +1890,7 @@
       "source_file": "infrastructure/jina/service.go",
       "source_location": "L12",
       "id": "jina_service",
-      "community": 2,
+      "community": 35,
       "norm_label": "service"
     },
     {
@@ -1710,7 +1899,7 @@
       "source_file": "infrastructure/jina/service.go",
       "source_location": "L18",
       "id": "jina_rerankrequest",
-      "community": 2,
+      "community": 35,
       "norm_label": "rerankrequest"
     },
     {
@@ -1719,7 +1908,7 @@
       "source_file": "infrastructure/jina/service.go",
       "source_location": "L26",
       "id": "jina_rerankresponse",
-      "community": 2,
+      "community": 35,
       "norm_label": "rerankresponse"
     },
     {
@@ -1728,7 +1917,7 @@
       "source_file": "infrastructure/jina/service.go",
       "source_location": "L33",
       "id": "jina_service_newservice",
-      "community": 2,
+      "community": 35,
       "norm_label": "newservice()"
     },
     {
@@ -1737,7 +1926,7 @@
       "source_file": "infrastructure/jina/service.go",
       "source_location": "L41",
       "id": "jina_service_rerankchunks",
-      "community": 2,
+      "community": 35,
       "norm_label": ".rerankchunks()"
     },
     {
@@ -1746,7 +1935,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L1",
       "id": "infrastructure_chunker_service_go",
-      "community": 6,
+      "community": 4,
       "norm_label": "service.go"
     },
     {
@@ -1755,7 +1944,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L28",
       "id": "chunker_chunkingservice",
-      "community": 6,
+      "community": 4,
       "norm_label": "chunkingservice"
     },
     {
@@ -1764,7 +1953,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L32",
       "id": "chunker_pdfchunkingservice",
-      "community": 6,
+      "community": 4,
       "norm_label": "pdfchunkingservice"
     },
     {
@@ -1773,7 +1962,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L44",
       "id": "chunker_qualitymetrics",
-      "community": 6,
+      "community": 4,
       "norm_label": "qualitymetrics"
     },
     {
@@ -1782,7 +1971,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L59",
       "id": "chunker_service_newchunkingservice",
-      "community": 6,
+      "community": 4,
       "norm_label": "newchunkingservice()"
     },
     {
@@ -1791,7 +1980,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L106",
       "id": "chunker_pdfchunkingservice_chunkpdf",
-      "community": 6,
+      "community": 4,
       "norm_label": ".chunkpdf()"
     },
     {
@@ -1800,7 +1989,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L162",
       "id": "chunker_extracteddata",
-      "community": 6,
+      "community": 4,
       "norm_label": "extracteddata"
     },
     {
@@ -1809,7 +1998,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L167",
       "id": "chunker_pagerange",
-      "community": 6,
+      "community": 4,
       "norm_label": "pagerange"
     },
     {
@@ -1818,7 +2007,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L173",
       "id": "chunker_pdfchunkingservice_extracttextwithqualitytracking",
-      "community": 6,
+      "community": 4,
       "norm_label": ".extracttextwithqualitytracking()"
     },
     {
@@ -1827,7 +2016,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L255",
       "id": "chunker_pdfchunkingservice_enhancedcleantext",
-      "community": 6,
+      "community": 4,
       "norm_label": ".enhancedcleantext()"
     },
     {
@@ -1836,7 +2025,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L324",
       "id": "chunker_pdfchunkingservice_sanitizeutf8",
-      "community": 6,
+      "community": 4,
       "norm_label": ".sanitizeutf8()"
     },
     {
@@ -1845,7 +2034,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L358",
       "id": "chunker_pdfchunkingservice_ensurevalidutf8",
-      "community": 6,
+      "community": 4,
       "norm_label": ".ensurevalidutf8()"
     },
     {
@@ -1854,7 +2043,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L366",
       "id": "chunker_pdfchunkingservice_semanticchunking",
-      "community": 6,
+      "community": 4,
       "norm_label": ".semanticchunking()"
     },
     {
@@ -1863,7 +2052,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L442",
       "id": "chunker_section",
-      "community": 6,
+      "community": 4,
       "norm_label": "section"
     },
     {
@@ -1872,7 +2061,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L449",
       "id": "chunker_pdfchunkingservice_detectsections",
-      "community": 6,
+      "community": 4,
       "norm_label": ".detectsections()"
     },
     {
@@ -1881,7 +2070,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L486",
       "id": "chunker_pdfchunkingservice_intelligentsentencesplit",
-      "community": 6,
+      "community": 4,
       "norm_label": ".intelligentsentencesplit()"
     },
     {
@@ -1890,7 +2079,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L588",
       "id": "chunker_pdfchunkingservice_chunksentences",
-      "community": 6,
+      "community": 4,
       "norm_label": ".chunksentences()"
     },
     {
@@ -1899,7 +2088,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L633",
       "id": "chunker_pdfchunkingservice_smartoverlap",
-      "community": 6,
+      "community": 4,
       "norm_label": ".smartoverlap()"
     },
     {
@@ -1908,7 +2097,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L671",
       "id": "chunker_pdfchunkingservice_finalizechunk",
-      "community": 6,
+      "community": 4,
       "norm_label": ".finalizechunk()"
     },
     {
@@ -1917,7 +2106,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L701",
       "id": "chunker_pdfchunkingservice_postprocesschunks",
-      "community": 6,
+      "community": 4,
       "norm_label": ".postprocesschunks()"
     },
     {
@@ -1926,7 +2115,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L753",
       "id": "chunker_pdfchunkingservice_validatepdfquality",
-      "community": 6,
+      "community": 4,
       "norm_label": ".validatepdfquality()"
     },
     {
@@ -1935,7 +2124,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L807",
       "id": "chunker_pdfchunkingservice_calculateletterratio",
-      "community": 6,
+      "community": 4,
       "norm_label": ".calculateletterratio()"
     },
     {
@@ -1944,7 +2133,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L822",
       "id": "chunker_pdfchunkingservice_calculategarbageratio",
-      "community": 6,
+      "community": 4,
       "norm_label": ".calculategarbageratio()"
     },
     {
@@ -1953,7 +2142,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L846",
       "id": "chunker_pdfchunkingservice_calculatepunctuationratio",
-      "community": 6,
+      "community": 4,
       "norm_label": ".calculatepunctuationratio()"
     },
     {
@@ -1962,7 +2151,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L861",
       "id": "chunker_pdfchunkingservice_haslanguagecoherence",
-      "community": 6,
+      "community": 4,
       "norm_label": ".haslanguagecoherence()"
     },
     {
@@ -1971,7 +2160,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L889",
       "id": "chunker_pdfchunkingservice_calculatechunkquality",
-      "community": 6,
+      "community": 4,
       "norm_label": ".calculatechunkquality()"
     },
     {
@@ -1980,7 +2169,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L947",
       "id": "chunker_pdfchunkingservice_calculateaveragechunkquality",
-      "community": 6,
+      "community": 4,
       "norm_label": ".calculateaveragechunkquality()"
     },
     {
@@ -1989,7 +2178,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L960",
       "id": "chunker_pdfchunkingservice_determineoverallquality",
-      "community": 6,
+      "community": 4,
       "norm_label": ".determineoverallquality()"
     },
     {
@@ -1998,7 +2187,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L982",
       "id": "chunker_pdfchunkingservice_formatqualityreport",
-      "community": 6,
+      "community": 4,
       "norm_label": ".formatqualityreport()"
     },
     {
@@ -2007,7 +2196,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L1009",
       "id": "chunker_service_getpagesforrange",
-      "community": 6,
+      "community": 4,
       "norm_label": "getpagesforrange()"
     },
     {
@@ -2016,7 +2205,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L1025",
       "id": "chunker_service_normalizewhitespace",
-      "community": 6,
+      "community": 4,
       "norm_label": "normalizewhitespace()"
     },
     {
@@ -2025,7 +2214,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L1033",
       "id": "chunker_service_uniquepages",
-      "community": 6,
+      "community": 4,
       "norm_label": "uniquepages()"
     },
     {
@@ -2034,7 +2223,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L1050",
       "id": "chunker_pdfchunkingservice_getchunks",
-      "community": 6,
+      "community": 4,
       "norm_label": ".getchunks()"
     },
     {
@@ -2043,7 +2232,7 @@
       "source_file": "infrastructure/chunker/service.go",
       "source_location": "L1056",
       "id": "chunker_pdfchunkingservice_getchunksbypages",
-      "community": 6,
+      "community": 4,
       "norm_label": ".getchunksbypages()"
     },
     {
@@ -2052,7 +2241,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L1",
       "id": "infrastructure_openrouter_service_go",
-      "community": 10,
+      "community": 8,
       "norm_label": "service.go"
     },
     {
@@ -2061,7 +2250,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L36",
       "id": "openrouter_chatmessageparttype",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatmessageparttype"
     },
     {
@@ -2070,7 +2259,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L43",
       "id": "openrouter_chatmessageimageurl",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatmessageimageurl"
     },
     {
@@ -2079,7 +2268,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L47",
       "id": "openrouter_chatmessagepart",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatmessagepart"
     },
     {
@@ -2088,7 +2277,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L53",
       "id": "openrouter_chatcompletionmessage",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatcompletionmessage"
     },
     {
@@ -2097,7 +2286,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L59",
       "id": "openrouter_responseformat",
-      "community": 10,
+      "community": 8,
       "norm_label": "responseformat"
     },
     {
@@ -2106,7 +2295,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L64",
       "id": "openrouter_responseformatschema",
-      "community": 10,
+      "community": 8,
       "norm_label": "responseformatschema"
     },
     {
@@ -2115,7 +2304,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L70",
       "id": "openrouter_chatcompletionrequest",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatcompletionrequest"
     },
     {
@@ -2124,7 +2313,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L78",
       "id": "openrouter_chatcompletionchoice",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatcompletionchoice"
     },
     {
@@ -2133,7 +2322,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L84",
       "id": "openrouter_chatcompletionresponse",
-      "community": 10,
+      "community": 8,
       "norm_label": "chatcompletionresponse"
     },
     {
@@ -2142,7 +2331,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L92",
       "id": "openrouter_embeddingrequest",
-      "community": 10,
+      "community": 8,
       "norm_label": "embeddingrequest"
     },
     {
@@ -2151,7 +2340,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L97",
       "id": "openrouter_embeddingdata",
-      "community": 10,
+      "community": 8,
       "norm_label": "embeddingdata"
     },
     {
@@ -2160,7 +2349,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L103",
       "id": "openrouter_embeddingresponse",
-      "community": 10,
+      "community": 8,
       "norm_label": "embeddingresponse"
     },
     {
@@ -2169,7 +2358,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L114",
       "id": "openrouter_subjectpromptconfig",
-      "community": 10,
+      "community": 8,
       "norm_label": "subjectpromptconfig"
     },
     {
@@ -2178,7 +2367,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L297",
       "id": "openrouter_service_classifysubject",
-      "community": 10,
+      "community": 8,
       "norm_label": "classifysubject()"
     },
     {
@@ -2187,7 +2376,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L327",
       "id": "openrouter_service_buildsubjectsystemprompt",
-      "community": 10,
+      "community": 8,
       "norm_label": "buildsubjectsystemprompt()"
     },
     {
@@ -2196,7 +2385,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L428",
       "id": "openrouter_config",
-      "community": 10,
+      "community": 8,
       "norm_label": "config"
     },
     {
@@ -2205,7 +2394,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L439",
       "id": "openrouter_openrouterservice",
-      "community": 10,
+      "community": 8,
       "norm_label": "openrouterservice"
     },
     {
@@ -2214,7 +2403,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L444",
       "id": "openrouter_service_newopenrouterservice",
-      "community": 2,
+      "community": 22,
       "norm_label": "newopenrouterservice()"
     },
     {
@@ -2223,7 +2412,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L455",
       "id": "openrouter_openrouterservice_makerequest",
-      "community": 10,
+      "community": 8,
       "norm_label": ".makerequest()"
     },
     {
@@ -2232,7 +2421,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L501",
       "id": "openrouter_openrouterservice_sendchatrequest",
-      "community": 10,
+      "community": 8,
       "norm_label": ".sendchatrequest()"
     },
     {
@@ -2241,7 +2430,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L560",
       "id": "openrouter_openrouterservice_generatechattitle",
-      "community": 10,
+      "community": 8,
       "norm_label": ".generatechattitle()"
     },
     {
@@ -2250,7 +2439,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L592",
       "id": "openrouter_openrouterservice_expandquery",
-      "community": 10,
+      "community": 8,
       "norm_label": ".expandquery()"
     },
     {
@@ -2259,7 +2448,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L624",
       "id": "openrouter_openrouterservice_generatequizquestion",
-      "community": 10,
+      "community": 8,
       "norm_label": ".generatequizquestion()"
     },
     {
@@ -2268,7 +2457,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L698",
       "id": "openrouter_openrouterservice_executequizrequest",
-      "community": 10,
+      "community": 8,
       "norm_label": ".executequizrequest()"
     },
     {
@@ -2277,7 +2466,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L761",
       "id": "openrouter_openrouterservice_extracttextfromimage",
-      "community": 10,
+      "community": 8,
       "norm_label": ".extracttextfromimage()"
     },
     {
@@ -2286,7 +2475,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L790",
       "id": "openrouter_openrouterservice_solvequestionwithreasoning",
-      "community": 10,
+      "community": 8,
       "norm_label": ".solvequestionwithreasoning()"
     },
     {
@@ -2295,7 +2484,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L840",
       "id": "openrouter_openrouterservice_generateembedding",
-      "community": 10,
+      "community": 8,
       "norm_label": ".generateembedding()"
     },
     {
@@ -2304,7 +2493,7 @@
       "source_file": "infrastructure/openrouter/service.go",
       "source_location": "L866",
       "id": "openrouter_openrouterservice_generateembeddingbatch",
-      "community": 10,
+      "community": 8,
       "norm_label": ".generateembeddingbatch()"
     },
     {
@@ -2313,7 +2502,7 @@
       "source_file": "infrastructure/jwe/helper.go",
       "source_location": "L1",
       "id": "infrastructure_jwe_helper_go",
-      "community": 14,
+      "community": 12,
       "norm_label": "helper.go"
     },
     {
@@ -2322,7 +2511,7 @@
       "source_file": "infrastructure/jwe/helper.go",
       "source_location": "L11",
       "id": "jwe_helper_is32bytekey",
-      "community": 14,
+      "community": 12,
       "norm_label": "is32bytekey()"
     },
     {
@@ -2331,7 +2520,7 @@
       "source_file": "infrastructure/jwe/helper.go",
       "source_location": "L15",
       "id": "jwe_helper_encryptclaims",
-      "community": 14,
+      "community": 12,
       "norm_label": "encryptclaims()"
     },
     {
@@ -2340,7 +2529,7 @@
       "source_file": "infrastructure/jwe/helper.go",
       "source_location": "L27",
       "id": "jwe_helper_decryptclaims",
-      "community": 14,
+      "community": 12,
       "norm_label": "decryptclaims()"
     },
     {
@@ -2349,7 +2538,7 @@
       "source_file": "infrastructure/jwe/helper.go",
       "source_location": "L42",
       "id": "jwe_helper_isexpired",
-      "community": 14,
+      "community": 12,
       "norm_label": "isexpired()"
     },
     {
@@ -2358,7 +2547,7 @@
       "source_file": "infrastructure/jwe/secure_email.go",
       "source_location": "L1",
       "id": "infrastructure_jwe_secure_email_go",
-      "community": 43,
+      "community": 61,
       "norm_label": "secure_email.go"
     },
     {
@@ -2367,7 +2556,7 @@
       "source_file": "infrastructure/jwe/refresh_token.go",
       "source_location": "L9",
       "id": "jwe_service",
-      "community": 14,
+      "community": 12,
       "norm_label": "service"
     },
     {
@@ -2376,7 +2565,7 @@
       "source_file": "infrastructure/jwe/secure_email.go",
       "source_location": "L11",
       "id": "jwe_service_generatesecureemailtoken",
-      "community": 14,
+      "community": 12,
       "norm_label": ".generatesecureemailtoken()"
     },
     {
@@ -2385,7 +2574,7 @@
       "source_file": "infrastructure/jwe/secure_email.go",
       "source_location": "L20",
       "id": "jwe_service_validatesecureemailtoken",
-      "community": 14,
+      "community": 12,
       "norm_label": ".validatesecureemailtoken()"
     },
     {
@@ -2394,7 +2583,7 @@
       "source_file": "infrastructure/jwe/access_token.go",
       "source_location": "L1",
       "id": "infrastructure_jwe_access_token_go",
-      "community": 44,
+      "community": 62,
       "norm_label": "access_token.go"
     },
     {
@@ -2403,7 +2592,7 @@
       "source_file": "infrastructure/jwe/access_token.go",
       "source_location": "L9",
       "id": "jwe_service_generateauthaccesstoken",
-      "community": 14,
+      "community": 12,
       "norm_label": ".generateauthaccesstoken()"
     },
     {
@@ -2412,7 +2601,7 @@
       "source_file": "infrastructure/jwe/access_token.go",
       "source_location": "L18",
       "id": "jwe_service_validateauthaccesstoken",
-      "community": 14,
+      "community": 12,
       "norm_label": ".validateauthaccesstoken()"
     },
     {
@@ -2421,7 +2610,7 @@
       "source_file": "infrastructure/jwe/config.go",
       "source_location": "L1",
       "id": "infrastructure_jwe_config_go",
-      "community": 14,
+      "community": 12,
       "norm_label": "config.go"
     },
     {
@@ -2430,7 +2619,7 @@
       "source_file": "infrastructure/jwe/config.go",
       "source_location": "L9",
       "id": "jwe_config",
-      "community": 14,
+      "community": 12,
       "norm_label": "config"
     },
     {
@@ -2439,7 +2628,7 @@
       "source_file": "infrastructure/jwe/config.go",
       "source_location": "L33",
       "id": "jwe_authclaims",
-      "community": 14,
+      "community": 12,
       "norm_label": "authclaims"
     },
     {
@@ -2448,7 +2637,7 @@
       "source_file": "infrastructure/jwe/config.go",
       "source_location": "L39",
       "id": "jwe_emailclaims",
-      "community": 14,
+      "community": 12,
       "norm_label": "emailclaims"
     },
     {
@@ -2457,7 +2646,7 @@
       "source_file": "infrastructure/jwe/config.go",
       "source_location": "L45",
       "id": "jwe_config_newjwetokenservice",
-      "community": 14,
+      "community": 12,
       "norm_label": "newjwetokenservice()"
     },
     {
@@ -2466,7 +2655,7 @@
       "source_file": "infrastructure/jwe/config.go",
       "source_location": "L100",
       "id": "jwe_config_hasproperencryptionkeys",
-      "community": 14,
+      "community": 12,
       "norm_label": ".hasproperencryptionkeys()"
     },
     {
@@ -2475,7 +2664,7 @@
       "source_file": "infrastructure/jwe/refresh_token.go",
       "source_location": "L1",
       "id": "infrastructure_jwe_refresh_token_go",
-      "community": 45,
+      "community": 63,
       "norm_label": "refresh_token.go"
     },
     {
@@ -2484,7 +2673,7 @@
       "source_file": "infrastructure/jwe/refresh_token.go",
       "source_location": "L9",
       "id": "jwe_service_generateauthrefreshtoken",
-      "community": 14,
+      "community": 12,
       "norm_label": ".generateauthrefreshtoken()"
     },
     {
@@ -2493,7 +2682,7 @@
       "source_file": "infrastructure/jwe/refresh_token.go",
       "source_location": "L18",
       "id": "jwe_service_validateauthrefreshtoken",
-      "community": 14,
+      "community": 12,
       "norm_label": ".validateauthrefreshtoken()"
     },
     {
@@ -2502,7 +2691,7 @@
       "source_file": "infrastructure/firebase/service.go",
       "source_location": "L1",
       "id": "infrastructure_firebase_service_go",
-      "community": 15,
+      "community": 22,
       "norm_label": "service.go"
     },
     {
@@ -2511,7 +2700,7 @@
       "source_file": "infrastructure/firebase/service.go",
       "source_location": "L14",
       "id": "firebase_service_newfcmclient",
-      "community": 15,
+      "community": 22,
       "norm_label": "newfcmclient()"
     },
     {
@@ -2520,7 +2709,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L1",
       "id": "infrastructure_s3_service_go",
-      "community": 2,
+      "community": 24,
       "norm_label": "service.go"
     },
     {
@@ -2529,7 +2718,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L18",
       "id": "s3_s3service",
-      "community": 2,
+      "community": 24,
       "norm_label": "s3service"
     },
     {
@@ -2538,7 +2727,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L24",
       "id": "s3_s3config",
-      "community": 2,
+      "community": 24,
       "norm_label": "s3config"
     },
     {
@@ -2547,7 +2736,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L34",
       "id": "s3_service_news3service",
-      "community": 2,
+      "community": 24,
       "norm_label": "news3service()"
     },
     {
@@ -2556,7 +2745,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L64",
       "id": "s3_s3service_uploadfile",
-      "community": 2,
+      "community": 24,
       "norm_label": ".uploadfile()"
     },
     {
@@ -2565,7 +2754,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L106",
       "id": "s3_service_hasextension",
-      "community": 2,
+      "community": 24,
       "norm_label": "hasextension()"
     },
     {
@@ -2574,7 +2763,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L110",
       "id": "s3_s3service_deletefile",
-      "community": 2,
+      "community": 24,
       "norm_label": ".deletefile()"
     },
     {
@@ -2583,7 +2772,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L121",
       "id": "s3_s3service_getfile",
-      "community": 2,
+      "community": 24,
       "norm_label": ".getfile()"
     },
     {
@@ -2592,7 +2781,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L140",
       "id": "s3_s3service_deletefiles",
-      "community": 2,
+      "community": 24,
       "norm_label": ".deletefiles()"
     },
     {
@@ -2601,7 +2790,7 @@
       "source_file": "infrastructure/s3/service.go",
       "source_location": "L163",
       "id": "s3_s3service_getfiles",
-      "community": 2,
+      "community": 24,
       "norm_label": ".getfiles()"
     },
     {
@@ -2610,7 +2799,7 @@
       "source_file": "infrastructure/slog/logger.go",
       "source_location": "L1",
       "id": "infrastructure_slog_logger_go",
-      "community": 2,
+      "community": 38,
       "norm_label": "logger.go"
     },
     {
@@ -2619,7 +2808,7 @@
       "source_file": "infrastructure/slog/logger.go",
       "source_location": "L8",
       "id": "slog_sloglogger",
-      "community": 2,
+      "community": 38,
       "norm_label": "sloglogger"
     },
     {
@@ -2628,7 +2817,7 @@
       "source_file": "infrastructure/slog/logger.go",
       "source_location": "L12",
       "id": "slog_logger_newlogger",
-      "community": 2,
+      "community": 38,
       "norm_label": "newlogger()"
     },
     {
@@ -2637,7 +2826,7 @@
       "source_file": "infrastructure/slog/logger.go",
       "source_location": "L30",
       "id": "slog_sloglogger_info",
-      "community": 2,
+      "community": 38,
       "norm_label": ".info()"
     },
     {
@@ -2646,7 +2835,7 @@
       "source_file": "infrastructure/slog/logger.go",
       "source_location": "L34",
       "id": "slog_sloglogger_error",
-      "community": 2,
+      "community": 38,
       "norm_label": ".error()"
     },
     {
@@ -2655,7 +2844,7 @@
       "source_file": "infrastructure/postgres/postgres.go",
       "source_location": "L1",
       "id": "infrastructure_postgres_postgres_go",
-      "community": 2,
+      "community": 48,
       "norm_label": "postgres.go"
     },
     {
@@ -2664,7 +2853,7 @@
       "source_file": "infrastructure/postgres/postgres.go",
       "source_location": "L9",
       "id": "postgres_postgres_newdb",
-      "community": 2,
+      "community": 48,
       "norm_label": "newdb()"
     },
     {
@@ -2673,7 +2862,7 @@
       "source_file": "infrastructure/postgres/postgres.go",
       "source_location": "L28",
       "id": "postgres_postgres_runtablemigrations",
-      "community": 2,
+      "community": 48,
       "norm_label": "runtablemigrations()"
     },
     {
@@ -2682,7 +2871,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_cookie_go",
-      "community": 24,
+      "community": 33,
       "norm_label": "cookie.go"
     },
     {
@@ -2691,7 +2880,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L11",
       "id": "fiber_fibercookieservice",
-      "community": 24,
+      "community": 33,
       "norm_label": "fibercookieservice"
     },
     {
@@ -2700,7 +2889,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L13",
       "id": "fiber_cookie_newcookieservice",
-      "community": 24,
+      "community": 33,
       "norm_label": "newcookieservice()"
     },
     {
@@ -2709,7 +2898,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L17",
       "id": "fiber_fibercookieservice_setrefreshtoken",
-      "community": 24,
+      "community": 33,
       "norm_label": ".setrefreshtoken()"
     },
     {
@@ -2718,7 +2907,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L32",
       "id": "fiber_fibercookieservice_setaccesstoken",
-      "community": 24,
+      "community": 33,
       "norm_label": ".setaccesstoken()"
     },
     {
@@ -2727,7 +2916,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L47",
       "id": "fiber_fibercookieservice_removetokens",
-      "community": 24,
+      "community": 33,
       "norm_label": ".removetokens()"
     },
     {
@@ -2844,7 +3033,7 @@
       "source_file": "infrastructure/fiber/server.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_server_go",
-      "community": 1,
+      "community": 28,
       "norm_label": "server.go"
     },
     {
@@ -2853,7 +3042,7 @@
       "source_file": "infrastructure/fiber/server.go",
       "source_location": "L17",
       "id": "fiber_server_setupserver",
-      "community": 1,
+      "community": 28,
       "norm_label": "setupserver()"
     },
     {
@@ -2862,7 +3051,7 @@
       "source_file": "infrastructure/fiber/server.go",
       "source_location": "L32",
       "id": "fiber_server_registermiddlewares",
-      "community": 1,
+      "community": 28,
       "norm_label": "registermiddlewares()"
     },
     {
@@ -2871,7 +3060,7 @@
       "source_file": "infrastructure/fiber/oauth_providers.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_oauth_providers_go",
-      "community": 1,
+      "community": 29,
       "norm_label": "oauth_providers.go"
     },
     {
@@ -2880,7 +3069,7 @@
       "source_file": "infrastructure/fiber/oauth_providers.go",
       "source_location": "L11",
       "id": "fiber_oauth_providers_newgoogleoauthservice",
-      "community": 1,
+      "community": 29,
       "norm_label": "newgoogleoauthservice()"
     },
     {
@@ -2889,7 +3078,7 @@
       "source_file": "infrastructure/fiber/oauth_providers.go",
       "source_location": "L31",
       "id": "fiber_oauth_providers_newfacebookoauthservice",
-      "community": 1,
+      "community": 29,
       "norm_label": "newfacebookoauthservice()"
     },
     {
@@ -2898,43 +3087,43 @@
       "source_file": "infrastructure/fiber/router.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_router_go",
-      "community": 1,
+      "community": 20,
       "norm_label": "router.go"
     },
     {
       "label": "handlerAdapter",
       "file_type": "code",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L91",
+      "source_location": "L92",
       "id": "fiber_handleradapter",
-      "community": 1,
+      "community": 20,
       "norm_label": "handleradapter"
     },
     {
       "label": "handlerAdapter[R, Res]",
       "file_type": "code",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L95",
+      "source_location": "L96",
       "id": "fiber_handleradapter_r_res",
-      "community": 1,
+      "community": 20,
       "norm_label": "handleradapter[r, res]"
     },
     {
       "label": ".Handle()",
       "file_type": "code",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L95",
+      "source_location": "L96",
       "id": "fiber_handleradapter_r_res_handle",
-      "community": 1,
+      "community": 20,
       "norm_label": ".handle()"
     },
     {
       "label": "SetupRoutes()",
       "file_type": "code",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L99",
+      "source_location": "L100",
       "id": "fiber_router_setuproutes",
-      "community": 1,
+      "community": 20,
       "norm_label": "setuproutes()"
     },
     {
@@ -2943,7 +3132,7 @@
       "source_file": "infrastructure/fiber/dependency_containers.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_dependency_containers_go",
-      "community": 2,
+      "community": 22,
       "norm_label": "dependency_containers.go"
     },
     {
@@ -2952,7 +3141,7 @@
       "source_file": "infrastructure/fiber/dependency_containers.go",
       "source_location": "L28",
       "id": "fiber_dependencycontainer",
-      "community": 2,
+      "community": 22,
       "norm_label": "dependencycontainer"
     },
     {
@@ -2961,7 +3150,7 @@
       "source_file": "infrastructure/fiber/dependency_containers.go",
       "source_location": "L44",
       "id": "fiber_dependency_containers_newauthdependencycontainer",
-      "community": 2,
+      "community": 22,
       "norm_label": "newauthdependencycontainer()"
     },
     {
@@ -2970,7 +3159,7 @@
       "source_file": "infrastructure/fiber/dependency_containers.go",
       "source_location": "L144",
       "id": "fiber_multimodelservice",
-      "community": 2,
+      "community": 22,
       "norm_label": "multimodelservice"
     },
     {
@@ -2979,7 +3168,7 @@
       "source_file": "infrastructure/fiber/dependency_containers.go",
       "source_location": "L149",
       "id": "fiber_multimodelservice_extracttextfromimage",
-      "community": 2,
+      "community": 22,
       "norm_label": ".extracttextfromimage()"
     },
     {
@@ -2988,7 +3177,7 @@
       "source_file": "infrastructure/fiber/dependency_containers.go",
       "source_location": "L153",
       "id": "fiber_dependency_containers_getenv",
-      "community": 1,
+      "community": 22,
       "norm_label": "getenv()"
     },
     {
@@ -2997,7 +3186,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_handler_go",
-      "community": 25,
+      "community": 34,
       "norm_label": "handler.go"
     },
     {
@@ -3006,7 +3195,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L15",
       "id": "fiber_request",
-      "community": 25,
+      "community": 34,
       "norm_label": "request"
     },
     {
@@ -3015,7 +3204,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L16",
       "id": "fiber_response",
-      "community": 25,
+      "community": 34,
       "norm_label": "response"
     },
     {
@@ -3024,7 +3213,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L18",
       "id": "fiber_handlerinterface",
-      "community": 25,
+      "community": 34,
       "norm_label": "handlerinterface"
     },
     {
@@ -3033,7 +3222,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L23",
       "id": "fiber_handler_handle",
-      "community": 25,
+      "community": 34,
       "norm_label": "handle()"
     },
     {
@@ -3042,7 +3231,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L109",
       "id": "fiber_handler_handleerror",
-      "community": 25,
+      "community": 34,
       "norm_label": "handleerror()"
     },
     {
@@ -3051,7 +3240,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L1",
       "id": "infrastructure_in_memory_client_go",
-      "community": 11,
+      "community": 9,
       "norm_label": "client.go"
     },
     {
@@ -3060,7 +3249,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L13",
       "id": "in_memory_inmemoryconfig",
-      "community": 11,
+      "community": 9,
       "norm_label": "inmemoryconfig"
     },
     {
@@ -3069,7 +3258,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L18",
       "id": "in_memory_inmemoryclient",
-      "community": 11,
+      "community": 9,
       "norm_label": "inmemoryclient"
     },
     {
@@ -3078,7 +3267,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L25",
       "id": "in_memory_client_newinmemoryclient",
-      "community": 11,
+      "community": 9,
       "norm_label": "newinmemoryclient()"
     },
     {
@@ -3087,7 +3276,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L38",
       "id": "in_memory_inmemoryclient_cleanupexpired",
-      "community": 11,
+      "community": 9,
       "norm_label": ".cleanupexpired()"
     },
     {
@@ -3096,7 +3285,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L55",
       "id": "in_memory_inmemoryclient_set",
-      "community": 11,
+      "community": 9,
       "norm_label": ".set()"
     },
     {
@@ -3105,7 +3294,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L65",
       "id": "in_memory_inmemoryclient_get",
-      "community": 11,
+      "community": 9,
       "norm_label": ".get()"
     },
     {
@@ -3114,7 +3303,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L83",
       "id": "in_memory_inmemoryclient_delete",
-      "community": 11,
+      "community": 9,
       "norm_label": ".delete()"
     },
     {
@@ -3123,7 +3312,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L91",
       "id": "in_memory_inmemoryclient_saveoauthstate",
-      "community": 11,
+      "community": 9,
       "norm_label": ".saveoauthstate()"
     },
     {
@@ -3132,7 +3321,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L96",
       "id": "in_memory_inmemoryclient_validateoauthstate",
-      "community": 11,
+      "community": 9,
       "norm_label": ".validateoauthstate()"
     },
     {
@@ -3141,7 +3330,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L104",
       "id": "in_memory_inmemoryclient_deleteoauthstate",
-      "community": 11,
+      "community": 9,
       "norm_label": ".deleteoauthstate()"
     },
     {
@@ -3150,7 +3339,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L109",
       "id": "in_memory_inmemoryclient_saveoauthsession",
-      "community": 11,
+      "community": 9,
       "norm_label": ".saveoauthsession()"
     },
     {
@@ -3159,7 +3348,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L125",
       "id": "in_memory_inmemoryclient_getoauthsession",
-      "community": 11,
+      "community": 9,
       "norm_label": ".getoauthsession()"
     },
     {
@@ -3168,7 +3357,7 @@
       "source_file": "infrastructure/in-memory/client.go",
       "source_location": "L145",
       "id": "in_memory_inmemoryclient_deleteoauthsession",
-      "community": 11,
+      "community": 9,
       "norm_label": ".deleteoauthsession()"
     },
     {
@@ -3177,7 +3366,7 @@
       "source_file": "infrastructure/validator/validator.go",
       "source_location": "L1",
       "id": "infrastructure_validator_validator_go",
-      "community": 2,
+      "community": 42,
       "norm_label": "validator.go"
     },
     {
@@ -3186,7 +3375,7 @@
       "source_file": "infrastructure/validator/validator.go",
       "source_location": "L8",
       "id": "validator_validator",
-      "community": 2,
+      "community": 42,
       "norm_label": "validator"
     },
     {
@@ -3195,7 +3384,7 @@
       "source_file": "infrastructure/validator/validator.go",
       "source_location": "L13",
       "id": "validator_validator_newvalidator",
-      "community": 2,
+      "community": 42,
       "norm_label": "newvalidator()"
     },
     {
@@ -3204,7 +3393,7 @@
       "source_file": "infrastructure/validator/validator.go",
       "source_location": "L21",
       "id": "validator_validator_validate",
-      "community": 2,
+      "community": 42,
       "norm_label": ".validate()"
     },
     {
@@ -3339,7 +3528,7 @@
       "source_file": "infrastructure/oauth/redirect.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_redirect_go",
-      "community": 19,
+      "community": 21,
       "norm_label": "redirect.go"
     },
     {
@@ -3348,7 +3537,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L21",
       "id": "oauth_oauthprovider",
-      "community": 19,
+      "community": 21,
       "norm_label": "oauthprovider"
     },
     {
@@ -3357,7 +3546,7 @@
       "source_file": "infrastructure/oauth/redirect.go",
       "source_location": "L11",
       "id": "oauth_oauthprovider_redirecthandler",
-      "community": 19,
+      "community": 21,
       "norm_label": ".redirecthandler()"
     },
     {
@@ -3366,7 +3555,7 @@
       "source_file": "infrastructure/oauth/redirect.go",
       "source_location": "L26",
       "id": "oauth_redirect_generatestate",
-      "community": 19,
+      "community": 21,
       "norm_label": "generatestate()"
     },
     {
@@ -3375,7 +3564,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_callback_go",
-      "community": 19,
+      "community": 21,
       "norm_label": "callback.go"
     },
     {
@@ -3384,7 +3573,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L16",
       "id": "oauth_oauthprovider_callback",
-      "community": 19,
+      "community": 21,
       "norm_label": ".callback()"
     },
     {
@@ -3393,7 +3582,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L64",
       "id": "oauth_oauthprovider_getclouduserinfo",
-      "community": 19,
+      "community": 21,
       "norm_label": ".getclouduserinfo()"
     },
     {
@@ -3402,7 +3591,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L79",
       "id": "oauth_oauthprovider_redirecttofrontendwitherror",
-      "community": 19,
+      "community": 21,
       "norm_label": ".redirecttofrontendwitherror()"
     },
     {
@@ -3411,7 +3600,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L84",
       "id": "oauth_oauthprovider_redirecttofrontendcallback",
-      "community": 19,
+      "community": 21,
       "norm_label": ".redirecttofrontendcallback()"
     },
     {
@@ -3420,7 +3609,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L89",
       "id": "oauth_callback_generatesessionkey",
-      "community": 19,
+      "community": 21,
       "norm_label": "generatesessionkey()"
     },
     {
@@ -3429,7 +3618,7 @@
       "source_file": "infrastructure/oauth/service.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_service_go",
-      "community": 16,
+      "community": 29,
       "norm_label": "service.go"
     },
     {
@@ -3438,7 +3627,7 @@
       "source_file": "infrastructure/oauth/service.go",
       "source_location": "L10",
       "id": "oauth_oauthtokens",
-      "community": 16,
+      "community": 29,
       "norm_label": "oauthtokens"
     },
     {
@@ -3456,7 +3645,7 @@
       "source_file": "infrastructure/oauth/service.go",
       "source_location": "L20",
       "id": "oauth_service_newoauthservice",
-      "community": 16,
+      "community": 29,
       "norm_label": "newoauthservice()"
     },
     {
@@ -3483,7 +3672,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_mobile_go",
-      "community": 1,
+      "community": 37,
       "norm_label": "mobile.go"
     },
     {
@@ -3492,7 +3681,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L10",
       "id": "oauth_mobileoauthhandler",
-      "community": 1,
+      "community": 37,
       "norm_label": "mobileoauthhandler"
     },
     {
@@ -3501,7 +3690,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L16",
       "id": "oauth_mobile_newmobileoauthhandler",
-      "community": 1,
+      "community": 37,
       "norm_label": "newmobileoauthhandler()"
     },
     {
@@ -3510,7 +3699,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L24",
       "id": "oauth_mobileloginrequest",
-      "community": 1,
+      "community": 37,
       "norm_label": "mobileloginrequest"
     },
     {
@@ -3519,7 +3708,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L41",
       "id": "oauth_mobileoauthhandler_handle",
-      "community": 1,
+      "community": 37,
       "norm_label": ".handle()"
     },
     {
@@ -3528,7 +3717,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_config_go",
-      "community": 19,
+      "community": 21,
       "norm_label": "config.go"
     },
     {
@@ -3537,7 +3726,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L8",
       "id": "oauth_oauthdependenciesconfig",
-      "community": 19,
+      "community": 21,
       "norm_label": "oauthdependenciesconfig"
     },
     {
@@ -3546,7 +3735,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L27",
       "id": "oauth_config_newoauthprovider",
-      "community": 1,
+      "community": 29,
       "norm_label": "newoauthprovider()"
     },
     {
@@ -3555,7 +3744,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_verifier_go",
-      "community": 11,
+      "community": 9,
       "norm_label": "verifier.go"
     },
     {
@@ -3564,7 +3753,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L11",
       "id": "oauth_tokenverifier",
-      "community": 11,
+      "community": 9,
       "norm_label": "tokenverifier"
     },
     {
@@ -3573,7 +3762,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L15",
       "id": "oauth_googleverifier",
-      "community": 11,
+      "community": 9,
       "norm_label": "googleverifier"
     },
     {
@@ -3582,7 +3771,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L17",
       "id": "oauth_verifier_newgoogleverifier",
-      "community": 11,
+      "community": 9,
       "norm_label": "newgoogleverifier()"
     },
     {
@@ -3591,7 +3780,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L21",
       "id": "oauth_googleverifier_verify",
-      "community": 11,
+      "community": 9,
       "norm_label": ".verify()"
     },
     {
@@ -3600,7 +3789,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L48",
       "id": "oauth_facebookverifier",
-      "community": 11,
+      "community": 9,
       "norm_label": "facebookverifier"
     },
     {
@@ -3609,7 +3798,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L50",
       "id": "oauth_verifier_newfacebookverifier",
-      "community": 11,
+      "community": 9,
       "norm_label": "newfacebookverifier()"
     },
     {
@@ -3618,7 +3807,7 @@
       "source_file": "infrastructure/oauth/verifier.go",
       "source_location": "L54",
       "id": "oauth_facebookverifier_verify",
-      "community": 11,
+      "community": 9,
       "norm_label": ".verify()"
     },
     {
@@ -3627,7 +3816,7 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L1",
       "id": "infrastructure_mailersend_email_service_go",
-      "community": 2,
+      "community": 30,
       "norm_label": "email_service.go"
     },
     {
@@ -3636,7 +3825,7 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L10",
       "id": "mailersend_mailersendservice",
-      "community": 2,
+      "community": 30,
       "norm_label": "mailersendservice"
     },
     {
@@ -3645,7 +3834,7 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L16",
       "id": "mailersend_email_service_newmailersendservice",
-      "community": 2,
+      "community": 30,
       "norm_label": "newmailersendservice()"
     },
     {
@@ -3654,7 +3843,7 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L20",
       "id": "mailersend_mailersendservice_sendwelcomeemail",
-      "community": 2,
+      "community": 30,
       "norm_label": ".sendwelcomeemail()"
     },
     {
@@ -3663,7 +3852,7 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L44",
       "id": "mailersend_mailersendservice_sendsuccessfullydeletedemail",
-      "community": 2,
+      "community": 30,
       "norm_label": ".sendsuccessfullydeletedemail()"
     },
     {
@@ -3672,7 +3861,7 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L68",
       "id": "mailersend_mailersendservice_sendpasswordresetemail",
-      "community": 2,
+      "community": 30,
       "norm_label": ".sendpasswordresetemail()"
     },
     {
@@ -3681,8 +3870,98 @@
       "source_file": "infrastructure/mailersend/email_service.go",
       "source_location": "L91",
       "id": "mailersend_mailersendservice_sendverificationemail",
-      "community": 2,
+      "community": 30,
       "norm_label": ".sendverificationemail()"
+    },
+    {
+      "label": "flashcard.go",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L1",
+      "id": "handlers_flashcard_flashcard_go",
+      "community": 47,
+      "norm_label": "flashcard.go"
+    },
+    {
+      "label": "FlashcardConfig",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L9",
+      "id": "flashcard_flashcardconfig",
+      "community": 47,
+      "norm_label": "flashcardconfig"
+    },
+    {
+      "label": "FlashcardHandler",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L13",
+      "id": "flashcard_flashcardhandler",
+      "community": 1,
+      "norm_label": "flashcardhandler"
+    },
+    {
+      "label": "NewFlashcardHandler()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L17",
+      "id": "flashcard_flashcard_newflashcardhandler",
+      "community": 47,
+      "norm_label": "newflashcardhandler()"
+    },
+    {
+      "label": ".HandleCreateDeck()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L33",
+      "id": "flashcard_flashcardhandler_handlecreatedeck",
+      "community": 1,
+      "norm_label": ".handlecreatedeck()"
+    },
+    {
+      "label": ".HandleGetDecks()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L49",
+      "id": "flashcard_flashcardhandler_handlegetdecks",
+      "community": 1,
+      "norm_label": ".handlegetdecks()"
+    },
+    {
+      "label": ".HandleAddCard()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L69",
+      "id": "flashcard_flashcardhandler_handleaddcard",
+      "community": 1,
+      "norm_label": ".handleaddcard()"
+    },
+    {
+      "label": ".HandleGetCards()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L86",
+      "id": "flashcard_flashcardhandler_handlegetcards",
+      "community": 1,
+      "norm_label": ".handlegetcards()"
+    },
+    {
+      "label": ".HandleGetDueCards()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L103",
+      "id": "flashcard_flashcardhandler_handlegetduecards",
+      "community": 1,
+      "norm_label": ".handlegetduecards()"
+    },
+    {
+      "label": ".HandleReviewCard()",
+      "file_type": "code",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L123",
+      "id": "flashcard_flashcardhandler_handlereviewcard",
+      "community": 1,
+      "norm_label": ".handlereviewcard()"
     },
     {
       "label": "file.go",
@@ -3690,7 +3969,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L1",
       "id": "handlers_file_file_go",
-      "community": 1,
+      "community": 20,
       "norm_label": "file.go"
     },
     {
@@ -3699,7 +3978,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L11",
       "id": "file_fileconfig",
-      "community": 1,
+      "community": 20,
       "norm_label": "fileconfig"
     },
     {
@@ -3708,7 +3987,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L15",
       "id": "file_filehandler",
-      "community": 8,
+      "community": 1,
       "norm_label": "filehandler"
     },
     {
@@ -3717,7 +3996,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L19",
       "id": "file_file_newfilehandler",
-      "community": 1,
+      "community": 20,
       "norm_label": "newfilehandler()"
     },
     {
@@ -3726,7 +4005,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L39",
       "id": "file_filehandler_handleuploadfile",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handleuploadfile()"
     },
     {
@@ -3735,7 +4014,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L78",
       "id": "file_filehandler_handlegetfiles",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetfiles()"
     },
     {
@@ -3744,7 +4023,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L100",
       "id": "file_filehandler_handlegetfile",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetfile()"
     },
     {
@@ -3753,7 +4032,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L132",
       "id": "file_filehandler_handledeletefile",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handledeletefile()"
     },
     {
@@ -3762,7 +4041,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L158",
       "id": "file_filehandler_handletogglefilesaved",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handletogglefilesaved()"
     },
     {
@@ -3771,7 +4050,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L1",
       "id": "handlers_chat_chat_go",
-      "community": 7,
+      "community": 5,
       "norm_label": "chat.go"
     },
     {
@@ -3780,7 +4059,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L10",
       "id": "chat_chatconfig",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatconfig"
     },
     {
@@ -3789,7 +4068,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L14",
       "id": "chat_chathandler",
-      "community": 7,
+      "community": 5,
       "norm_label": "chathandler"
     },
     {
@@ -3798,7 +4077,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L18",
       "id": "chat_chat_newchathandler",
-      "community": 7,
+      "community": 5,
       "norm_label": "newchathandler()"
     },
     {
@@ -3807,7 +4086,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L36",
       "id": "chat_chathandler_handlegetchats",
-      "community": 7,
+      "community": 5,
       "norm_label": ".handlegetchats()"
     },
     {
@@ -3816,7 +4095,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L61",
       "id": "chat_chathandler_handlegetchatbyid",
-      "community": 7,
+      "community": 5,
       "norm_label": ".handlegetchatbyid()"
     },
     {
@@ -3825,7 +4104,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L102",
       "id": "chat_chathandler_handleupdatechat",
-      "community": 7,
+      "community": 5,
       "norm_label": ".handleupdatechat()"
     },
     {
@@ -3834,7 +4113,7 @@
       "source_file": "handlers/chat/chat.go",
       "source_location": "L131",
       "id": "chat_chathandler_handledeletechat",
-      "community": 7,
+      "community": 5,
       "norm_label": ".handledeletechat()"
     },
     {
@@ -3843,7 +4122,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L1",
       "id": "handlers_quiz_quiz_go",
-      "community": 8,
+      "community": 20,
       "norm_label": "quiz.go"
     },
     {
@@ -3852,7 +4131,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L9",
       "id": "quiz_quizconfig",
-      "community": 8,
+      "community": 20,
       "norm_label": "quizconfig"
     },
     {
@@ -3861,7 +4140,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L13",
       "id": "quiz_quizhandler",
-      "community": 8,
+      "community": 1,
       "norm_label": "quizhandler"
     },
     {
@@ -3870,7 +4149,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L17",
       "id": "quiz_quiz_newquizhandler",
-      "community": 8,
+      "community": 20,
       "norm_label": "newquizhandler()"
     },
     {
@@ -3879,7 +4158,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L33",
       "id": "quiz_quizhandler_handlegeneratequiz",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegeneratequiz()"
     },
     {
@@ -3888,7 +4167,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L57",
       "id": "quiz_quizhandler_handlesolvequiz",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlesolvequiz()"
     },
     {
@@ -3897,7 +4176,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L75",
       "id": "quiz_quizhandler_handlegetquizzes",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetquizzes()"
     },
     {
@@ -3906,7 +4185,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L94",
       "id": "quiz_quizhandler_handlegetquizbyid",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetquizbyid()"
     },
     {
@@ -3915,7 +4194,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L111",
       "id": "quiz_quizhandler_handlegetattempts",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetattempts()"
     },
     {
@@ -3924,7 +4203,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L138",
       "id": "quiz_quizhandler_handlegetattemptbyid",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetattemptbyid()"
     },
     {
@@ -3933,7 +4212,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L1",
       "id": "handlers_auth_auth_go",
-      "community": 13,
+      "community": 11,
       "norm_label": "auth.go"
     },
     {
@@ -3942,7 +4221,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L13",
       "id": "auth_loginrequest",
-      "community": 13,
+      "community": 11,
       "norm_label": "loginrequest"
     },
     {
@@ -3951,7 +4230,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L18",
       "id": "auth_loginresponse",
-      "community": 13,
+      "community": 11,
       "norm_label": "loginresponse"
     },
     {
@@ -3960,7 +4239,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L23",
       "id": "auth_signuprequest",
-      "community": 13,
+      "community": 11,
       "norm_label": "signuprequest"
     },
     {
@@ -3969,7 +4248,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L29",
       "id": "auth_signupresponse",
-      "community": 13,
+      "community": 11,
       "norm_label": "signupresponse"
     },
     {
@@ -3978,7 +4257,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L34",
       "id": "auth_logoutrequest",
-      "community": 13,
+      "community": 11,
       "norm_label": "logoutrequest"
     },
     {
@@ -3987,7 +4266,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L38",
       "id": "auth_logoutresponse",
-      "community": 13,
+      "community": 11,
       "norm_label": "logoutresponse"
     },
     {
@@ -3996,7 +4275,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L40",
       "id": "auth_refreshtokenrequest",
-      "community": 13,
+      "community": 11,
       "norm_label": "refreshtokenrequest"
     },
     {
@@ -4005,7 +4284,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L44",
       "id": "auth_refreshtokenresponse",
-      "community": 13,
+      "community": 11,
       "norm_label": "refreshtokenresponse"
     },
     {
@@ -4014,7 +4293,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L48",
       "id": "auth_exchangerequest",
-      "community": 13,
+      "community": 11,
       "norm_label": "exchangerequest"
     },
     {
@@ -4023,7 +4302,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L52",
       "id": "auth_exchangeresponse",
-      "community": 13,
+      "community": 11,
       "norm_label": "exchangeresponse"
     },
     {
@@ -4032,7 +4311,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L59",
       "id": "auth_authconfig",
-      "community": 13,
+      "community": 11,
       "norm_label": "authconfig"
     },
     {
@@ -4041,7 +4320,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L65",
       "id": "auth_authhandler",
-      "community": 13,
+      "community": 11,
       "norm_label": "authhandler"
     },
     {
@@ -4050,7 +4329,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L71",
       "id": "auth_auth_newauthhandler",
-      "community": 13,
+      "community": 11,
       "norm_label": "newauthhandler()"
     },
     {
@@ -4059,7 +4338,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L93",
       "id": "auth_authhandler_handlelogin",
-      "community": 13,
+      "community": 11,
       "norm_label": ".handlelogin()"
     },
     {
@@ -4068,7 +4347,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L127",
       "id": "auth_authhandler_handlesignup",
-      "community": 13,
+      "community": 11,
       "norm_label": ".handlesignup()"
     },
     {
@@ -4077,7 +4356,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L162",
       "id": "auth_authhandler_handlelogout",
-      "community": 13,
+      "community": 11,
       "norm_label": ".handlelogout()"
     },
     {
@@ -4086,7 +4365,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L184",
       "id": "auth_authhandler_handlerefreshtoken",
-      "community": 13,
+      "community": 11,
       "norm_label": ".handlerefreshtoken()"
     },
     {
@@ -4095,7 +4374,7 @@
       "source_file": "handlers/auth/auth.go",
       "source_location": "L210",
       "id": "auth_authhandler_handleexchange",
-      "community": 13,
+      "community": 11,
       "norm_label": ".handleexchange()"
     },
     {
@@ -4104,7 +4383,7 @@
       "source_file": "handlers/healthcheck/healthcheck.go",
       "source_location": "L1",
       "id": "handlers_healthcheck_healthcheck_go",
-      "community": 1,
+      "community": 32,
       "norm_label": "healthcheck.go"
     },
     {
@@ -4113,7 +4392,7 @@
       "source_file": "handlers/healthcheck/healthcheck.go",
       "source_location": "L12",
       "id": "healthcheck_healthcheckrequest",
-      "community": 1,
+      "community": 32,
       "norm_label": "healthcheckrequest"
     },
     {
@@ -4122,7 +4401,7 @@
       "source_file": "handlers/healthcheck/healthcheck.go",
       "source_location": "L14",
       "id": "healthcheck_healthcheckresponse",
-      "community": 1,
+      "community": 32,
       "norm_label": "healthcheckresponse"
     },
     {
@@ -4131,7 +4410,7 @@
       "source_file": "handlers/healthcheck/healthcheck.go",
       "source_location": "L18",
       "id": "healthcheck_healthcheckhandler",
-      "community": 1,
+      "community": 32,
       "norm_label": "healthcheckhandler"
     },
     {
@@ -4140,7 +4419,7 @@
       "source_file": "handlers/healthcheck/healthcheck.go",
       "source_location": "L30",
       "id": "healthcheck_healthcheck_newhealthcheckhandler",
-      "community": 1,
+      "community": 32,
       "norm_label": "newhealthcheckhandler()"
     },
     {
@@ -4149,7 +4428,7 @@
       "source_file": "handlers/healthcheck/healthcheck.go",
       "source_location": "L34",
       "id": "healthcheck_healthcheckhandler_handle",
-      "community": 1,
+      "community": 32,
       "norm_label": ".handle()"
     },
     {
@@ -4158,7 +4437,7 @@
       "source_file": "handlers/message/message.go",
       "source_location": "L1",
       "id": "handlers_message_message_go",
-      "community": 8,
+      "community": 1,
       "norm_label": "message.go"
     },
     {
@@ -4167,7 +4446,7 @@
       "source_file": "handlers/message/message.go",
       "source_location": "L9",
       "id": "message_messageconfig",
-      "community": 8,
+      "community": 1,
       "norm_label": "messageconfig"
     },
     {
@@ -4176,7 +4455,7 @@
       "source_file": "handlers/message/message.go",
       "source_location": "L13",
       "id": "message_messagehandler",
-      "community": 8,
+      "community": 1,
       "norm_label": "messagehandler"
     },
     {
@@ -4185,7 +4464,7 @@
       "source_file": "handlers/message/message.go",
       "source_location": "L17",
       "id": "message_message_newmessagehandler",
-      "community": 8,
+      "community": 1,
       "norm_label": "newmessagehandler()"
     },
     {
@@ -4194,7 +4473,7 @@
       "source_file": "handlers/message/message.go",
       "source_location": "L34",
       "id": "message_messagehandler_handlesendmessage",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlesendmessage()"
     },
     {
@@ -4203,7 +4482,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L1",
       "id": "handlers_system_handler_go",
-      "community": 1,
+      "community": 31,
       "norm_label": "handler.go"
     },
     {
@@ -4212,7 +4491,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L8",
       "id": "system_systemconfigrequest",
-      "community": 1,
+      "community": 31,
       "norm_label": "systemconfigrequest"
     },
     {
@@ -4221,7 +4500,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L10",
       "id": "system_versionresponse",
-      "community": 1,
+      "community": 31,
       "norm_label": "versionresponse"
     },
     {
@@ -4230,7 +4509,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L19",
       "id": "system_systemconfighandler",
-      "community": 1,
+      "community": 31,
       "norm_label": "systemconfighandler"
     },
     {
@@ -4239,7 +4518,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L31",
       "id": "system_handler_newsystemconfighandler",
-      "community": 1,
+      "community": 31,
       "norm_label": "newsystemconfighandler()"
     },
     {
@@ -4248,7 +4527,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L35",
       "id": "system_systemconfighandler_handle",
-      "community": 1,
+      "community": 31,
       "norm_label": ".handle()"
     },
     {
@@ -4257,7 +4536,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L1",
       "id": "handlers_user_user_go",
-      "community": 12,
+      "community": 10,
       "norm_label": "user.go"
     },
     {
@@ -4266,7 +4545,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L14",
       "id": "user_getcurrentuserrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "getcurrentuserrequest"
     },
     {
@@ -4275,7 +4554,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L15",
       "id": "user_getcurrentuserresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "getcurrentuserresponse"
     },
     {
@@ -4284,7 +4563,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L24",
       "id": "user_changepasswordrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "changepasswordrequest"
     },
     {
@@ -4293,7 +4572,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L28",
       "id": "user_changepasswordresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "changepasswordresponse"
     },
     {
@@ -4302,7 +4581,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L30",
       "id": "user_deleteaccountrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "deleteaccountrequest"
     },
     {
@@ -4311,7 +4590,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L31",
       "id": "user_deleteaccountresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "deleteaccountresponse"
     },
     {
@@ -4320,7 +4599,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L33",
       "id": "user_updateusernamerequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "updateusernamerequest"
     },
     {
@@ -4329,7 +4608,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L36",
       "id": "user_updateusernameresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "updateusernameresponse"
     },
     {
@@ -4338,7 +4617,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L38",
       "id": "user_updatefcmtokenrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "updatefcmtokenrequest"
     },
     {
@@ -4347,7 +4626,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L41",
       "id": "user_updatefcmtokenresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "updatefcmtokenresponse"
     },
     {
@@ -4356,7 +4635,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L43",
       "id": "user_updatepreferencesrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "updatepreferencesrequest"
     },
     {
@@ -4365,7 +4644,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L51",
       "id": "user_updatepreferencesresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "updatepreferencesresponse"
     },
     {
@@ -4374,7 +4653,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L53",
       "id": "user_getstreakrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "getstreakrequest"
     },
     {
@@ -4383,7 +4662,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L54",
       "id": "user_getstreakresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "getstreakresponse"
     },
     {
@@ -4392,7 +4671,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L61",
       "id": "user_forgotpasswordrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "forgotpasswordrequest"
     },
     {
@@ -4401,7 +4680,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L64",
       "id": "user_forgotpasswordresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "forgotpasswordresponse"
     },
     {
@@ -4410,7 +4689,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L66",
       "id": "user_resetpasswordrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "resetpasswordrequest"
     },
     {
@@ -4419,7 +4698,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L70",
       "id": "user_resetpasswordresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "resetpasswordresponse"
     },
     {
@@ -4428,7 +4707,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L72",
       "id": "user_verifyemailrequest",
-      "community": 12,
+      "community": 10,
       "norm_label": "verifyemailrequest"
     },
     {
@@ -4437,7 +4716,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L75",
       "id": "user_verifyemailresponse",
-      "community": 12,
+      "community": 10,
       "norm_label": "verifyemailresponse"
     },
     {
@@ -4446,7 +4725,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L79",
       "id": "user_userhandler",
-      "community": 8,
+      "community": 1,
       "norm_label": "userhandler"
     },
     {
@@ -4455,7 +4734,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L85",
       "id": "user_user_newuserhandler",
-      "community": 12,
+      "community": 10,
       "norm_label": "newuserhandler()"
     },
     {
@@ -4464,7 +4743,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L104",
       "id": "user_userhandler_handlegetcurrentuser",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetcurrentuser()"
     },
     {
@@ -4473,7 +4752,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L139",
       "id": "user_userhandler_handlechangepassword",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlechangepassword()"
     },
     {
@@ -4482,7 +4761,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L166",
       "id": "user_userhandler_handledeleteaccount",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handledeleteaccount()"
     },
     {
@@ -4491,7 +4770,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L186",
       "id": "user_userhandler_handleupdateusername",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handleupdateusername()"
     },
     {
@@ -4500,7 +4779,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L210",
       "id": "user_userhandler_handleupdatefcmtoken",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handleupdatefcmtoken()"
     },
     {
@@ -4509,7 +4788,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L235",
       "id": "user_userhandler_handleupdatepreferences",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handleupdatepreferences()"
     },
     {
@@ -4518,7 +4797,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L268",
       "id": "user_userhandler_handlegetstreak",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handlegetstreak()"
     },
     {
@@ -4527,7 +4806,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L295",
       "id": "user_userhandler_handleforgotpassword",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handleforgotpassword()"
     },
     {
@@ -4536,7 +4815,7 @@
       "source_file": "handlers/user/user.go",
       "source_location": "L318",
       "id": "user_userhandler_handleresetpassword",
-      "community": 8,
+      "community": 1,
       "norm_label": ".handleresetpassword()"
     },
     {
@@ -4599,7 +4878,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L1",
       "id": "domain_notification_go",
-      "community": 29,
+      "community": 43,
       "norm_label": "notification.go"
     },
     {
@@ -4608,7 +4887,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L20",
       "id": "domain_notificationrepository",
-      "community": 29,
+      "community": 43,
       "norm_label": "notificationrepository"
     },
     {
@@ -4617,7 +4896,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L26",
       "id": "domain_notificationservice",
-      "community": 29,
+      "community": 43,
       "norm_label": "notificationservice"
     },
     {
@@ -4626,7 +4905,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L32",
       "id": "domain_fcmclient",
-      "community": 29,
+      "community": 43,
       "norm_label": "fcmclient"
     },
     {
@@ -4797,7 +5076,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L79",
       "id": "domain_subscription_defaultusagelimitsconfig",
-      "community": 2,
+      "community": 22,
       "norm_label": "defaultusagelimitsconfig()"
     },
     {
@@ -4887,7 +5166,7 @@
       "source_file": "domain/email.go",
       "source_location": "L1",
       "id": "domain_email_go",
-      "community": 33,
+      "community": 50,
       "norm_label": "email.go"
     },
     {
@@ -4896,7 +5175,7 @@
       "source_file": "domain/email.go",
       "source_location": "L3",
       "id": "domain_emailclaims",
-      "community": 33,
+      "community": 50,
       "norm_label": "emailclaims"
     },
     {
@@ -4923,7 +5202,7 @@
       "source_file": "domain/util.go",
       "source_location": "L17",
       "id": "domain_util_getuserid",
-      "community": 8,
+      "community": 1,
       "norm_label": "getuserid()"
     },
     {
@@ -4941,7 +5220,7 @@
       "source_file": "domain/util.go",
       "source_location": "L26",
       "id": "domain_util_isprodenv",
-      "community": 15,
+      "community": 22,
       "norm_label": "isprodenv()"
     },
     {
@@ -4950,7 +5229,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L1",
       "id": "domain_interfaces_go",
-      "community": 30,
+      "community": 44,
       "norm_label": "interfaces.go"
     },
     {
@@ -4959,7 +5238,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L7",
       "id": "domain_tokenpayload",
-      "community": 30,
+      "community": 44,
       "norm_label": "tokenpayload"
     },
     {
@@ -4968,7 +5247,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L11",
       "id": "domain_tokenservice",
-      "community": 30,
+      "community": 44,
       "norm_label": "tokenservice"
     },
     {
@@ -4977,7 +5256,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L20",
       "id": "domain_mailservice",
-      "community": 30,
+      "community": 44,
       "norm_label": "mailservice"
     },
     {
@@ -4986,7 +5265,7 @@
       "source_file": "domain/file.go",
       "source_location": "L1",
       "id": "domain_file_go",
-      "community": 3,
+      "community": 7,
       "norm_label": "file.go"
     },
     {
@@ -4995,7 +5274,7 @@
       "source_file": "domain/file.go",
       "source_location": "L15",
       "id": "domain_filetype",
-      "community": 3,
+      "community": 7,
       "norm_label": "filetype"
     },
     {
@@ -5004,7 +5283,7 @@
       "source_file": "domain/file.go",
       "source_location": "L23",
       "id": "domain_file_detectfiletype",
-      "community": 3,
+      "community": 7,
       "norm_label": "detectfiletype()"
     },
     {
@@ -5013,7 +5292,7 @@
       "source_file": "domain/file.go",
       "source_location": "L35",
       "id": "domain_file",
-      "community": 3,
+      "community": 7,
       "norm_label": "file"
     },
     {
@@ -5022,7 +5301,7 @@
       "source_file": "domain/file.go",
       "source_location": "L48",
       "id": "domain_uploadfilerequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "uploadfilerequest"
     },
     {
@@ -5031,7 +5310,7 @@
       "source_file": "domain/file.go",
       "source_location": "L52",
       "id": "domain_uploadfileresponse",
-      "community": 3,
+      "community": 7,
       "norm_label": "uploadfileresponse"
     },
     {
@@ -5040,7 +5319,7 @@
       "source_file": "domain/file.go",
       "source_location": "L56",
       "id": "domain_getfilesrequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "getfilesrequest"
     },
     {
@@ -5049,7 +5328,7 @@
       "source_file": "domain/file.go",
       "source_location": "L58",
       "id": "domain_getfilesresponse",
-      "community": 3,
+      "community": 19,
       "norm_label": "getfilesresponse"
     },
     {
@@ -5058,7 +5337,7 @@
       "source_file": "domain/file.go",
       "source_location": "L60",
       "id": "domain_fileresponsedto",
-      "community": 3,
+      "community": 7,
       "norm_label": "fileresponsedto"
     },
     {
@@ -5067,7 +5346,7 @@
       "source_file": "domain/file.go",
       "source_location": "L70",
       "id": "domain_getfilerequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "getfilerequest"
     },
     {
@@ -5076,7 +5355,7 @@
       "source_file": "domain/file.go",
       "source_location": "L74",
       "id": "domain_getfileresponse",
-      "community": 3,
+      "community": 7,
       "norm_label": "getfileresponse"
     },
     {
@@ -5085,7 +5364,7 @@
       "source_file": "domain/file.go",
       "source_location": "L78",
       "id": "domain_deletefilerequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "deletefilerequest"
     },
     {
@@ -5094,7 +5373,7 @@
       "source_file": "domain/file.go",
       "source_location": "L82",
       "id": "domain_deletefileresponse",
-      "community": 3,
+      "community": 7,
       "norm_label": "deletefileresponse"
     },
     {
@@ -5103,7 +5382,7 @@
       "source_file": "domain/file.go",
       "source_location": "L84",
       "id": "domain_togglefilesavedrequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "togglefilesavedrequest"
     },
     {
@@ -5112,7 +5391,7 @@
       "source_file": "domain/file.go",
       "source_location": "L88",
       "id": "domain_togglefilesavedresponse",
-      "community": 3,
+      "community": 7,
       "norm_label": "togglefilesavedresponse"
     },
     {
@@ -5121,7 +5400,7 @@
       "source_file": "domain/file.go",
       "source_location": "L94",
       "id": "domain_filerepository",
-      "community": 3,
+      "community": 7,
       "norm_label": "filerepository"
     },
     {
@@ -5130,7 +5409,7 @@
       "source_file": "domain/file.go",
       "source_location": "L106",
       "id": "domain_filestorageservice",
-      "community": 3,
+      "community": 7,
       "norm_label": "filestorageservice"
     },
     {
@@ -5139,7 +5418,7 @@
       "source_file": "domain/file.go",
       "source_location": "L114",
       "id": "domain_fileservice",
-      "community": 3,
+      "community": 7,
       "norm_label": "fileservice"
     },
     {
@@ -5148,7 +5427,7 @@
       "source_file": "domain/file.go",
       "source_location": "L124",
       "id": "domain_filemetadata",
-      "community": 3,
+      "community": 7,
       "norm_label": "filemetadata"
     },
     {
@@ -5157,7 +5436,7 @@
       "source_file": "domain/file.go",
       "source_location": "L131",
       "id": "domain_vectordb",
-      "community": 3,
+      "community": 7,
       "norm_label": "vectordb"
     },
     {
@@ -5166,7 +5445,7 @@
       "source_file": "domain/file.go",
       "source_location": "L138",
       "id": "domain_embeddingservice",
-      "community": 3,
+      "community": 7,
       "norm_label": "embeddingservice"
     },
     {
@@ -5175,7 +5454,7 @@
       "source_file": "domain/file.go",
       "source_location": "L142",
       "id": "domain_chunker",
-      "community": 3,
+      "community": 7,
       "norm_label": "chunker"
     },
     {
@@ -5184,7 +5463,7 @@
       "source_file": "domain/file.go",
       "source_location": "L146",
       "id": "domain_chunk",
-      "community": 3,
+      "community": 7,
       "norm_label": "chunk"
     },
     {
@@ -5193,7 +5472,7 @@
       "source_file": "domain/file.go",
       "source_location": "L152",
       "id": "domain_chunkmetadata",
-      "community": 3,
+      "community": 7,
       "norm_label": "chunkmetadata"
     },
     {
@@ -5202,7 +5481,7 @@
       "source_file": "domain/file.go",
       "source_location": "L159",
       "id": "domain_chunkoptions",
-      "community": 3,
+      "community": 7,
       "norm_label": "chunkoptions"
     },
     {
@@ -5211,7 +5490,7 @@
       "source_file": "domain/file.go",
       "source_location": "L165",
       "id": "domain_embeddingbatchrequest",
-      "community": 3,
+      "community": 7,
       "norm_label": "embeddingbatchrequest"
     },
     {
@@ -5220,7 +5499,7 @@
       "source_file": "domain/file.go",
       "source_location": "L171",
       "id": "domain_text",
-      "community": 3,
+      "community": 7,
       "norm_label": "text"
     },
     {
@@ -5229,7 +5508,7 @@
       "source_file": "domain/file.go",
       "source_location": "L176",
       "id": "domain_embeddingresponse",
-      "community": 3,
+      "community": 7,
       "norm_label": "embeddingresponse"
     },
     {
@@ -5238,7 +5517,7 @@
       "source_file": "domain/file.go",
       "source_location": "L182",
       "id": "domain_embedding",
-      "community": 3,
+      "community": 7,
       "norm_label": "embedding"
     },
     {
@@ -5247,8 +5526,170 @@
       "source_file": "domain/file.go",
       "source_location": "L191",
       "id": "domain_fileprocessor",
-      "community": 3,
+      "community": 7,
       "norm_label": "fileprocessor"
+    },
+    {
+      "label": "flashcard.go",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L1",
+      "id": "domain_flashcard_go",
+      "community": 13,
+      "norm_label": "flashcard.go"
+    },
+    {
+      "label": "Deck",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L12",
+      "id": "domain_deck",
+      "community": 13,
+      "norm_label": "deck"
+    },
+    {
+      "label": "Flashcard",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L21",
+      "id": "domain_flashcard",
+      "community": 13,
+      "norm_label": "flashcard"
+    },
+    {
+      "label": "FlashcardReview",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L30",
+      "id": "domain_flashcardreview",
+      "community": 13,
+      "norm_label": "flashcardreview"
+    },
+    {
+      "label": "FlashcardWithReview",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L43",
+      "id": "domain_flashcardwithreview",
+      "community": 13,
+      "norm_label": "flashcardwithreview"
+    },
+    {
+      "label": "CreateDeckRequest",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L50",
+      "id": "domain_createdeckrequest",
+      "community": 13,
+      "norm_label": "createdeckrequest"
+    },
+    {
+      "label": "CreateDeckResponse",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L55",
+      "id": "domain_createdeckresponse",
+      "community": 13,
+      "norm_label": "createdeckresponse"
+    },
+    {
+      "label": "AddCardRequest",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L59",
+      "id": "domain_addcardrequest",
+      "community": 13,
+      "norm_label": "addcardrequest"
+    },
+    {
+      "label": "AddCardResponse",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L65",
+      "id": "domain_addcardresponse",
+      "community": 13,
+      "norm_label": "addcardresponse"
+    },
+    {
+      "label": "ReviewCardRequest",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L69",
+      "id": "domain_reviewcardrequest",
+      "community": 13,
+      "norm_label": "reviewcardrequest"
+    },
+    {
+      "label": "ReviewCardResponse",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L74",
+      "id": "domain_reviewcardresponse",
+      "community": 13,
+      "norm_label": "reviewcardresponse"
+    },
+    {
+      "label": "GetDecksRequest",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L78",
+      "id": "domain_getdecksrequest",
+      "community": 13,
+      "norm_label": "getdecksrequest"
+    },
+    {
+      "label": "GetDecksResponse",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L80",
+      "id": "domain_getdecksresponse",
+      "community": 13,
+      "norm_label": "getdecksresponse"
+    },
+    {
+      "label": "GetCardsRequest",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L84",
+      "id": "domain_getcardsrequest",
+      "community": 13,
+      "norm_label": "getcardsrequest"
+    },
+    {
+      "label": "GetCardsResponse",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L88",
+      "id": "domain_getcardsresponse",
+      "community": 13,
+      "norm_label": "getcardsresponse"
+    },
+    {
+      "label": "GetDueCardsRequest",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L92",
+      "id": "domain_getduecardsrequest",
+      "community": 13,
+      "norm_label": "getduecardsrequest"
+    },
+    {
+      "label": "FlashcardRepository",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L98",
+      "id": "domain_flashcardrepository",
+      "community": 13,
+      "norm_label": "flashcardrepository"
+    },
+    {
+      "label": "FlashcardService",
+      "file_type": "code",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L114",
+      "id": "domain_flashcardservice",
+      "community": 13,
+      "norm_label": "flashcardservice"
     },
     {
       "label": "quiz.go",
@@ -5256,7 +5697,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L1",
       "id": "domain_quiz_go",
-      "community": 4,
+      "community": 2,
       "norm_label": "quiz.go"
     },
     {
@@ -5265,7 +5706,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L10",
       "id": "domain_quiz",
-      "community": 4,
+      "community": 2,
       "norm_label": "quiz"
     },
     {
@@ -5274,7 +5715,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L18",
       "id": "domain_quizquestion",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizquestion"
     },
     {
@@ -5283,7 +5724,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L27",
       "id": "domain_option",
-      "community": 4,
+      "community": 2,
       "norm_label": "option"
     },
     {
@@ -5292,7 +5733,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L34",
       "id": "domain_quiz_newquiz",
-      "community": 4,
+      "community": 2,
       "norm_label": "newquiz()"
     },
     {
@@ -5301,7 +5742,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L43",
       "id": "domain_quiz_addquestion",
-      "community": 4,
+      "community": 2,
       "norm_label": ".addquestion()"
     },
     {
@@ -5310,7 +5751,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L49",
       "id": "domain_quizsolvingdata",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizsolvingdata"
     },
     {
@@ -5319,7 +5760,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L54",
       "id": "domain_questiondata",
-      "community": 4,
+      "community": 2,
       "norm_label": "questiondata"
     },
     {
@@ -5328,7 +5769,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L59",
       "id": "domain_quizattempt",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizattempt"
     },
     {
@@ -5337,7 +5778,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L70",
       "id": "domain_quizattemptanswer",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizattemptanswer"
     },
     {
@@ -5346,7 +5787,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L79",
       "id": "domain_quizattemptdetail",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizattemptdetail"
     },
     {
@@ -5355,7 +5796,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L89",
       "id": "domain_attemptdetailresponse",
-      "community": 4,
+      "community": 2,
       "norm_label": "attemptdetailresponse"
     },
     {
@@ -5364,7 +5805,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L100",
       "id": "domain_attemptanswerdetail",
-      "community": 4,
+      "community": 2,
       "norm_label": "attemptanswerdetail"
     },
     {
@@ -5373,7 +5814,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L111",
       "id": "domain_generatequizrequest",
-      "community": 4,
+      "community": 2,
       "norm_label": "generatequizrequest"
     },
     {
@@ -5382,7 +5823,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L118",
       "id": "domain_generatequizresponse",
-      "community": 4,
+      "community": 2,
       "norm_label": "generatequizresponse"
     },
     {
@@ -5391,7 +5832,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L122",
       "id": "domain_getquizzesrequest",
-      "community": 4,
+      "community": 2,
       "norm_label": "getquizzesrequest"
     },
     {
@@ -5400,7 +5841,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L124",
       "id": "domain_getquizzesresponse",
-      "community": 4,
+      "community": 2,
       "norm_label": "getquizzesresponse"
     },
     {
@@ -5409,7 +5850,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L126",
       "id": "domain_quizresponsedto",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizresponsedto"
     },
     {
@@ -5418,7 +5859,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L133",
       "id": "domain_getquizbyidrequest",
-      "community": 4,
+      "community": 2,
       "norm_label": "getquizbyidrequest"
     },
     {
@@ -5427,7 +5868,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L137",
       "id": "domain_getquizbyidresponse",
-      "community": 4,
+      "community": 2,
       "norm_label": "getquizbyidresponse"
     },
     {
@@ -5436,7 +5877,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L139",
       "id": "domain_getattemptsrequest",
-      "community": 4,
+      "community": 2,
       "norm_label": "getattemptsrequest"
     },
     {
@@ -5445,7 +5886,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L144",
       "id": "domain_getattemptsresponse",
-      "community": 4,
+      "community": 2,
       "norm_label": "getattemptsresponse"
     },
     {
@@ -5454,7 +5895,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L149",
       "id": "domain_getattemptbyidrequest",
-      "community": 4,
+      "community": 2,
       "norm_label": "getattemptbyidrequest"
     },
     {
@@ -5463,7 +5904,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L153",
       "id": "domain_solvequizrequest",
-      "community": 4,
+      "community": 2,
       "norm_label": "solvequizrequest"
     },
     {
@@ -5472,7 +5913,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L158",
       "id": "domain_answer",
-      "community": 4,
+      "community": 2,
       "norm_label": "answer"
     },
     {
@@ -5481,7 +5922,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L163",
       "id": "domain_solvequizresponse",
-      "community": 4,
+      "community": 2,
       "norm_label": "solvequizresponse"
     },
     {
@@ -5490,7 +5931,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L171",
       "id": "domain_answerfeedback",
-      "community": 4,
+      "community": 2,
       "norm_label": "answerfeedback"
     },
     {
@@ -5499,7 +5940,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L181",
       "id": "domain_quizrepository",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizrepository"
     },
     {
@@ -5508,7 +5949,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L194",
       "id": "domain_chunkservice",
-      "community": 4,
+      "community": 2,
       "norm_label": "chunkservice"
     },
     {
@@ -5517,7 +5958,7 @@
       "source_file": "domain/quiz.go",
       "source_location": "L199",
       "id": "domain_quizservice",
-      "community": 4,
+      "community": 2,
       "norm_label": "quizservice"
     },
     {
@@ -5526,7 +5967,7 @@
       "source_file": "domain/validator.go",
       "source_location": "L1",
       "id": "domain_validator_go",
-      "community": 34,
+      "community": 51,
       "norm_label": "validator.go"
     },
     {
@@ -5535,7 +5976,7 @@
       "source_file": "domain/validator.go",
       "source_location": "L3",
       "id": "domain_validator",
-      "community": 34,
+      "community": 51,
       "norm_label": "validator"
     },
     {
@@ -5544,7 +5985,7 @@
       "source_file": "domain/error.go",
       "source_location": "L1",
       "id": "domain_error_go",
-      "community": 31,
+      "community": 45,
       "norm_label": "error.go"
     },
     {
@@ -5553,7 +5994,7 @@
       "source_file": "domain/error.go",
       "source_location": "L5",
       "id": "domain_error",
-      "community": 31,
+      "community": 45,
       "norm_label": "error"
     },
     {
@@ -5562,7 +6003,7 @@
       "source_file": "domain/error.go",
       "source_location": "L11",
       "id": "domain_error_error",
-      "community": 31,
+      "community": 45,
       "norm_label": ".error()"
     },
     {
@@ -5571,7 +6012,7 @@
       "source_file": "domain/error.go",
       "source_location": "L15",
       "id": "domain_error_newerror",
-      "community": 31,
+      "community": 45,
       "norm_label": "newerror()"
     },
     {
@@ -5580,7 +6021,7 @@
       "source_file": "domain/user.go",
       "source_location": "L1",
       "id": "domain_user_go",
-      "community": 9,
+      "community": 6,
       "norm_label": "user.go"
     },
     {
@@ -5589,7 +6030,7 @@
       "source_file": "domain/user.go",
       "source_location": "L17",
       "id": "domain_user",
-      "community": 9,
+      "community": 6,
       "norm_label": "user"
     },
     {
@@ -5598,7 +6039,7 @@
       "source_file": "domain/user.go",
       "source_location": "L27",
       "id": "domain_user_newuser",
-      "community": 9,
+      "community": 6,
       "norm_label": "newuser()"
     },
     {
@@ -5607,7 +6048,7 @@
       "source_file": "domain/user.go",
       "source_location": "L50",
       "id": "domain_user_validatepassword",
-      "community": 9,
+      "community": 6,
       "norm_label": ".validatepassword()"
     },
     {
@@ -5616,7 +6057,7 @@
       "source_file": "domain/user.go",
       "source_location": "L67",
       "id": "domain_user_hashpassword",
-      "community": 9,
+      "community": 6,
       "norm_label": ".hashpassword()"
     },
     {
@@ -5625,7 +6066,7 @@
       "source_file": "domain/user.go",
       "source_location": "L87",
       "id": "domain_user_validateusername",
-      "community": 9,
+      "community": 6,
       "norm_label": "validateusername()"
     },
     {
@@ -5634,7 +6075,7 @@
       "source_file": "domain/user.go",
       "source_location": "L100",
       "id": "domain_user_ispasswordtooshort",
-      "community": 9,
+      "community": 6,
       "norm_label": "ispasswordtooshort()"
     },
     {
@@ -5643,7 +6084,7 @@
       "source_file": "domain/user.go",
       "source_location": "L104",
       "id": "domain_notificationpreferences",
-      "community": 9,
+      "community": 6,
       "norm_label": "notificationpreferences"
     },
     {
@@ -5652,7 +6093,7 @@
       "source_file": "domain/user.go",
       "source_location": "L110",
       "id": "domain_userpreferences",
-      "community": 9,
+      "community": 6,
       "norm_label": "userpreferences"
     },
     {
@@ -5661,7 +6102,7 @@
       "source_file": "domain/user.go",
       "source_location": "L115",
       "id": "domain_userrepository",
-      "community": 9,
+      "community": 6,
       "norm_label": "userrepository"
     },
     {
@@ -5670,7 +6111,7 @@
       "source_file": "domain/user.go",
       "source_location": "L133",
       "id": "domain_userservice",
-      "community": 9,
+      "community": 6,
       "norm_label": "userservice"
     },
     {
@@ -5679,7 +6120,7 @@
       "source_file": "domain/logger.go",
       "source_location": "L1",
       "id": "domain_logger_go",
-      "community": 35,
+      "community": 52,
       "norm_label": "logger.go"
     },
     {
@@ -5688,7 +6129,7 @@
       "source_file": "domain/logger.go",
       "source_location": "L3",
       "id": "domain_logger",
-      "community": 35,
+      "community": 52,
       "norm_label": "logger"
     },
     {
@@ -5697,7 +6138,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L1",
       "id": "domain_chat_go",
-      "community": 7,
+      "community": 5,
       "norm_label": "chat.go"
     },
     {
@@ -5706,7 +6147,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L10",
       "id": "domain_chat",
-      "community": 7,
+      "community": 5,
       "norm_label": "chat"
     },
     {
@@ -5715,7 +6156,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L17",
       "id": "domain_chat_newchat",
-      "community": 5,
+      "community": 3,
       "norm_label": "newchat()"
     },
     {
@@ -5724,7 +6165,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L26",
       "id": "domain_role",
-      "community": 7,
+      "community": 5,
       "norm_label": "role"
     },
     {
@@ -5733,7 +6174,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L34",
       "id": "domain_querytype",
-      "community": 7,
+      "community": 5,
       "norm_label": "querytype"
     },
     {
@@ -5742,7 +6183,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L42",
       "id": "domain_chatrequest",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatrequest"
     },
     {
@@ -5751,7 +6192,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L47",
       "id": "domain_chatresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatresponse"
     },
     {
@@ -5760,7 +6201,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L51",
       "id": "domain_queryexpansionresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "queryexpansionresponse"
     },
     {
@@ -5769,7 +6210,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L55",
       "id": "domain_updatechatrequest",
-      "community": 7,
+      "community": 5,
       "norm_label": "updatechatrequest"
     },
     {
@@ -5778,7 +6219,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L59",
       "id": "domain_updatechatresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "updatechatresponse"
     },
     {
@@ -5787,7 +6228,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L62",
       "id": "domain_chatmessage",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatmessage"
     },
     {
@@ -5796,7 +6237,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L70",
       "id": "domain_getchatsrequest",
-      "community": 7,
+      "community": 5,
       "norm_label": "getchatsrequest"
     },
     {
@@ -5805,7 +6246,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L72",
       "id": "domain_getchatsresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "getchatsresponse"
     },
     {
@@ -5814,7 +6255,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L74",
       "id": "domain_chatresponsedto",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatresponsedto"
     },
     {
@@ -5823,7 +6264,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L80",
       "id": "domain_getchatbyidrequest",
-      "community": 7,
+      "community": 5,
       "norm_label": "getchatbyidrequest"
     },
     {
@@ -5832,7 +6273,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L84",
       "id": "domain_getchatbyidresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "getchatbyidresponse"
     },
     {
@@ -5841,7 +6282,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L86",
       "id": "domain_messagedto",
-      "community": 7,
+      "community": 5,
       "norm_label": "messagedto"
     },
     {
@@ -5850,7 +6291,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L94",
       "id": "domain_updatechatdto",
-      "community": 7,
+      "community": 5,
       "norm_label": "updatechatdto"
     },
     {
@@ -5859,7 +6300,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L99",
       "id": "domain_deletechatrequest",
-      "community": 7,
+      "community": 5,
       "norm_label": "deletechatrequest"
     },
     {
@@ -5868,7 +6309,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L103",
       "id": "domain_deletechatresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "deletechatresponse"
     },
     {
@@ -5877,7 +6318,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L107",
       "id": "domain_chatrepository",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatrepository"
     },
     {
@@ -5886,7 +6327,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L115",
       "id": "domain_chatservice",
-      "community": 7,
+      "community": 5,
       "norm_label": "chatservice"
     },
     {
@@ -5895,7 +6336,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L122",
       "id": "domain_aiservice",
-      "community": 7,
+      "community": 5,
       "norm_label": "aiservice"
     },
     {
@@ -5904,7 +6345,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L132",
       "id": "domain_singleembeddingrequest",
-      "community": 7,
+      "community": 5,
       "norm_label": "singleembeddingrequest"
     },
     {
@@ -5913,7 +6354,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L136",
       "id": "domain_singleembeddingresponse",
-      "community": 7,
+      "community": 5,
       "norm_label": "singleembeddingresponse"
     },
     {
@@ -5922,7 +6363,7 @@
       "source_file": "domain/chat.go",
       "source_location": "L140",
       "id": "domain_singleembeddingservice",
-      "community": 7,
+      "community": 5,
       "norm_label": "singleembeddingservice"
     },
     {
@@ -5931,7 +6372,7 @@
       "source_file": "domain/message.go",
       "source_location": "L1",
       "id": "domain_message_go",
-      "community": 5,
+      "community": 3,
       "norm_label": "message.go"
     },
     {
@@ -5940,7 +6381,7 @@
       "source_file": "domain/message.go",
       "source_location": "L10",
       "id": "domain_message",
-      "community": 5,
+      "community": 3,
       "norm_label": "message"
     },
     {
@@ -5949,7 +6390,7 @@
       "source_file": "domain/message.go",
       "source_location": "L20",
       "id": "domain_contextsnapshot",
-      "community": 5,
+      "community": 3,
       "norm_label": "contextsnapshot"
     },
     {
@@ -5958,7 +6399,7 @@
       "source_file": "domain/message.go",
       "source_location": "L26",
       "id": "domain_attachment",
-      "community": 5,
+      "community": 3,
       "norm_label": "attachment"
     },
     {
@@ -5967,7 +6408,7 @@
       "source_file": "domain/message.go",
       "source_location": "L31",
       "id": "domain_message_newmessage",
-      "community": 5,
+      "community": 3,
       "norm_label": "newmessage()"
     },
     {
@@ -5976,7 +6417,7 @@
       "source_file": "domain/message.go",
       "source_location": "L41",
       "id": "domain_message_updatechatid",
-      "community": 5,
+      "community": 3,
       "norm_label": ".updatechatid()"
     },
     {
@@ -5985,7 +6426,7 @@
       "source_file": "domain/message.go",
       "source_location": "L47",
       "id": "domain_sendmessagerequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "sendmessagerequest"
     },
     {
@@ -5994,7 +6435,7 @@
       "source_file": "domain/message.go",
       "source_location": "L54",
       "id": "domain_sendmessageresponse",
-      "community": 5,
+      "community": 3,
       "norm_label": "sendmessageresponse"
     },
     {
@@ -6003,7 +6444,7 @@
       "source_file": "domain/message.go",
       "source_location": "L64",
       "id": "domain_messagerepository",
-      "community": 5,
+      "community": 3,
       "norm_label": "messagerepository"
     },
     {
@@ -6012,7 +6453,7 @@
       "source_file": "domain/message.go",
       "source_location": "L72",
       "id": "domain_messageservice",
-      "community": 5,
+      "community": 3,
       "norm_label": "messageservice"
     },
     {
@@ -6021,7 +6462,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L1",
       "id": "domain_auth_go",
-      "community": 26,
+      "community": 36,
       "norm_label": "auth.go"
     },
     {
@@ -6030,7 +6471,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L7",
       "id": "domain_authservice",
-      "community": 26,
+      "community": 36,
       "norm_label": "authservice"
     },
     {
@@ -6039,7 +6480,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L15",
       "id": "domain_authrepository",
-      "community": 26,
+      "community": 36,
       "norm_label": "authrepository"
     },
     {
@@ -6048,7 +6489,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L26",
       "id": "domain_signupdata",
-      "community": 26,
+      "community": 36,
       "norm_label": "signupdata"
     },
     {
@@ -6057,7 +6498,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L31",
       "id": "domain_oauthuserregistrationdata",
-      "community": 26,
+      "community": 36,
       "norm_label": "oauthuserregistrationdata"
     },
     {
@@ -6066,7 +6507,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L36",
       "id": "domain_authcache",
-      "community": 26,
+      "community": 36,
       "norm_label": "authcache"
     },
     {
@@ -6075,7 +6516,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L1",
       "id": "domain_streak_go",
-      "community": 27,
+      "community": 39,
       "norm_label": "streak.go"
     },
     {
@@ -6084,7 +6525,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L10",
       "id": "domain_usagestats",
-      "community": 27,
+      "community": 39,
       "norm_label": "usagestats"
     },
     {
@@ -6093,7 +6534,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L19",
       "id": "domain_streakresponse",
-      "community": 27,
+      "community": 39,
       "norm_label": "streakresponse"
     },
     {
@@ -6102,7 +6543,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L26",
       "id": "domain_streakrepository",
-      "community": 27,
+      "community": 39,
       "norm_label": "streakrepository"
     },
     {
@@ -6111,7 +6552,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L32",
       "id": "domain_streakservice",
-      "community": 27,
+      "community": 39,
       "norm_label": "streakservice"
     }
   ],
@@ -6153,7 +6594,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L255",
+      "source_location": "L269",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "jobs_cron_setupcronjobs"
@@ -6530,7 +6971,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L138",
+      "source_location": "L139",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_file_newfileservice"
@@ -6628,7 +7069,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L143",
+      "source_location": "L144",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_file_newfileprocessorfactory"
@@ -6659,7 +7100,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L144",
+      "source_location": "L145",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_file_newpdfprocessor"
@@ -6691,7 +7132,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L145",
+      "source_location": "L146",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_file_newimageprocessor"
@@ -6728,6 +7169,97 @@
       "weight": 1.0,
       "source": "services_messageservice_sendmessage",
       "target": "services_file_isimagefile"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "services_flashcard_go",
+      "target": "services_flashcardservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "services_flashcard_go",
+      "target": "services_flashcard_newflashcardservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "services_flashcardservice",
+      "target": "services_flashcardservice_createdeck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "services_flashcardservice",
+      "target": "services_flashcardservice_getdecks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "services_flashcardservice",
+      "target": "services_flashcardservice_addcard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "services_flashcardservice",
+      "target": "services_flashcardservice_getcards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L96",
+      "weight": 1.0,
+      "source": "services_flashcardservice",
+      "target": "services_flashcardservice_getduecards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "services/flashcard.go",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "services_flashcardservice",
+      "target": "services_flashcardservice_reviewcard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "infrastructure/fiber/router.go",
+      "source_location": "L173",
+      "weight": 1.0,
+      "source": "fiber_router_setuproutes",
+      "target": "services_flashcard_newflashcardservice"
     },
     {
       "relation": "contains",
@@ -6835,7 +7367,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L167",
+      "source_location": "L168",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_quiz_newquizservice"
@@ -6979,7 +7511,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L130",
+      "source_location": "L131",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_user_newuserservice"
@@ -7072,7 +7604,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L133",
+      "source_location": "L134",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_chat_newchatservice"
@@ -7381,7 +7913,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L153",
+      "source_location": "L154",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_message_newmessageservice"
@@ -7616,7 +8148,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L111",
+      "source_location": "L112",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_auth_newauthservice"
@@ -7688,7 +8220,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L128",
+      "source_location": "L129",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "services_streak_newstreakservice"
@@ -7967,6 +8499,116 @@
       "weight": 1.0,
       "source": "repository_repository",
       "target": "repository_repository_close",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_savedeck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_getdecksbyuserid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_getdeckbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_deletedeck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_savecard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L99",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_getcardsbydeckid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L162",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_getcardbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_deletecard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L185",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_savereview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L204",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_getreviewbycardanduserid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "repository/flashcard.go",
+      "source_location": "L221",
+      "weight": 1.0,
+      "source": "repository_repository",
+      "target": "repository_repository_getduecardsfordeck",
       "confidence_score": 1.0
     },
     {
@@ -10345,7 +10987,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L102",
+      "source_location": "L103",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "fiber_middleware_newmiddlewaremanager"
@@ -10525,7 +11167,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L118",
+      "source_location": "L119",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "fiber_oauth_providers_newgoogleoauthservice"
@@ -10558,7 +11200,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L119",
+      "source_location": "L120",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "fiber_oauth_providers_newfacebookoauthservice"
@@ -10567,7 +11209,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L91",
+      "source_location": "L92",
       "weight": 1.0,
       "source": "infrastructure_fiber_router_go",
       "target": "fiber_handleradapter",
@@ -10577,7 +11219,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L99",
+      "source_location": "L100",
       "weight": 1.0,
       "source": "infrastructure_fiber_router_go",
       "target": "fiber_router_setuproutes",
@@ -10587,7 +11229,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L95",
+      "source_location": "L96",
       "weight": 1.0,
       "source": "fiber_handleradapter_r_res",
       "target": "fiber_handleradapter_r_res_handle",
@@ -10598,7 +11240,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L174",
+      "source_location": "L180",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "fiber_handleradapter_r_res_handle",
@@ -10610,7 +11252,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L100",
+      "source_location": "L101",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "fiber_dependency_containers_newauthdependencycontainer"
@@ -10621,7 +11263,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L104",
+      "source_location": "L105",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "healthcheck_healthcheck_newhealthcheckhandler"
@@ -10632,7 +11274,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L105",
+      "source_location": "L106",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "system_handler_newsystemconfighandler"
@@ -10643,7 +11285,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L107",
+      "source_location": "L108",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "domain_util_isprodenv"
@@ -10654,7 +11296,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L112",
+      "source_location": "L113",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "auth_auth_newauthhandler"
@@ -10665,7 +11307,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L121",
+      "source_location": "L122",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "oauth_service_newoauthservice"
@@ -10676,7 +11318,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L123",
+      "source_location": "L124",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "oauth_verifier_newgoogleverifier"
@@ -10687,7 +11329,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L124",
+      "source_location": "L125",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "oauth_verifier_newfacebookverifier"
@@ -10698,7 +11340,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L126",
+      "source_location": "L127",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "oauth_mobile_newmobileoauthhandler"
@@ -10709,7 +11351,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L131",
+      "source_location": "L132",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "user_user_newuserhandler"
@@ -10720,7 +11362,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L134",
+      "source_location": "L135",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "chat_chat_newchathandler"
@@ -10731,7 +11373,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L149",
+      "source_location": "L150",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "file_file_newfilehandler"
@@ -10742,7 +11384,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L163",
+      "source_location": "L164",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "message_message_newmessagehandler"
@@ -10753,7 +11395,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L168",
+      "source_location": "L169",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "quiz_quiz_newquizhandler"
@@ -10764,7 +11406,18 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "infrastructure/fiber/router.go",
-      "source_location": "L203",
+      "source_location": "L174",
+      "weight": 1.0,
+      "source": "fiber_router_setuproutes",
+      "target": "flashcard_flashcard_newflashcardhandler"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "infrastructure/fiber/router.go",
+      "source_location": "L209",
       "weight": 1.0,
       "source": "fiber_router_setuproutes",
       "target": "subscription_subscription_newsubscriptionhandler"
@@ -11830,6 +12483,162 @@
       "source": "mailersend_mailersendservice",
       "target": "mailersend_mailersendservice_sendverificationemail",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "handlers_flashcard_flashcard_go",
+      "target": "flashcard_flashcardconfig",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "handlers_flashcard_flashcard_go",
+      "target": "flashcard_flashcardhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "handlers_flashcard_flashcard_go",
+      "target": "flashcard_flashcard_newflashcardhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler",
+      "target": "flashcard_flashcardhandler_handlecreatedeck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler",
+      "target": "flashcard_flashcardhandler_handlegetdecks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler",
+      "target": "flashcard_flashcardhandler_handleaddcard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L86",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler",
+      "target": "flashcard_flashcardhandler_handlegetcards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L103",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler",
+      "target": "flashcard_flashcardhandler_handlegetduecards",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L123",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler",
+      "target": "flashcard_flashcardhandler_handlereviewcard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler_handlecreatedeck",
+      "target": "domain_util_getuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler_handlegetdecks",
+      "target": "domain_util_getuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler_handleaddcard",
+      "target": "domain_util_getuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L87",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler_handlegetcards",
+      "target": "domain_util_getuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L104",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler_handlegetduecards",
+      "target": "domain_util_getuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "handlers/flashcard/flashcard.go",
+      "source_location": "L124",
+      "weight": 1.0,
+      "source": "flashcard_flashcardhandler_handlereviewcard",
+      "target": "domain_util_getuserid"
     },
     {
       "relation": "contains",
@@ -13623,6 +14432,176 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_deck",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_flashcard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L30",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_flashcardreview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_flashcardwithreview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_createdeckrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_createdeckresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_addcardrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_addcardresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_reviewcardrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L74",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_reviewcardresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_getdecksrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_getdecksresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_getcardsrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_getcardsresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L92",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_getduecardsrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_flashcardrepository",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "domain/flashcard.go",
+      "source_location": "L114",
+      "weight": 1.0,
+      "source": "domain_flashcard_go",
+      "target": "domain_flashcardservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "domain/quiz.go",
       "source_location": "L10",
       "weight": 1.0,
@@ -14546,5 +15525,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "474c012302598493c997f78f52e813c2f3027b31"
+  "built_at_commit": "bb6dd4544e1748a1406de7a7c97a57d282f68931"
 }

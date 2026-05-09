@@ -19,6 +19,10 @@
     "mtime": 1777815009.1843672,
     "hash": "3f8acd69ba42c1111c113bc4173643a6"
   },
+  "/home/mr-isik/WebDev/MedAIst-Backend/services/flashcard.go": {
+    "mtime": 1778342420.6770048,
+    "hash": "84a0766659d43de7605e1fec23368a41"
+  },
   "/home/mr-isik/WebDev/MedAIst-Backend/services/quiz.go": {
     "mtime": 1777815009.1843672,
     "hash": "6de12061ba0cea2d57bba5045df8fac5"
@@ -58,6 +62,10 @@
   "/home/mr-isik/WebDev/MedAIst-Backend/repository/repository.go": {
     "mtime": 1777815009.1843672,
     "hash": "20f0ae26c51a2dcd4705115cdaed43c0"
+  },
+  "/home/mr-isik/WebDev/MedAIst-Backend/repository/flashcard.go": {
+    "mtime": 1778342394.3067024,
+    "hash": "20368ec67c148bcfd39c854534a388c0"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/repository/quiz.go": {
     "mtime": 1777815009.1843672,
@@ -128,8 +136,8 @@
     "hash": "9719e495e89b0eb58b6378d20d3ad734"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/infrastructure/postgres/postgres.go": {
-    "mtime": 1777815009.1843672,
-    "hash": "05b7a02dee3650bedef66b850a8df7be"
+    "mtime": 1778342351.4928925,
+    "hash": "3038e2eaef4fc3e89f6f8c0ae044c283"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/infrastructure/fiber/cookie.go": {
     "mtime": 1776451736.1718273,
@@ -152,8 +160,8 @@
     "hash": "3988c6efb41fe792b040bf9164ed9d36"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/infrastructure/fiber/router.go": {
-    "mtime": 1777815009.1843672,
-    "hash": "563bc964afcc1f8795cf73d27dde2512"
+    "mtime": 1778342493.2145338,
+    "hash": "c1707ceff456e1740f27a52116bf4a4e"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/infrastructure/fiber/dependency_containers.go": {
     "mtime": 1777815009.1843672,
@@ -202,6 +210,10 @@
   "/home/mr-isik/WebDev/MedAIst-Backend/infrastructure/mailersend/email_service.go": {
     "mtime": 1776451736.1751606,
     "hash": "bc32b3fe760c6395f2a1e337402d1ac3"
+  },
+  "/home/mr-isik/WebDev/MedAIst-Backend/handlers/flashcard/flashcard.go": {
+    "mtime": 1778342466.5942123,
+    "hash": "c407bcb3ba13f11eec19fd05f7b72e7e"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/handlers/file/file.go": {
     "mtime": 1777815009.1843672,
@@ -266,6 +278,10 @@
   "/home/mr-isik/WebDev/MedAIst-Backend/domain/file.go": {
     "mtime": 1777815009.1843672,
     "hash": "569ed96b6f396a152b6508c4a3511543"
+  },
+  "/home/mr-isik/WebDev/MedAIst-Backend/domain/flashcard.go": {
+    "mtime": 1778342442.2205896,
+    "hash": "2f0738aea75758b48f6eb5865d06e8f0"
   },
   "/home/mr-isik/WebDev/MedAIst-Backend/domain/quiz.go": {
     "mtime": 1777815009.1843672,
