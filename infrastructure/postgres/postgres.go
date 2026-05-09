@@ -185,7 +185,43 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
     UNIQUE(user_id, action_type, usage_date)
 );
 
+-- FLASHCARD DECKS
+CREATE TABLE IF NOT EXISTS flashcard_decks (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- FLASHCARDS
+CREATE TABLE IF NOT EXISTS flashcards (
+    id UUID PRIMARY KEY,
+    deck_id UUID NOT NULL REFERENCES flashcard_decks(id) ON DELETE CASCADE,
+    front TEXT NOT NULL,
+    back TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- FLASHCARD REVIEWS
+CREATE TABLE IF NOT EXISTS flashcard_reviews (
+    id UUID PRIMARY KEY,
+    flashcard_id UUID NOT NULL REFERENCES flashcards(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    next_review_date TIMESTAMP NOT NULL DEFAULT NOW(),
+    interval REAL NOT NULL DEFAULT 0,
+    ease_factor REAL NOT NULL DEFAULT 2.5,
+    repetitions INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(flashcard_id, user_id)
+);
+
     -- INDEXES
+    CREATE INDEX IF NOT EXISTS idx_flashcards_deck_id ON flashcards(deck_id);
+    CREATE INDEX IF NOT EXISTS idx_flashcard_reviews_due ON flashcard_reviews(user_id, next_review_date);
     CREATE INDEX IF NOT EXISTS  idx_quiz_questions_quiz_id ON quiz_questions(quiz_id);
     CREATE INDEX IF NOT EXISTS  idx_quiz_attempts_quiz_user ON quiz_attempts(quiz_id, user_id);
     CREATE INDEX IF NOT EXISTS idx_quiz_attempt_answers_attempt_id ON quiz_attempt_answers(attempt_id);

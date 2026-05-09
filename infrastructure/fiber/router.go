@@ -79,6 +79,7 @@ import (
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/healthcheck"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/message"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/quiz"
+	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/flashcard"
 	subscriptionHandler "github.com/MedAIst-Studio/MedAIist-Backend/handlers/subscription"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/system"
 	"github.com/MedAIst-Studio/MedAIist-Backend/handlers/user"
@@ -169,6 +170,11 @@ func SetupRoutes(app *fiber.App) {
 		QuizService: quizService,
 	})
 
+	flashcardService := services.NewFlashcardService(dc.Repo)
+	flashcardHandler := flashcard.NewFlashcardHandler(&flashcard.FlashcardConfig{
+		FlashcardService: flashcardService,
+	})
+
 	sl := dc.slogLogger
 
 	app.Get("/healthcheck", Handle(healthcheckHandler, sl))
@@ -229,6 +235,14 @@ func SetupRoutes(app *fiber.App) {
 	quizApp.Get("/attempts/:id", Handle(handlerAdapter[domain.GetAttemptByIdRequest, domain.AttemptDetailResponse]{quizHandler.HandleGetAttemptById}, sl))
 	quizApp.Post("/:id/solve", Handle(handlerAdapter[domain.SolveQuizRequest, domain.SolveQuizResponse]{quizHandler.HandleSolveQuiz}, sl))
 	quizApp.Get("/:id", Handle(handlerAdapter[domain.GetQuizByIdRequest, domain.GetQuizByIdResponse]{quizHandler.HandleGetQuizById}, sl))
+
+	flashcardsApp := app.Group("/flashcards", middlewareManager.AuthMiddleware)
+	flashcardsApp.Post("/decks", Handle(handlerAdapter[domain.CreateDeckRequest, domain.CreateDeckResponse]{flashcardHandler.HandleCreateDeck}, sl))
+	flashcardsApp.Get("/decks", Handle(handlerAdapter[domain.GetDecksRequest, domain.GetDecksResponse]{flashcardHandler.HandleGetDecks}, sl))
+	flashcardsApp.Post("/decks/:id/cards", Handle(handlerAdapter[domain.AddCardRequest, domain.AddCardResponse]{flashcardHandler.HandleAddCard}, sl))
+	flashcardsApp.Get("/decks/:id/cards", Handle(handlerAdapter[domain.GetCardsRequest, domain.GetCardsResponse]{flashcardHandler.HandleGetCards}, sl))
+	flashcardsApp.Get("/decks/:id/review", Handle(handlerAdapter[domain.GetDueCardsRequest, domain.GetCardsResponse]{flashcardHandler.HandleGetDueCards}, sl))
+	flashcardsApp.Post("/cards/:id/review", Handle(handlerAdapter[domain.ReviewCardRequest, domain.ReviewCardResponse]{flashcardHandler.HandleReviewCard}, sl))
 
 	if !domain.IsProdEnv() {
 		app.Get("/swagger/*", fiberSwagger.WrapHandler)
