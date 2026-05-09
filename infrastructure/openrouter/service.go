@@ -21,7 +21,7 @@ const (
 	Kurallar:
 	1. Asıl niyeti koru - kullanıcının ne sorduğunu değiştirme.
 	2. Farklı ifadeler, eş anlamlılar ve bakış açıları kullan.
-	3. YKS (TYT/AYT) müfredatına uygun terimler kullanmaya çalış.
+	3. Tıp fakültesi (TUS/DUS) müfredatına uygun tıbbi terimler kullanmaya çalış.
 	4. Asıl sorguda olmayan tamamen yeni bilgi ekleme.
 
 	SADECE şu formatta geçerli bir JSON döndür:
@@ -115,211 +115,183 @@ type SubjectPromptConfig struct {
 	SubjectName       string
 	SystemPromptExtra string // Subject-specific additions to the base system prompt
 	DistractorRules   string // Subject-specific distractor crafting rules
-	FewShotExample    string // One high-quality YKS example per subject
+	FewShotExample    string // One high-quality TUS/Komite example per subject
 }
 
 var subjectPrompts = map[string]SubjectPromptConfig{
-	"biyoloji": {
-		SubjectName:       "Biyoloji",
-		SystemPromptExtra: `Bu bir BİYOLOJİ sorusudur. Hücre yapıları, organeller, genetik, ekosistem, sınıflandırma, fizyoloji gibi biyoloji alt dallarına hakimsin.`,
-		DistractorRules: `- Çeldiricilerde benzer biyolojik terimleri kullan (ör: mitoz/mayoz, DNA/RNA, osmoz/difüzyon)
-- Süreç sıralama sorularında adımları karıştır
-- Organellerin işlevlerini birbiriyle değiştir
-- Bitki/hayvan hücresi karıştırmaları yap`,
+	"anatomi": {
+		SubjectName:       "Anatomi",
+		SystemPromptExtra: `Bu bir ANATOMİ sorusudur. İnsan vücudunun yapıları, organlar, kemikler, kaslar, sinirler ve damarlar gibi anatomi alt dallarına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde komşu veya benzer işlevli anatomik yapıları kullan
+- Sinir inervasyonları veya kanlanma varyasyonlarını çeldirici olarak ekle
+- Yön ve yerleşim terimlerini (anterior/posterior, medial/lateral) karıştır
+- Benzer isimli anatomik oluşumları kullan`,
 		FewShotExample: `ÖRNEK SORU:
 {
-  "questionText": "Ökaryot hücrelerde protein sentezinin başladığı organel aşağıdakilerden hangisidir?",
+  "questionText": "Aşağıdaki kaslardan hangisi N. musculocutaneus tarafından inerve edilir?",
   "difficulty": "orta",
-  "topic": "Hücre Biyolojisi - Organeller",
+  "topic": "Üst Ekstremite Kasları",
   "options": [
-    {"no": 1, "label": "A", "text": "Ribozom", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "Golgi cisimciği", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "Endoplazmik retikulum", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "Lizozom", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "Mitokondri", "isCorrect": false}
+    {"no": 1, "label": "A", "text": "M. biceps brachii", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "M. triceps brachii", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "M. deltoideus", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "M. brachioradialis", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "M. pronator teres", "isCorrect": false}
   ],
-  "explanation": "Protein sentezi ribozomlarda başlar. Golgi cisimciği proteinleri paketler, ER taşıma sağlar, lizozom sindirim yapar, mitokondri enerji üretir."
+  "explanation": "M. biceps brachii, m. coracobrachialis ve m. brachialis'in büyük bir kısmı N. musculocutaneus tarafından inerve edilir. Triceps n. radialis, deltoid n. axillaris, brachioradialis n. radialis, pronator teres ise n. medianus tarafından uyarılır."
 }`,
 	},
-	"matematik": {
-		SubjectName:       "Matematik",
-		SystemPromptExtra: `Bu bir MATEMATİK sorusudur. Sayılar, cebir, fonksiyonlar, geometri, olasılık, türev-integral gibi matematik alt dallarına hakimsin.`,
-		DistractorRules: `- Çeldiricilerde yaygın hesaplama hatalarının sonuçlarını kullan
-- İşlem önceliği hatası yapıldığında çıkacak sonuçları şık olarak koy
-- Formülü yanlış uygulama sonuçlarını kullan
-- Negatif/pozitif işaret hatalarının sonuçlarını ekle`,
+	"fizyoloji": {
+		SubjectName:       "Fizyoloji",
+		SystemPromptExtra: `Bu bir FİZYOLOJİ sorusudur. Hücre, sinir, kas, kan, dolaşım, solunum, boşaltım, sindirim ve endokrin sistem fizyolojisine hakimsin.`,
+		DistractorRules: `- Çeldiricilerde zıt etki gösteren hormonları/mekanizmaları kullan
+- Fizyolojik süreçlerin adımlarını karıştır
+- Reseptör tiplerini ve etkilerini birbirine karıştır
+- İyon kanallarının açılma/kapanma durumlarını ve yönlerini (içe/dışa) yanlış eşleştir`,
 		FewShotExample: `ÖRNEK SORU:
 {
-  "questionText": "f(x) = 2x² - 8x + 6 fonksiyonunun tepe noktasının y koordinatı kaçtır?",
-  "difficulty": "orta",
-  "topic": "İkinci Derece Fonksiyonlar",
-  "options": [
-    {"no": 1, "label": "A", "text": "-2", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "2", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "6", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "-6", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "0", "isCorrect": false}
-  ],
-  "explanation": "Tepe noktası x = -b/2a = 8/4 = 2. f(2) = 2(4) - 16 + 6 = -2. Diğer şıklar yaygın işaret ve hesap hatalarıdır."
-}`,
-	},
-	"fizik": {
-		SubjectName:       "Fizik",
-		SystemPromptExtra: `Bu bir FİZİK sorusudur. Mekanik, termodinamik, elektrik, optik, dalgalar, modern fizik gibi fizik alt dallarına hakimsin.`,
-		DistractorRules: `- Çeldiricilerde birim dönüşüm hataları kullan
-- Yanlış formül uygulanırsa çıkacak sonuçları ekle
-- Vektörel/skaler büyüklük karıştırmalarını kullan
-- Newton yasalarının yanlış uygulanması sonuçlarını ekle`,
-		FewShotExample: `ÖRNEK SORU:
-{
-  "questionText": "Kütlesi 2 kg olan bir cisim sürtünmesiz yatay düzlemde 10 N sabit kuvvetle itilmektedir. Cismin ivmesi kaç m/s² dir?",
+  "questionText": "Aksiyon potansiyelinin depolarizasyon evresinden temel olarak hangi iyonun hücre içine girmesi sorumludur?",
   "difficulty": "kolay",
-  "topic": "Dinamik - Newton'un Hareket Yasaları",
+  "topic": "Hücre Fizyolojisi",
   "options": [
-    {"no": 1, "label": "A", "text": "5", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "10", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "20", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "2", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "0,5", "isCorrect": false}
+    {"no": 1, "label": "A", "text": "Sodyum (Na+)", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Potasyum (K+)", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Kalsiyum (Ca2+)", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Klorür (Cl-)", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Magnezyum (Mg2+)", "isCorrect": false}
   ],
-  "explanation": "F = m.a → a = F/m = 10/2 = 5 m/s². B şıkkı F değerini, C F×m hatasını, D m değerini, E m/F hatasını temsil eder."
+  "explanation": "Aksiyon potansiyelinin depolarizasyon evresinde voltaj kapılı sodyum kanalları açılır ve hücre içine yoğun miktarda Na+ girer. Repolarizasyondan ise K+ çıkışı sorumludur."
 }`,
 	},
-	"kimya": {
-		SubjectName:       "Kimya",
-		SystemPromptExtra: `Bu bir KİMYA sorusudur. Atom yapısı, periyodik tablo, kimyasal bağlar, reaksiyonlar, çözeltiler, organik kimya gibi kimya alt dallarına hakimsin.`,
-		DistractorRules: `- Çeldiricilerde periyodik tabloda komşu elementlerin özelliklerini kullan
-- Benzer kimyasal formülleri/bileşikleri karıştır
-- Denklem denkleştirme hatalarını kullan
-- Mol hesabı hatalarının sonuçlarını ekle`,
+	"biyokimya": {
+		SubjectName:       "Biyokimya",
+		SystemPromptExtra: `Bu bir BİYOKİMYA sorusudur. Karbonhidrat, lipit, protein, nükleik asit metabolizması, enzimler ve moleküler biyoloji konularına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde aynı yolaktaki diğer enzimleri/metabolitleri kullan
+- Hız kısıtlayıcı adımları ve regülatörlerini karıştır
+- Benzer isimli enzim/koenzimleri çeldirici yap
+- Defekt durumunda biriken/eksilen maddeleri tersine çevir`,
 		FewShotExample: `ÖRNEK SORU:
 {
-  "questionText": "Aşağıdaki bileşiklerden hangisi iyonik bağ içerir?",
-  "difficulty": "orta",
-  "topic": "Kimyasal Bağlar",
+  "questionText": "Glikoliz yolağında ATP üreten ilk basamağı katalize eden enzim aşağıdakilerden hangisidir?",
+  "difficulty": "zor",
+  "topic": "Karbonhidrat Metabolizması",
   "options": [
-    {"no": 1, "label": "A", "text": "NaCl", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "H₂O", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "CO₂", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "CH₄", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "NH₃", "isCorrect": false}
+    {"no": 1, "label": "A", "text": "Fosfogliserat kinaz", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Hekzokinaz", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Fosfofruktokinaz-1", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Pirüvat kinaz", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Gliseraldehit 3-fosfat dehidrogenaz", "isCorrect": false}
   ],
-  "explanation": "NaCl metal (Na) ve ametal (Cl) arasında oluşan iyonik bağ içerir. Diğerleri ametal-ametal arası kovalent bağlı bileşiklerdir."
+  "explanation": "Glikolizde ilk ATP üretimi, 1,3-bisfosfogliseratın 3-fosfogliserata dönüştüğü basamakta fosfogliserat kinaz tarafından gerçekleştirilir. Hekzokinaz ve PFK-1 ATP tüketen enzimlerdir."
 }`,
 	},
-	"tarih": {
-		SubjectName:       "Tarih",
-		SystemPromptExtra: `Bu bir TARİH sorusudur. Türk tarihi, dünya tarihi, inkılap tarihi, uygarlık tarihi gibi alt dallara hakimsin.`,
-		DistractorRules: `- Çeldiricilerde kronolojik olarak yakın dönemlerdeki olayları kullan
-- Benzer reformları/antlaşmaları karıştır
-- Farklı devletlerin benzer uygulamalarını kullan
-- Neden-sonuç ilişkisini ters çeviren seçenekler ekle`,
+	"patoloji": {
+		SubjectName:       "Patoloji",
+		SystemPromptExtra: `Bu bir PATOLOJİ sorusudur. Hücresel hasar, inflamasyon, neoplazi, hemodinamik bozukluklar ve sistemik patoloji konularına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde benzer mikroskobik/makroskobik bulguları olan farklı hastalıkları kullan
+- Kanserlerde farklı doku tiplerinin öncü lezyonlarını karıştır
+- Benzer isimli sendromları veya bulguları çeldirici olarak ver
+- Spesifik boyamaları veya genetik mutasyonları karıştır`,
 		FewShotExample: `ÖRNEK SORU:
 {
-  "questionText": "Osmanlı Devleti'nde ilk anayasal düzenleme aşağıdakilerden hangisidir?",
-  "difficulty": "orta",
-  "topic": "Osmanlı Modernleşmesi",
-  "options": [
-    {"no": 1, "label": "A", "text": "Kanun-i Esasi (1876)", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "Tanzimat Fermanı (1839)", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "Islahat Fermanı (1856)", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "Sened-i İttifak (1808)", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "II. Meşrutiyet (1908)", "isCorrect": false}
-  ],
-  "explanation": "Kanun-i Esasi 1876'da ilan edilen ilk Osmanlı anayasasıdır. Diğerleri önemli belgeler olmakla birlikte anayasa niteliği taşımazlar."
-}`,
-	},
-	"edebiyat": {
-		SubjectName:       "Türk Dili ve Edebiyatı",
-		SystemPromptExtra: `Bu bir EDEBİYAT sorusudur. Türk edebiyatı dönemleri, edebi akımlar, eser-yazar eşleştirmesi, nazım biçimleri, edebi sanatlar gibi alt dallara hakimsin.`,
-		DistractorRules: `- Çeldiricilerde aynı dönemin farklı yazarlarını/eserlerini kullan
-- Farklı edebi akımların benzer özelliklerini karıştır
-- Nazım biçimlerinin benzer özelliklerini kullan
-- Edebi sanatları birbirine yakın olanlarla karıştır`,
-		FewShotExample: `ÖRNEK SORU:
-{
-  "questionText": "'Safahat' adlı eser aşağıdaki yazarlardan hangisine aittir?",
+  "questionText": "Akut inflamasyonda dokuya ilk göç eden ve en erken dönemde baskın olan inflamatuar hücre aşağıdakilerden hangisidir?",
   "difficulty": "kolay",
-  "topic": "Milli Edebiyat Dönemi",
+  "topic": "İnflamasyon",
   "options": [
-    {"no": 1, "label": "A", "text": "Mehmet Akif Ersoy", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "Yahya Kemal Beyatlı", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "Tevfik Fikret", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "Ziya Gökalp", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "Namık Kemal", "isCorrect": false}
+    {"no": 1, "label": "A", "text": "Nötrofil", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Makrofaj", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Lenfosit", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Eozinofil", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Plazma hücresi", "isCorrect": false}
   ],
-  "explanation": "Safahat, Mehmet Akif Ersoy'un yedi bölümden oluşan manzum eseridir. Diğer seçenekler aynı veya yakın dönemin önemli şairleridir."
+  "explanation": "Akut inflamasyonun ilk 6-24 saatlik döneminde dokuya ilk ve en yoğun göç eden hücre nötrofildir. Monositler (makrofajlar) genellikle 24-48 saat sonra alana gelir."
 }`,
 	},
-	"cografya": {
-		SubjectName:       "Coğrafya",
-		SystemPromptExtra: `Bu bir COĞRAFYA sorusudur. Fiziki coğrafya, beşeri coğrafya, Türkiye coğrafyası, iklim, nüfus, ekonomi gibi alt dallara hakimsin.`,
-		DistractorRules: `- Çeldiricilerde komşu bölgelerin/ülkelerin özelliklerini kullan
-- Benzer iklim tiplerini karıştır
-- Nüfus ve ekonomi verilerinde yakın değerleri kullan
-- Yer şekillerinin benzer özelliklerini karıştır`,
+	"farmakoloji": {
+		SubjectName:       "Farmakoloji",
+		SystemPromptExtra: `Bu bir FARMAKOLOJİ sorusudur. İlaçların farmakokinetiği, farmakodinamiği, otonom, santral, kardiyovasküler sistem farmakolojisi ve kemoterapötiklere hakimsin.`,
+		DistractorRules: `- Çeldiricilerde aynı gruptan diğer ilaçları kullan ama etkilerini değiştir
+- İlaç yan etkilerini/toksisitelerini birbirine karıştır
+- Antidot eşleştirmelerini yanlış yap
+- Farklı reseptör tipine etki eden ilaçları seçeneklere ekle`,
 		FewShotExample: `ÖRNEK SORU:
 {
-  "questionText": "Türkiye'de en fazla yağış alan bölge aşağıdakilerden hangisidir?",
-  "difficulty": "kolay",
-  "topic": "Türkiye İklimi",
+  "questionText": "Aşağıdaki ilaçlardan hangisi opioid intoksikasyonu tedavisinde kullanılan spesifik bir antidottur?",
+  "difficulty": "orta",
+  "topic": "Santral Sinir Sistemi Farmakolojisi",
   "options": [
-    {"no": 1, "label": "A", "text": "Karadeniz Bölgesi", "isCorrect": true},
-    {"no": 2, "label": "B", "text": "Marmara Bölgesi", "isCorrect": false},
-    {"no": 3, "label": "C", "text": "Akdeniz Bölgesi", "isCorrect": false},
-    {"no": 4, "label": "D", "text": "Ege Bölgesi", "isCorrect": false},
-    {"no": 5, "label": "E", "text": "Doğu Anadolu Bölgesi", "isCorrect": false}
+    {"no": 1, "label": "A", "text": "Naloksan", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Flumazenil", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Fomepizol", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "N-asetilsistein", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Protamin sülfat", "isCorrect": false}
   ],
-  "explanation": "Karadeniz Bölgesi okyanusal iklim etkisiyle Türkiye'nin en çok yağış alan bölgesidir. Her mevsim yağışlıdır."
+  "explanation": "Naloksan, opioid reseptörlerinin kompetitif antagonistidir ve zehirlenmelerinde kullanılır. Flumazenil benzodiazepin, N-asetilsistein parasetamol, protamin sülfat heparin zehirlenmesinde kullanılır."
+}`,
+	},
+	"mikrobiyoloji": {
+		SubjectName:       "Mikrobiyoloji",
+		SystemPromptExtra: `Bu bir MİKROBİYOLOJİ sorusudur. Genel ve özel bakteriyoloji, viroloji, mikoloji, parazitoloji ve immünoloji konularına hakimsin.`,
+		DistractorRules: `- Çeldiricilerde aynı familyadan diğer etkenleri kullan
+- Bakterilerin gram boyanma/morfoloji özelliklerini karıştır
+- Virüslerin nükleik asit tiplerini (DNA/RNA, zarflı/zarfsız) birbirine karıştır
+- Spesifik vektörleri ve ara konakları yanlış eşleştir`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Gram negatif, oksidaz pozitif, virgüle benzer eğri çomak şeklinde olan ve pirinç suyu görünümünde ishale yol açan etken hangisidir?",
+  "difficulty": "orta",
+  "topic": "Özel Bakteriyoloji",
+  "options": [
+    {"no": 1, "label": "A", "text": "Vibrio cholerae", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Escherichia coli", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Salmonella typhi", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Shigella dysenteriae", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Campylobacter jejuni", "isCorrect": false}
+  ],
+  "explanation": "Vibrio cholerae gram negatif, virgül şeklinde (curved rod), oksidaz pozitif bir bakteridir ve tipik sulu ishal tablosu oluşturur. Diğerleri farklı morfoloji veya klinik tablolara neden olur."
+}`,
+	},
+	"klinik": {
+		SubjectName:       "Klinik Bilimler",
+		SystemPromptExtra: `Bu bir KLİNİK sorusudur. Dahiliye, pediatri, genel cerrahi, kadın hastalıkları ve doğum, psikiyatri gibi klinik tıp bilimlerine hakimsin.`,
+		DistractorRules: `- Çeldiricilerde benzer semptomları olan ayırıcı tanıdaki diğer hastalıkları kullan
+- En olası tanı/ilk istenecek tetkik/altın standart tanı yöntemlerini karıştır
+- Birinci basamak tedavilerle kurtarma (salvage) tedavilerini birbirinin yerine koy
+- Hastalıkların komplikasyonlarını birbiriyle değiştir`,
+		FewShotExample: `ÖRNEK SORU:
+{
+  "questionText": "Kırk beş yaşında obez kadın hasta, özellikle yağlı yemeklerden sonra sağ üst kadranda beliren ve sağ skapulaya yayılan ağrı şikayetiyle başvuruyor. Fizik muayenede Murphy belirtisi pozitiftir. Bu hastadaki en olası tanı nedir?",
+  "difficulty": "orta",
+  "topic": "Genel Cerrahi / Gastrointestinal Sistem",
+  "options": [
+    {"no": 1, "label": "A", "text": "Akut kolesistit", "isCorrect": true},
+    {"no": 2, "label": "B", "text": "Akut pankreatit", "isCorrect": false},
+    {"no": 3, "label": "C", "text": "Peptik ülser perforasyonu", "isCorrect": false},
+    {"no": 4, "label": "D", "text": "Akut apandisit", "isCorrect": false},
+    {"no": 5, "label": "E", "text": "Nefrolitiazis", "isCorrect": false}
+  ],
+  "explanation": "Orta yaş, kadın, obez, yağlı yemek sonrası sağ üst kadran ağrısı ve pozitif Murphy belirtisi klasik olarak akut kolesistiti işaret eder. Pankreatit daha çok sırta kuşak tarzı yayılır."
 }`,
 	},
 	"genel": {
-		SubjectName:       "Genel",
-		SystemPromptExtra: `Konuyu metnin içeriğinden belirle ve o alana uygun bir soru üret.`,
-		DistractorRules: `- Çeldiriciler sorunun konusuyla aynı alandan olmalıdır
+		SubjectName:       "Tıp Genel",
+		SystemPromptExtra: `Konuyu tıbbi metnin içeriğinden belirle ve tıp öğrencilerine uygun seviyede bir soru üret.`,
+		DistractorRules: `- Çeldiriciler sorunun tıbbi konusuyla aynı alandan olmalıdır
 - Her çeldirici mantıklı ama yanlış olmalıdır
-- Çeldiriciler birbirine yakın kavramlardan seçilmelidir`,
+- Çeldiriciler birbirine yakın klinik/temel kavramlardan seçilmelidir`,
 		FewShotExample: "",
 	},
 }
 
 // subjectKeywords maps keywords to subject identifiers for zero-cost classification
 var subjectKeywords = map[string][]string{
-	"biyoloji": {"hücre", "mitoz", "mayoz", "dna", "rna", "gen", "protein", "enzim", "organel", "mitokondri",
-		"ribozom", "kloroplast", "fotosentez", "solunum", "sinir", "hormon", "endokrin", "sindirim",
-		"dolaşım", "boşaltım", "üreme", "kalıtım", "mutasyon", "evrim", "ekosistem", "popülasyon",
-		"biyoloji", "organizma", "canlı", "bitki", "hayvan", "bakteri", "virüs", "mantarlar",
-		"kromozom", "allel", "fenotip", "genotip", "biyoteknoloji", "ekoloji"},
-	"matematik": {"denklem", "fonksiyon", "türev", "integral", "limit", "matris", "determinant",
-		"logaritma", "üstel", "polinom", "geometri", "trigonometri", "olasılık", "istatistik",
-		"permütasyon", "kombinasyon", "asal", "faktöriyel", "binom", "oran", "orantı",
-		"dizi", "seri", "aritmetik", "parabol", "hiperbol", "elips", "çember", "doğru",
-		"açı", "üçgen", "kare", "dikdörtgen", "prizma", "küre", "silindir", "koni"},
-	"fizik": {"kuvvet", "ivme", "hız", "momentum", "enerji", "iş", "güç", "newton",
-		"elektrik", "manyetik", "akım", "gerilim", "direnç", "kapasitör", "indüksiyon",
-		"dalga", "frekans", "periyot", "ses", "ışık", "kırılma", "yansıma", "optik",
-		"termodinamik", "sıcaklık", "basınç", "hacim", "atom", "çekirdek", "radyoaktif",
-		"fizik", "hareket", "sürtünme", "yerçekimi", "potansiyel", "kinetik"},
-	"kimya": {"element", "bileşik", "karışım", "atom", "molekül", "iyon", "katyon", "anyon",
-		"periyodik", "orbital", "bağ", "kovalent", "iyonik", "metalik", "asit", "baz",
-		"tuz", "oksit", "redoks", "elektroliz", "mol", "avogadro", "çözelti", "derişim",
-		"organik", "hidrokarbon", "alkan", "alken", "alkin", "alkol", "aldehit", "keton",
-		"kimya", "reaksiyon", "denge", "hız", "termodinamik", "kaynama", "erime"},
-	"tarih": {"osmanlı", "selçuklu", "cumhuriyet", "atatürk", "inkılap", "savaş", "antlaşma",
-		"padişah", "sultan", "sadrazam", "vilayet", "eyalet", "ferman", "kanun",
-		"meşrutiyet", "tanzimat", "devrim", "reform", "bağımsızlık", "milli", "mücadele",
-		"tarih", "uygarlık", "medeniyet", "imparatorluk", "halifelik", "fetih", "kuruluş",
-		"yıkılış", "isyan", "ayaklanma", "kongre", "meclis", "anayasa"},
-	"edebiyat": {"şiir", "roman", "hikaye", "tiyatro", "deneme", "makale", "eleştiri",
-		"nazım", "nesir", "beyit", "dörtlük", "bent", "aruz", "hece", "kafiye",
-		"edebiyat", "edebi", "akım", "divan", "tanzimat", "servet", "fünun", "fecr",
-		"milli", "cumhuriyet", "yazar", "şair", "eser", "kahraman", "anlatıcı",
-		"mecaz", "benzetme", "istiare", "kinaye", "teşbih", "metonimi"},
-	"cografya": {"iklim", "sıcaklık", "yağış", "rüzgar", "basınç", "bölge", "nüfus",
-		"göç", "yerleşme", "şehir", "kır", "tarım", "hayvancılık", "sanayi", "ticaret",
-		"coğrafya", "dağ", "ova", "plato", "akarsu", "göl", "deniz", "okyanus",
-		"kıta", "ülke", "harita", "enlem", "boylam", "meridyen", "paralel",
-		"karadeniz", "akdeniz", "ege", "marmara", "anadolu", "trakya", "deprem", "volkan"},
+	"anatomi":       {"kemik", "kas", "sinir", "damar", "arter", "ven", "eklem", "ligaman", "fasya", "kafatası", "vertebra", "toraks", "abdomen", "pelvis", "ekstremite", "pleksus", "foramen", "fossa", "anatomi", "kadavra", "innervasyon", "origo", "insertio"},
+	"fizyoloji":     {"hücre", "aksiyon potansiyeli", "sinaps", "reseptör", "hormon", "kalp debisi", "kan basıncı", "solunum", "filtrasyon", "sekresyon", "absorbsiyon", "metabolizma", "termoregülasyon", "kan", "koagülasyon", "fizyoloji", "işlev", "potansiyel"},
+	"biyokimya":     {"enzim", "protein", "karbonhidrat", "lipit", "aminoasit", "vitamin", "mineral", "metabolizma", "glikoliz", "krebs", "oksidatif fosforilasyon", "dna", "rna", "replikasyon", "transkripsiyon", "translasyon", "biyokimya", "molekül", "kolesterol"},
+	"patoloji":      {"inflamasyon", "nekroz", "apoptoz", "neoplazi", "tümör", "kanser", "karsinom", "sarkom", "granülom", "hiperplazi", "hipertrofi", "atrofi", "metaplazi", "displazi", "patoloji", "biyopsi", "makroskopi", "mikroskopi", "kist"},
+	"farmakoloji":   {"ilaç", "reseptör", "agonist", "antagonist", "farmakokinetik", "farmakodinamik", "yan etki", "toksisite", "antibiyotik", "analjezik", "anestezik", "antihipertansif", "antidiyabetik", "farmakoloji", "doz", "endikasyon", "kontrendikasyon", "antidot"},
+	"mikrobiyoloji": {"bakteri", "virüs", "mantar", "parazit", "enfeksiyon", "antibiyotik direnci", "kültür", "pcr", "antijen", "antikor", "bağışıklık", "aşı", "flora", "patojen", "mikrobiyoloji", "mikroskop", "boyama", "agar"},
+	"klinik":        {"hipertansiyon", "diyabet", "astım", "yetmezlik", "siroz", "anemi", "lösemi", "tanı", "tedavi", "semptom", "bulgu", "sendrom", "muayene", "akut", "kronik", "komplikasyon", "anamnez", "klinik", "cerrahi", "hasta", "ağrı"},
 }
 
 func classifySubject(chunk string) string {
@@ -358,32 +330,32 @@ func buildSubjectSystemPrompt(subject string) string {
 		config = subjectPrompts["genel"]
 	}
 
-	basePrompt := fmt.Sprintf(`Sen 20 yıllık deneyime sahip, kıdemli bir ÖSYM soru hazırlayıcısısın.
+	basePrompt := fmt.Sprintf(`Sen 20 yıllık deneyime sahip, kıdemli bir TUS (Tıpta Uzmanlık Eğitimi Giriş Sınavı) ve tıp fakültesi komite soru hazırlayıcısısın.
 Uzmanlık alanın: %s
 
 %s
 
-TEMEL GÖREVİN: Verilen metne dayalı, YKS standardında yüksek kaliteli çoktan seçmeli sorular üretmek.
+TEMEL GÖREVİN: Verilen metne dayalı, TUS standardında veya tıp fakültesi zorluğunda yüksek kaliteli çoktan seçmeli sorular üretmek.
 
 KRİTİK KURALLAR:
-1. SORU KÖKÜ: Net, anlaşılır ve tek başına okunduğunda ne sorulduğu anlaşılacak şekilde yaz. 20-40 kelime arasında olmalı.
+1. SORU KÖKÜ: Net, anlaşılır ve tek başına okunduğunda ne sorulduğu anlaşılacak şekilde yaz. Vakaya dayalı (klinik) veya temel bilgi sorgulayan türde olabilir. (20-60 kelime).
 2. TUTARLILIK: Her şık (A-E), soru köküyle dilbilgisel ve anlamsal olarak uyumlu olmalıdır. Soru kökünü oku, ardından her şıkkı soru köküne ekleyerek oku — cümle doğal ve anlamlı olmalı.
 3. KONU BİRLİĞİ: Tüm şıklar aynı konu alanından olmalıdır. Şıklar birbiriyle karşılaştırılabilir nitelikte olmalıdır.
 4. ÇELDİRİCİ KALİTESİ:
    - Yanlış şıklar "neredeyse doğru" olmalı — tamamen alakasız veya saçma OLMAMALI.
-   - İyi bir çeldirici, konuyu yüzeysel bilen öğrenciyi yanıltabilmeli.
+   - İyi bir çeldirici, konuyu yüzeysel bilen bir tıp öğrencisini yanıltabilmeli.
    - Tüm şıklar benzer uzunlukta ve aynı dil yapısında olmalıdır.
-   - Bir öğrenci şıklara baktığında hepsinin makul bir cevap olabileceğini düşünmeli.
+   - Bir öğrenci şıklara baktığında hepsinin makul bir tıbbi tanı/tedavi/mekanizma olabileceğini düşünmeli.
 %s
 
 ❌ KÖTÜ ÇELDİRİCİ ÖRNEKLERİ (BUNLARI YAPMA):
-- Soruyla tamamen alakasız şıklar (ör: biyoloji sorusunda tarih terimi)
-- Açıkça saçma veya mantıksız seçenekler
+- Soruyla tamamen alakasız şıklar (ör: dahiliye sorusunda alakasız anatomik terim)
+- Açıkça saçma veya tıp dışı seçenekler
 - Aynı şıkkın farklı kelimelerle tekrarlanması
 - Şıklar arasında belirgin uzunluk farkı (doğru cevap çok uzun, diğerleri kısa)
 
-5. ZORLUK: Sorunun zorluk seviyesini belirle (kolay/orta/zor). Orta-zor seviyeyi hedefle.
-6. KONU: Sorunun hangi konuyla ilgili olduğunu kısaca belirt.
+5. ZORLUK: Sorunun zorluk seviyesini belirle (kolay/orta/zor). Orta-zor TUS seviyesini hedefle.
+6. KONU: Sorunun hangi tıbbi konuyla ilgili olduğunu kısaca belirt.
 7. Sadece verilen JSON şemasına uygun çıktı üret.
 8. Türkçe yaz.`, config.SubjectName, config.SystemPromptExtra, config.DistractorRules)
 
@@ -654,7 +626,7 @@ func (s *OpenRouterService) GenerateQuizQuestion(ctx context.Context, chunk stri
 	subject := classifySubject(chunk)
 	systemPrompt := buildSubjectSystemPrompt(subject)
 
-	prompt := fmt.Sprintf(`Aşağıdaki metin parçasını dikkatlice oku ve bu metne dayalı bir çoktan seçmeli soru üret.
+	prompt := fmt.Sprintf(`Aşağıdaki tıbbi/bilimsel metin parçasını dikkatlice oku ve bu metne dayalı bir çoktan seçmeli soru üret.
 
 --- METİN BAŞLANGIÇ ---
 %s
@@ -662,20 +634,20 @@ func (s *OpenRouterService) GenerateQuizQuestion(ctx context.Context, chunk stri
 
 SORU ÜRETME ADIMLARI (Sırasıyla uygula, her adımı düşün):
 
-1. METİN ANALİZİ: Metindeki en önemli kavramı, ilişkiyi veya bilgiyi belirle. Konuyu "topic" alanına yaz.
+1. METİN ANALİZİ: Metindeki en önemli tıbbi/klinik kavramı, ilişkiyi veya bilgiyi belirle. Konuyu "topic" alanına yaz.
 2. ZORLUK BELİRLE: Sorunun zorluk seviyesini belirle ve "difficulty" alanına yaz.
-3. SORU KÖKÜ YAZIMI: Bu kavramı ölçen, net ve anlaşılır bir soru kökü yaz (20-40 kelime).
+3. SORU KÖKÜ YAZIMI: Bu kavramı ölçen, net ve anlaşılır bir soru kökü veya vaka yaz (20-60 kelime).
    - Soru kökü tek başına okunduğunda ne sorulduğu anlaşılmalı.
-   - ÖSYM/YKS tarzında olmalı.
+   - TUS veya tıp fakültesi komite sınavları tarzında olmalı.
 4. DOĞRU ŞIK: Metne dayalı olarak doğru cevabı yaz.
 5. ÇELDİRİCİ ŞIKLAR: Kalan 4 şıkkı oluştururken:
    a) Her çeldirici, soru kökünü doğal şekilde tamamlamalı veya cevaplamalıdır.
    b) Çeldiriciler, sorunun konusuyla AYNI konu alanından olmalıdır.
    c) Çeldiriciler mantıklı ama yanlış olmalıdır — rastgele veya alakasız bilgi YAZMA.
    d) Tüm şıklar benzer uzunlukta ve dil yapısında olmalıdır.
-   e) Bir öğrenci şıklara baktığında hepsinin makul bir cevap olabileceğini düşünmeli.
+   e) Bir tıp öğrencisi şıklara baktığında hepsinin makul bir tıbbi cevap olabileceğini düşünmeli.
 6. KENDİ KENDİNİ KONTROL ET: Soru kökünü oku, sonra her şıkkı soru köküne ekleyerek oku. Cümle doğal mı? Şıklar aynı kategoriden mi? Alakasız şık var mı?
-7. AÇIKLAMA: Doğru cevabın neden doğru olduğunu VE diğer şıkların neden yanlış olduğunu kısaca açıkla.
+7. AÇIKLAMA: Doğru cevabın neden doğru olduğunu VE diğer şıkların neden yanlış olduğunu tıbbi mekanizmalarla kısaca açıkla.
 
 FORMAT KURALLARI:
 - Tam 5 şık (A-E), sadece 1 tanesi doğru.
