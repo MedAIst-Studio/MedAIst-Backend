@@ -5,12 +5,12 @@
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 731 nodes · 875 edges · 59 communities (44 shown, 15 thin omitted)
+- 731 nodes · 875 edges · 59 communities (45 shown, 14 thin omitted)
 - Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 113 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `cddcdc70`
+- Built from commit: `360eb2b4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -77,16 +77,16 @@
 ## Surprising Connections (you probably didn't know these)
 - `NewAuthDependencyContainer()` --calls--> `NewSubscriptionService()`  [INFERRED]
   infrastructure/fiber/dependency_containers.go → services/subscription.go
+- `SetupRoutes()` --calls--> `NewFileService()`  [INFERRED]
+  infrastructure/fiber/router.go → services/file.go
+- `SetupRoutes()` --calls--> `NewFileProcessorFactory()`  [INFERRED]
+  infrastructure/fiber/router.go → services/file.go
 - `SetupRoutes()` --calls--> `NewFlashcardService()`  [INFERRED]
   infrastructure/fiber/router.go → services/flashcard.go
 - `SetupRoutes()` --calls--> `NewQuizService()`  [INFERRED]
   infrastructure/fiber/router.go → services/quiz.go
-- `SetupRoutes()` --calls--> `NewUserService()`  [INFERRED]
-  infrastructure/fiber/router.go → services/user.go
-- `SetupRoutes()` --calls--> `NewChatService()`  [INFERRED]
-  infrastructure/fiber/router.go → services/chat.go
 
-## Communities (59 total, 15 thin omitted)
+## Communities (59 total, 14 thin omitted)
 
 ### Community 1 - "Handler Components"
 Cohesion: 0.05
@@ -157,74 +157,78 @@ Cohesion: 0.13
 Nodes (5): NewFlashcardService(), flashcardService, appendRecentDate(), NewStreakService(), StreakService
 
 ### Community 18 - "Qdrant Vector DB Components"
-Cohesion: 0.17
-Nodes (5): GetFilesResponse, FileProcessorFactory, FileService, ImageProcessor, PdfProcessor
-
-### Community 19 - "PDF Processor Components"
 Cohesion: 0.16
 Nodes (8): ContextKey, GetUserIDFromString(), FiberContextKey, messageTypeProbe, NewMiddlewareManager(), MiddlewareManager, detectMessageActionType(), getUsageLimitError()
 
-### Community 20 - "File Handlers Fiber"
+### Community 19 - "PDF Processor Components"
 Cohesion: 0.13
 Nodes (13): ActionType, GetUsageStatusRequest, LimitPeriod, PlanLimits, PlanType, RevenueCatWebhookEvent, Subscription, SubscriptionRepository (+5 more)
 
-### Community 21 - "OAuth Provider Components"
-Cohesion: 0.23
-Nodes (9): handlerAdapter, handlerAdapter[R, Res], SetupRoutes(), getFileExtension(), isImageFile(), NewFileProcessorFactory(), NewFileService(), NewImageProcessor() (+1 more)
+### Community 20 - "File Handlers Fiber"
+Cohesion: 0.21
+Nodes (4): GetFilesResponse, FileService, ImageProcessor, PdfProcessor
 
-### Community 22 - "Fiber Dependency Components"
+### Community 21 - "OAuth Provider Components"
 Cohesion: 0.21
 Nodes (4): generateSessionKey(), OAuthDependenciesConfig, OAuthProvider, generateState()
+
+### Community 23 - "Subscription Service Components"
+Cohesion: 0.22
+Nodes (7): handlerAdapter, handlerAdapter[R, Res], SetupRoutes(), cleanupExpiredImages(), SetupCronJobs(), NewImageProcessor(), NewPdfProcessor()
 
 ### Community 24 - "S3 Service Components"
 Cohesion: 0.22
 Nodes (4): S3Config, S3Service, hasExtension(), NewS3Service()
 
-### Community 27 - "Image Processor Components"
+### Community 26 - "Chat Service Components"
 Cohesion: 0.33
-Nodes (4): NewSystemConfigHandler(), SystemConfigHandler, SystemConfigRequest, VersionResponse
+Nodes (5): getFileExtension(), isImageFile(), NewFileProcessorFactory(), NewFileService(), FileProcessorFactory
 
 ### Community 28 - "Main Application Components"
 Cohesion: 0.33
 Nodes (4): NewHealthcheckHandler(), HealthcheckHandler, HealthcheckRequest, HealthcheckResponse
 
-### Community 30 - "Mailersend Email Components"
+### Community 29 - "OAuth Handlers Components"
+Cohesion: 0.33
+Nodes (4): NewSystemConfigHandler(), SystemConfigHandler, SystemConfigRequest, VersionResponse
+
+### Community 31 - "System Handler Components"
 Cohesion: 0.4
 Nodes (5): Handle(), handleError(), HandlerInterface, Request, Response
 
-### Community 31 - "System Handler Components"
+### Community 32 - "Healthcheck Handler"
 Cohesion: 0.33
 Nodes (5): AuthCache, AuthRepository, AuthService, OAuthUserRegistrationData, SignupData
 
-### Community 32 - "Healthcheck Handler"
+### Community 33 - "Fiber Cookie Service"
 Cohesion: 0.4
 Nodes (3): NewMobileOAuthHandler(), MobileLoginRequest, MobileOAuthHandler
 
-### Community 33 - "Fiber Cookie Service"
+### Community 34 - "Fiber Handlers Components"
 Cohesion: 0.4
 Nodes (4): StreakRepository, StreakResponse, StreakService, UsageStats
 
-### Community 35 - "Jina Reranker Components"
+### Community 36 - "Auth Cache Components"
 Cohesion: 0.5
 Nodes (3): FCMClient, NotificationRepository, NotificationService
 
-### Community 36 - "Auth Cache Components"
+### Community 37 - "Mobile OAuth Components"
 Cohesion: 0.5
 Nodes (3): MailService, TokenPayload, TokenService
 
 ## Knowledge Gaps
 - **217 isolated node(s):** `questionResult`, `searchResult`, `RerankRequest`, `RerankResponse`, `ChunkingService` (+212 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `SetupRoutes()` connect `OAuth Provider Components` to `Handler Components`, `Quiz Components`, `Message Components`, `Pdf Chunking Components`, `User Service Components`, `File Chunk Components`, `User Handlers Components`, `Auth Handlers Components`, `JWE Service Components`, `Flashcard Components`, `Fiber Middleware Components`, `Plan Limits Subscription`, `PDF Processor Components`, `Chat Service Components`, `Image Processor Components`, `Main Application Components`, `Healthcheck Handler`, `Slog Logger Components`, `Streak Repository`, `Subscription DB Components`, `Notification Service`?**
+- **Why does `SetupRoutes()` connect `Subscription Service Components` to `Handler Components`, `Quiz Components`, `Message Components`, `Pdf Chunking Components`, `User Service Components`, `File Chunk Components`, `User Handlers Components`, `Auth Handlers Components`, `JWE Service Components`, `Flashcard Components`, `Fiber Middleware Components`, `Plan Limits Subscription`, `Qdrant Vector DB Components`, `Chat Service Components`, `Image Processor Components`, `Main Application Components`, `OAuth Handlers Components`, `Fiber Cookie Service`, `Streak Repository`, `Subscription DB Components`, `Notification Service`?**
   _High betweenness centrality (0.580) - this node is a cross-community bridge._
-- **Why does `NewAuthDependencyContainer()` connect `Handler Components` to `Chat Components`, `User Handlers Components`, `Auth Handlers Components`, `Streak Service Components`, `OAuth Provider Components`, `Subscription Service Components`, `S3 Service Components`, `Auth Handlers Components`?**
+- **Why does `NewAuthDependencyContainer()` connect `Handler Components` to `Chat Components`, `User Handlers Components`, `Auth Handlers Components`, `Streak Service Components`, `Fiber Dependency Components`, `Subscription Service Components`, `S3 Service Components`, `Auth Handlers Components`?**
   _High betweenness centrality (0.492) - this node is a cross-community bridge._
-- **Why does `Repository` connect `Repository Components` to `Auth Handlers Components`, `Fiber Handlers Components`?**
+- **Why does `Repository` connect `Repository Components` to `Auth Handlers Components`, `Jina Reranker Components`?**
   _High betweenness centrality (0.175) - this node is a cross-community bridge._
 - **Are the 32 inferred relationships involving `SetupRoutes()` (e.g. with `main()` and `NewAuthDependencyContainer()`) actually correct?**
   _`SetupRoutes()` has 32 INFERRED edges - model-reasoned connections that need verification._

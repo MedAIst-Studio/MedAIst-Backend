@@ -18,7 +18,7 @@
       "source_file": "jobs/cron.go",
       "source_location": "L1",
       "id": "jobs_cron_go",
-      "community": 41,
+      "community": 23,
       "norm_label": "cron.go"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "jobs/cron.go",
       "source_location": "L13",
       "id": "jobs_cron_setupcronjobs",
-      "community": 41,
+      "community": 23,
       "norm_label": "setupcronjobs()"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "jobs/cron.go",
       "source_location": "L92",
       "id": "jobs_cron_cleanupexpiredimages",
-      "community": 41,
+      "community": 23,
       "norm_label": "cleanupexpiredimages()"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L1",
       "id": "services_subscription_go",
-      "community": 23,
+      "community": 22,
       "norm_label": "subscription.go"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L12",
       "id": "services_subscriptionservice",
-      "community": 23,
+      "community": 22,
       "norm_label": "subscriptionservice"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L18",
       "id": "services_subscription_newsubscriptionservice",
-      "community": 23,
+      "community": 22,
       "norm_label": "newsubscriptionservice()"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L32",
       "id": "services_subscriptionservice_checkusagelimit",
-      "community": 23,
+      "community": 22,
       "norm_label": ".checkusagelimit()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L74",
       "id": "services_subscriptionservice_incrementusage",
-      "community": 23,
+      "community": 22,
       "norm_label": ".incrementusage()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L79",
       "id": "services_subscriptionservice_handlewebhookevent",
-      "community": 23,
+      "community": 22,
       "norm_label": ".handlewebhookevent()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L186",
       "id": "services_subscriptionservice_getusagestatus",
-      "community": 23,
+      "community": 22,
       "norm_label": ".getusagestatus()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L249",
       "id": "services_subscriptionservice_determineplantype",
-      "community": 23,
+      "community": 22,
       "norm_label": ".determineplantype()"
     },
     {
@@ -171,7 +171,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L265",
       "id": "services_subscriptionservice_detectentitlement",
-      "community": 23,
+      "community": 22,
       "norm_label": ".detectentitlement()"
     },
     {
@@ -180,7 +180,7 @@
       "source_file": "services/subscription.go",
       "source_location": "L275",
       "id": "services_subscriptionservice_getstartofperiod",
-      "community": 23,
+      "community": 22,
       "norm_label": ".getstartofperiod()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "services/file.go",
       "source_location": "L1",
       "id": "services_file_go",
-      "community": 21,
+      "community": 26,
       "norm_label": "file.go"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "services/file.go",
       "source_location": "L16",
       "id": "services_fileservice",
-      "community": 18,
+      "community": 20,
       "norm_label": "fileservice"
     },
     {
@@ -207,7 +207,7 @@
       "source_file": "services/file.go",
       "source_location": "L24",
       "id": "services_file_newfileservice",
-      "community": 21,
+      "community": 26,
       "norm_label": "newfileservice()"
     },
     {
@@ -216,7 +216,7 @@
       "source_file": "services/file.go",
       "source_location": "L40",
       "id": "services_fileservice_uploadfile",
-      "community": 18,
+      "community": 20,
       "norm_label": ".uploadfile()"
     },
     {
@@ -225,7 +225,7 @@
       "source_file": "services/file.go",
       "source_location": "L79",
       "id": "services_fileservice_getfilesbyuserid",
-      "community": 18,
+      "community": 20,
       "norm_label": ".getfilesbyuserid()"
     },
     {
@@ -234,7 +234,7 @@
       "source_file": "services/file.go",
       "source_location": "L105",
       "id": "services_fileservice_getfile",
-      "community": 18,
+      "community": 20,
       "norm_label": ".getfile()"
     },
     {
@@ -243,7 +243,7 @@
       "source_file": "services/file.go",
       "source_location": "L131",
       "id": "services_fileservice_deletefile",
-      "community": 18,
+      "community": 20,
       "norm_label": ".deletefile()"
     },
     {
@@ -252,7 +252,7 @@
       "source_file": "services/file.go",
       "source_location": "L152",
       "id": "services_fileservice_togglefilesaved",
-      "community": 18,
+      "community": 20,
       "norm_label": ".togglefilesaved()"
     },
     {
@@ -261,7 +261,7 @@
       "source_file": "services/file.go",
       "source_location": "L170",
       "id": "services_fileservice_recover",
-      "community": 18,
+      "community": 20,
       "norm_label": ".recover()"
     },
     {
@@ -270,7 +270,7 @@
       "source_file": "services/file.go",
       "source_location": "L178",
       "id": "services_fileprocessorfactory",
-      "community": 18,
+      "community": 26,
       "norm_label": "fileprocessorfactory"
     },
     {
@@ -279,7 +279,7 @@
       "source_file": "services/file.go",
       "source_location": "L183",
       "id": "services_file_newfileprocessorfactory",
-      "community": 21,
+      "community": 26,
       "norm_label": "newfileprocessorfactory()"
     },
     {
@@ -288,7 +288,7 @@
       "source_file": "services/file.go",
       "source_location": "L190",
       "id": "services_fileprocessorfactory_getprocessor",
-      "community": 18,
+      "community": 26,
       "norm_label": ".getprocessor()"
     },
     {
@@ -297,7 +297,7 @@
       "source_file": "services/file.go",
       "source_location": "L202",
       "id": "services_pdfprocessor",
-      "community": 18,
+      "community": 20,
       "norm_label": "pdfprocessor"
     },
     {
@@ -306,7 +306,7 @@
       "source_file": "services/file.go",
       "source_location": "L212",
       "id": "services_file_newpdfprocessor",
-      "community": 21,
+      "community": 23,
       "norm_label": "newpdfprocessor()"
     },
     {
@@ -315,7 +315,7 @@
       "source_file": "services/file.go",
       "source_location": "L224",
       "id": "services_pdfprocessor_process",
-      "community": 18,
+      "community": 20,
       "norm_label": ".process()"
     },
     {
@@ -324,7 +324,7 @@
       "source_file": "services/file.go",
       "source_location": "L309",
       "id": "services_pdfprocessor_recover",
-      "community": 18,
+      "community": 20,
       "norm_label": ".recover()"
     },
     {
@@ -333,7 +333,7 @@
       "source_file": "services/file.go",
       "source_location": "L315",
       "id": "services_imageprocessor",
-      "community": 18,
+      "community": 20,
       "norm_label": "imageprocessor"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "services/file.go",
       "source_location": "L317",
       "id": "services_file_newimageprocessor",
-      "community": 21,
+      "community": 23,
       "norm_label": "newimageprocessor()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "services/file.go",
       "source_location": "L321",
       "id": "services_imageprocessor_process",
-      "community": 18,
+      "community": 20,
       "norm_label": ".process()"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "services/file.go",
       "source_location": "L339",
       "id": "services_file_getfileextension",
-      "community": 21,
+      "community": 26,
       "norm_label": "getfileextension()"
     },
     {
@@ -378,7 +378,7 @@
       "source_file": "services/file.go",
       "source_location": "L346",
       "id": "services_file_isimagefile",
-      "community": 21,
+      "community": 26,
       "norm_label": "isimagefile()"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "services/chat.go",
       "source_location": "L1",
       "id": "services_chat_go",
-      "community": 26,
+      "community": 27,
       "norm_label": "chat.go"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "services/chat.go",
       "source_location": "L10",
       "id": "services_chatservice",
-      "community": 26,
+      "community": 27,
       "norm_label": "chatservice"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "services/chat.go",
       "source_location": "L14",
       "id": "services_chat_newchatservice",
-      "community": 26,
+      "community": 27,
       "norm_label": "newchatservice()"
     },
     {
@@ -693,7 +693,7 @@
       "source_file": "services/chat.go",
       "source_location": "L20",
       "id": "services_chatservice_getchatsbyuserid",
-      "community": 26,
+      "community": 27,
       "norm_label": ".getchatsbyuserid()"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "services/chat.go",
       "source_location": "L24",
       "id": "services_chatservice_getchatbyid",
-      "community": 26,
+      "community": 27,
       "norm_label": ".getchatbyid()"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "services/chat.go",
       "source_location": "L28",
       "id": "services_chatservice_updatechat",
-      "community": 26,
+      "community": 27,
       "norm_label": ".updatechat()"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "services/chat.go",
       "source_location": "L32",
       "id": "services_chatservice_deletechat",
-      "community": 26,
+      "community": 27,
       "norm_label": ".deletechat()"
     },
     {
@@ -1089,7 +1089,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L1",
       "id": "repository_subscription_go",
-      "community": 34,
+      "community": 35,
       "norm_label": "subscription.go"
     },
     {
@@ -1116,7 +1116,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L54",
       "id": "repository_repository_upsertsubscription",
-      "community": 34,
+      "community": 35,
       "norm_label": ".upsertsubscription()"
     },
     {
@@ -1152,7 +1152,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L121",
       "id": "repository_subscription_nullstring",
-      "community": 34,
+      "community": 35,
       "norm_label": "nullstring()"
     },
     {
@@ -1161,7 +1161,7 @@
       "source_file": "repository/subscription.go",
       "source_location": "L128",
       "id": "repository_subscription_nulltime",
-      "community": 34,
+      "community": 35,
       "norm_label": "nulltime()"
     },
     {
@@ -2880,7 +2880,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_cookie_go",
-      "community": 29,
+      "community": 30,
       "norm_label": "cookie.go"
     },
     {
@@ -2889,7 +2889,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L11",
       "id": "fiber_fibercookieservice",
-      "community": 29,
+      "community": 30,
       "norm_label": "fibercookieservice"
     },
     {
@@ -2898,7 +2898,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L13",
       "id": "fiber_cookie_newcookieservice",
-      "community": 29,
+      "community": 30,
       "norm_label": "newcookieservice()"
     },
     {
@@ -2907,7 +2907,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L17",
       "id": "fiber_fibercookieservice_setrefreshtoken",
-      "community": 29,
+      "community": 30,
       "norm_label": ".setrefreshtoken()"
     },
     {
@@ -2916,7 +2916,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L32",
       "id": "fiber_fibercookieservice_setaccesstoken",
-      "community": 29,
+      "community": 30,
       "norm_label": ".setaccesstoken()"
     },
     {
@@ -2925,7 +2925,7 @@
       "source_file": "infrastructure/fiber/cookie.go",
       "source_location": "L47",
       "id": "fiber_fibercookieservice_removetokens",
-      "community": 29,
+      "community": 30,
       "norm_label": ".removetokens()"
     },
     {
@@ -2934,7 +2934,7 @@
       "source_file": "infrastructure/fiber/middleware.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_middleware_go",
-      "community": 19,
+      "community": 18,
       "norm_label": "middleware.go"
     },
     {
@@ -2943,7 +2943,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L13",
       "id": "fiber_middlewaremanager",
-      "community": 19,
+      "community": 18,
       "norm_label": "middlewaremanager"
     },
     {
@@ -2952,7 +2952,7 @@
       "source_file": "infrastructure/fiber/middleware.go",
       "source_location": "L17",
       "id": "fiber_middleware_newmiddlewaremanager",
-      "community": 19,
+      "community": 18,
       "norm_label": "newmiddlewaremanager()"
     },
     {
@@ -2961,7 +2961,7 @@
       "source_file": "infrastructure/fiber/middleware.go",
       "source_location": "L25",
       "id": "fiber_middlewaremanager_authmiddleware",
-      "community": 19,
+      "community": 18,
       "norm_label": ".authmiddleware()"
     },
     {
@@ -2970,7 +2970,7 @@
       "source_file": "infrastructure/fiber/middleware.go",
       "source_location": "L55",
       "id": "fiber_fibercontextkey",
-      "community": 19,
+      "community": 18,
       "norm_label": "fibercontextkey"
     },
     {
@@ -2979,7 +2979,7 @@
       "source_file": "infrastructure/fiber/middleware.go",
       "source_location": "L57",
       "id": "fiber_middleware_contextmiddleware",
-      "community": 19,
+      "community": 18,
       "norm_label": "contextmiddleware()"
     },
     {
@@ -2988,7 +2988,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_usage_middleware_go",
-      "community": 19,
+      "community": 18,
       "norm_label": "usage_middleware.go"
     },
     {
@@ -2997,7 +2997,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L13",
       "id": "fiber_middlewaremanager_usagelimitmiddleware",
-      "community": 19,
+      "community": 18,
       "norm_label": ".usagelimitmiddleware()"
     },
     {
@@ -3006,7 +3006,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L65",
       "id": "fiber_middlewaremanager_messageusagelimitmiddleware",
-      "community": 19,
+      "community": 18,
       "norm_label": ".messageusagelimitmiddleware()"
     },
     {
@@ -3015,7 +3015,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L115",
       "id": "fiber_messagetypeprobe",
-      "community": 19,
+      "community": 18,
       "norm_label": "messagetypeprobe"
     },
     {
@@ -3024,7 +3024,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L121",
       "id": "fiber_usage_middleware_detectmessageactiontype",
-      "community": 19,
+      "community": 18,
       "norm_label": "detectmessageactiontype()"
     },
     {
@@ -3033,7 +3033,7 @@
       "source_file": "infrastructure/fiber/usage_middleware.go",
       "source_location": "L137",
       "id": "fiber_usage_middleware_getusagelimiterror",
-      "community": 19,
+      "community": 18,
       "norm_label": "getusagelimiterror()"
     },
     {
@@ -3096,7 +3096,7 @@
       "source_file": "infrastructure/fiber/router.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_router_go",
-      "community": 21,
+      "community": 23,
       "norm_label": "router.go"
     },
     {
@@ -3105,7 +3105,7 @@
       "source_file": "infrastructure/fiber/router.go",
       "source_location": "L92",
       "id": "fiber_handleradapter",
-      "community": 21,
+      "community": 23,
       "norm_label": "handleradapter"
     },
     {
@@ -3114,7 +3114,7 @@
       "source_file": "infrastructure/fiber/router.go",
       "source_location": "L96",
       "id": "fiber_handleradapter_r_res",
-      "community": 21,
+      "community": 23,
       "norm_label": "handleradapter[r, res]"
     },
     {
@@ -3123,7 +3123,7 @@
       "source_file": "infrastructure/fiber/router.go",
       "source_location": "L96",
       "id": "fiber_handleradapter_r_res_handle",
-      "community": 21,
+      "community": 23,
       "norm_label": ".handle()"
     },
     {
@@ -3132,7 +3132,7 @@
       "source_file": "infrastructure/fiber/router.go",
       "source_location": "L100",
       "id": "fiber_router_setuproutes",
-      "community": 21,
+      "community": 23,
       "norm_label": "setuproutes()"
     },
     {
@@ -3195,7 +3195,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L1",
       "id": "infrastructure_fiber_handler_go",
-      "community": 30,
+      "community": 31,
       "norm_label": "handler.go"
     },
     {
@@ -3204,7 +3204,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L15",
       "id": "fiber_request",
-      "community": 30,
+      "community": 31,
       "norm_label": "request"
     },
     {
@@ -3213,7 +3213,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L16",
       "id": "fiber_response",
-      "community": 30,
+      "community": 31,
       "norm_label": "response"
     },
     {
@@ -3222,7 +3222,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L18",
       "id": "fiber_handlerinterface",
-      "community": 30,
+      "community": 31,
       "norm_label": "handlerinterface"
     },
     {
@@ -3231,7 +3231,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L23",
       "id": "fiber_handler_handle",
-      "community": 30,
+      "community": 31,
       "norm_label": "handle()"
     },
     {
@@ -3240,7 +3240,7 @@
       "source_file": "infrastructure/fiber/handler.go",
       "source_location": "L109",
       "id": "fiber_handler_handleerror",
-      "community": 30,
+      "community": 31,
       "norm_label": "handleerror()"
     },
     {
@@ -3537,7 +3537,7 @@
       "source_file": "infrastructure/oauth/redirect.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_redirect_go",
-      "community": 22,
+      "community": 21,
       "norm_label": "redirect.go"
     },
     {
@@ -3546,7 +3546,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L21",
       "id": "oauth_oauthprovider",
-      "community": 22,
+      "community": 21,
       "norm_label": "oauthprovider"
     },
     {
@@ -3555,7 +3555,7 @@
       "source_file": "infrastructure/oauth/redirect.go",
       "source_location": "L11",
       "id": "oauth_oauthprovider_redirecthandler",
-      "community": 22,
+      "community": 21,
       "norm_label": ".redirecthandler()"
     },
     {
@@ -3564,7 +3564,7 @@
       "source_file": "infrastructure/oauth/redirect.go",
       "source_location": "L26",
       "id": "oauth_redirect_generatestate",
-      "community": 22,
+      "community": 21,
       "norm_label": "generatestate()"
     },
     {
@@ -3573,7 +3573,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_callback_go",
-      "community": 22,
+      "community": 21,
       "norm_label": "callback.go"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L16",
       "id": "oauth_oauthprovider_callback",
-      "community": 22,
+      "community": 21,
       "norm_label": ".callback()"
     },
     {
@@ -3591,7 +3591,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L64",
       "id": "oauth_oauthprovider_getclouduserinfo",
-      "community": 22,
+      "community": 21,
       "norm_label": ".getclouduserinfo()"
     },
     {
@@ -3600,7 +3600,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L79",
       "id": "oauth_oauthprovider_redirecttofrontendwitherror",
-      "community": 22,
+      "community": 21,
       "norm_label": ".redirecttofrontendwitherror()"
     },
     {
@@ -3609,7 +3609,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L84",
       "id": "oauth_oauthprovider_redirecttofrontendcallback",
-      "community": 22,
+      "community": 21,
       "norm_label": ".redirecttofrontendcallback()"
     },
     {
@@ -3618,7 +3618,7 @@
       "source_file": "infrastructure/oauth/callback.go",
       "source_location": "L89",
       "id": "oauth_callback_generatesessionkey",
-      "community": 22,
+      "community": 21,
       "norm_label": "generatesessionkey()"
     },
     {
@@ -3681,7 +3681,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_mobile_go",
-      "community": 32,
+      "community": 33,
       "norm_label": "mobile.go"
     },
     {
@@ -3690,7 +3690,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L10",
       "id": "oauth_mobileoauthhandler",
-      "community": 32,
+      "community": 33,
       "norm_label": "mobileoauthhandler"
     },
     {
@@ -3699,7 +3699,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L16",
       "id": "oauth_mobile_newmobileoauthhandler",
-      "community": 32,
+      "community": 33,
       "norm_label": "newmobileoauthhandler()"
     },
     {
@@ -3708,7 +3708,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L24",
       "id": "oauth_mobileloginrequest",
-      "community": 32,
+      "community": 33,
       "norm_label": "mobileloginrequest"
     },
     {
@@ -3717,7 +3717,7 @@
       "source_file": "infrastructure/oauth/mobile.go",
       "source_location": "L41",
       "id": "oauth_mobileoauthhandler_handle",
-      "community": 32,
+      "community": 33,
       "norm_label": ".handle()"
     },
     {
@@ -3726,7 +3726,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L1",
       "id": "infrastructure_oauth_config_go",
-      "community": 22,
+      "community": 21,
       "norm_label": "config.go"
     },
     {
@@ -3735,7 +3735,7 @@
       "source_file": "infrastructure/oauth/config.go",
       "source_location": "L8",
       "id": "oauth_oauthdependenciesconfig",
-      "community": 22,
+      "community": 21,
       "norm_label": "oauthdependenciesconfig"
     },
     {
@@ -3888,7 +3888,7 @@
       "source_file": "handlers/flashcard/flashcard.go",
       "source_location": "L1",
       "id": "handlers_flashcard_flashcard_go",
-      "community": 38,
+      "community": 39,
       "norm_label": "flashcard.go"
     },
     {
@@ -3897,7 +3897,7 @@
       "source_file": "handlers/flashcard/flashcard.go",
       "source_location": "L9",
       "id": "flashcard_flashcardconfig",
-      "community": 38,
+      "community": 39,
       "norm_label": "flashcardconfig"
     },
     {
@@ -3915,7 +3915,7 @@
       "source_file": "handlers/flashcard/flashcard.go",
       "source_location": "L17",
       "id": "flashcard_flashcard_newflashcardhandler",
-      "community": 38,
+      "community": 39,
       "norm_label": "newflashcardhandler()"
     },
     {
@@ -3978,7 +3978,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L1",
       "id": "handlers_file_file_go",
-      "community": 40,
+      "community": 41,
       "norm_label": "file.go"
     },
     {
@@ -3987,7 +3987,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L11",
       "id": "file_fileconfig",
-      "community": 40,
+      "community": 41,
       "norm_label": "fileconfig"
     },
     {
@@ -4005,7 +4005,7 @@
       "source_file": "handlers/file/file.go",
       "source_location": "L19",
       "id": "file_file_newfilehandler",
-      "community": 40,
+      "community": 41,
       "norm_label": "newfilehandler()"
     },
     {
@@ -4131,7 +4131,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L1",
       "id": "handlers_quiz_quiz_go",
-      "community": 39,
+      "community": 40,
       "norm_label": "quiz.go"
     },
     {
@@ -4140,7 +4140,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L9",
       "id": "quiz_quizconfig",
-      "community": 39,
+      "community": 40,
       "norm_label": "quizconfig"
     },
     {
@@ -4158,7 +4158,7 @@
       "source_file": "handlers/quiz/quiz.go",
       "source_location": "L17",
       "id": "quiz_quiz_newquizhandler",
-      "community": 39,
+      "community": 40,
       "norm_label": "newquizhandler()"
     },
     {
@@ -4491,7 +4491,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L1",
       "id": "handlers_system_handler_go",
-      "community": 27,
+      "community": 29,
       "norm_label": "handler.go"
     },
     {
@@ -4500,7 +4500,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L8",
       "id": "system_systemconfigrequest",
-      "community": 27,
+      "community": 29,
       "norm_label": "systemconfigrequest"
     },
     {
@@ -4509,7 +4509,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L10",
       "id": "system_versionresponse",
-      "community": 27,
+      "community": 29,
       "norm_label": "versionresponse"
     },
     {
@@ -4518,7 +4518,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L19",
       "id": "system_systemconfighandler",
-      "community": 27,
+      "community": 29,
       "norm_label": "systemconfighandler"
     },
     {
@@ -4527,7 +4527,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L31",
       "id": "system_handler_newsystemconfighandler",
-      "community": 27,
+      "community": 29,
       "norm_label": "newsystemconfighandler()"
     },
     {
@@ -4536,7 +4536,7 @@
       "source_file": "handlers/system/handler.go",
       "source_location": "L35",
       "id": "system_systemconfighandler_handle",
-      "community": 27,
+      "community": 29,
       "norm_label": ".handle()"
     },
     {
@@ -4887,7 +4887,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L1",
       "id": "domain_notification_go",
-      "community": 35,
+      "community": 36,
       "norm_label": "notification.go"
     },
     {
@@ -4896,7 +4896,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L20",
       "id": "domain_notificationrepository",
-      "community": 35,
+      "community": 36,
       "norm_label": "notificationrepository"
     },
     {
@@ -4905,7 +4905,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L26",
       "id": "domain_notificationservice",
-      "community": 35,
+      "community": 36,
       "norm_label": "notificationservice"
     },
     {
@@ -4914,7 +4914,7 @@
       "source_file": "domain/notification.go",
       "source_location": "L32",
       "id": "domain_fcmclient",
-      "community": 35,
+      "community": 36,
       "norm_label": "fcmclient"
     },
     {
@@ -5031,7 +5031,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L1",
       "id": "domain_subscription_go",
-      "community": 20,
+      "community": 19,
       "norm_label": "subscription.go"
     },
     {
@@ -5040,7 +5040,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L12",
       "id": "domain_plantype",
-      "community": 20,
+      "community": 19,
       "norm_label": "plantype"
     },
     {
@@ -5049,7 +5049,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L38",
       "id": "domain_limitperiod",
-      "community": 20,
+      "community": 19,
       "norm_label": "limitperiod"
     },
     {
@@ -5058,7 +5058,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L47",
       "id": "domain_actiontype",
-      "community": 20,
+      "community": 19,
       "norm_label": "actiontype"
     },
     {
@@ -5067,7 +5067,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L61",
       "id": "domain_planlimits",
-      "community": 20,
+      "community": 19,
       "norm_label": "planlimits"
     },
     {
@@ -5076,7 +5076,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L71",
       "id": "domain_usagelimitsconfig",
-      "community": 20,
+      "community": 19,
       "norm_label": "usagelimitsconfig"
     },
     {
@@ -5094,7 +5094,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L127",
       "id": "domain_planlimits_getlimit",
-      "community": 20,
+      "community": 19,
       "norm_label": ".getlimit()"
     },
     {
@@ -5103,7 +5103,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L146",
       "id": "domain_subscription",
-      "community": 20,
+      "community": 19,
       "norm_label": "subscription"
     },
     {
@@ -5112,7 +5112,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L162",
       "id": "domain_usagerecord",
-      "community": 20,
+      "community": 19,
       "norm_label": "usagerecord"
     },
     {
@@ -5121,7 +5121,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L172",
       "id": "domain_revenuecatwebhookevent",
-      "community": 20,
+      "community": 19,
       "norm_label": "revenuecatwebhookevent"
     },
     {
@@ -5130,7 +5130,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L178",
       "id": "domain_usagestatusresponse",
-      "community": 20,
+      "community": 19,
       "norm_label": "usagestatusresponse"
     },
     {
@@ -5139,7 +5139,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L184",
       "id": "domain_usagedetail",
-      "community": 20,
+      "community": 19,
       "norm_label": "usagedetail"
     },
     {
@@ -5148,7 +5148,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L190",
       "id": "domain_getusagestatusrequest",
-      "community": 20,
+      "community": 19,
       "norm_label": "getusagestatusrequest"
     },
     {
@@ -5157,7 +5157,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L194",
       "id": "domain_subscriptionrepository",
-      "community": 20,
+      "community": 19,
       "norm_label": "subscriptionrepository"
     },
     {
@@ -5166,7 +5166,7 @@
       "source_file": "domain/subscription.go",
       "source_location": "L205",
       "id": "domain_subscriptionservice",
-      "community": 20,
+      "community": 19,
       "norm_label": "subscriptionservice"
     },
     {
@@ -5193,7 +5193,7 @@
       "source_file": "domain/util.go",
       "source_location": "L1",
       "id": "domain_util_go",
-      "community": 19,
+      "community": 18,
       "norm_label": "util.go"
     },
     {
@@ -5202,7 +5202,7 @@
       "source_file": "domain/util.go",
       "source_location": "L10",
       "id": "domain_contextkey",
-      "community": 19,
+      "community": 18,
       "norm_label": "contextkey"
     },
     {
@@ -5220,7 +5220,7 @@
       "source_file": "domain/util.go",
       "source_location": "L22",
       "id": "domain_util_getuseridfromstring",
-      "community": 19,
+      "community": 18,
       "norm_label": "getuseridfromstring()"
     },
     {
@@ -5238,7 +5238,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L1",
       "id": "domain_interfaces_go",
-      "community": 36,
+      "community": 37,
       "norm_label": "interfaces.go"
     },
     {
@@ -5247,7 +5247,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L7",
       "id": "domain_tokenpayload",
-      "community": 36,
+      "community": 37,
       "norm_label": "tokenpayload"
     },
     {
@@ -5256,7 +5256,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L11",
       "id": "domain_tokenservice",
-      "community": 36,
+      "community": 37,
       "norm_label": "tokenservice"
     },
     {
@@ -5265,7 +5265,7 @@
       "source_file": "domain/interfaces.go",
       "source_location": "L20",
       "id": "domain_mailservice",
-      "community": 36,
+      "community": 37,
       "norm_label": "mailservice"
     },
     {
@@ -5337,7 +5337,7 @@
       "source_file": "domain/file.go",
       "source_location": "L58",
       "id": "domain_getfilesresponse",
-      "community": 18,
+      "community": 20,
       "norm_label": "getfilesresponse"
     },
     {
@@ -5994,7 +5994,7 @@
       "source_file": "domain/error.go",
       "source_location": "L1",
       "id": "domain_error_go",
-      "community": 37,
+      "community": 38,
       "norm_label": "error.go"
     },
     {
@@ -6003,7 +6003,7 @@
       "source_file": "domain/error.go",
       "source_location": "L5",
       "id": "domain_error",
-      "community": 37,
+      "community": 38,
       "norm_label": "error"
     },
     {
@@ -6012,7 +6012,7 @@
       "source_file": "domain/error.go",
       "source_location": "L11",
       "id": "domain_error_error",
-      "community": 37,
+      "community": 38,
       "norm_label": ".error()"
     },
     {
@@ -6021,7 +6021,7 @@
       "source_file": "domain/error.go",
       "source_location": "L15",
       "id": "domain_error_newerror",
-      "community": 37,
+      "community": 38,
       "norm_label": "newerror()"
     },
     {
@@ -6471,7 +6471,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L1",
       "id": "domain_auth_go",
-      "community": 31,
+      "community": 32,
       "norm_label": "auth.go"
     },
     {
@@ -6480,7 +6480,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L7",
       "id": "domain_authservice",
-      "community": 31,
+      "community": 32,
       "norm_label": "authservice"
     },
     {
@@ -6489,7 +6489,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L15",
       "id": "domain_authrepository",
-      "community": 31,
+      "community": 32,
       "norm_label": "authrepository"
     },
     {
@@ -6498,7 +6498,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L26",
       "id": "domain_signupdata",
-      "community": 31,
+      "community": 32,
       "norm_label": "signupdata"
     },
     {
@@ -6507,7 +6507,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L31",
       "id": "domain_oauthuserregistrationdata",
-      "community": 31,
+      "community": 32,
       "norm_label": "oauthuserregistrationdata"
     },
     {
@@ -6516,7 +6516,7 @@
       "source_file": "domain/auth.go",
       "source_location": "L36",
       "id": "domain_authcache",
-      "community": 31,
+      "community": 32,
       "norm_label": "authcache"
     },
     {
@@ -6525,7 +6525,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L1",
       "id": "domain_streak_go",
-      "community": 33,
+      "community": 34,
       "norm_label": "streak.go"
     },
     {
@@ -6534,7 +6534,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L10",
       "id": "domain_usagestats",
-      "community": 33,
+      "community": 34,
       "norm_label": "usagestats"
     },
     {
@@ -6543,7 +6543,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L19",
       "id": "domain_streakresponse",
-      "community": 33,
+      "community": 34,
       "norm_label": "streakresponse"
     },
     {
@@ -6552,7 +6552,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L26",
       "id": "domain_streakrepository",
-      "community": 33,
+      "community": 34,
       "norm_label": "streakrepository"
     },
     {
@@ -6561,7 +6561,7 @@
       "source_file": "domain/streak.go",
       "source_location": "L32",
       "id": "domain_streakservice",
-      "community": 33,
+      "community": 34,
       "norm_label": "streakservice"
     },
     {
@@ -15562,5 +15562,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "cddcdc704275b9c48591a64bfbadec6f1bf0ad47"
+  "built_at_commit": "360eb2b4bf882d4f750c2b79659804ecf0e48897"
 }
